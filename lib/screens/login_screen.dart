@@ -12,17 +12,18 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
   bool _registerMode = false;
   bool _busy = false;
   bool _showPassword = false;
-  bool _rememberMe = false;
   String? _message;
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -43,6 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
         final result = await service.signUp(
           email: _emailController.text,
           password: _passwordController.text,
+          fullName: _nameController.text,
         );
         if (mounted) {
           setState(() => _message = result);
@@ -105,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 16),
                   const Text(
-                    'S.I.G.V.A.C.H.',
+                    'SI.G.VA.C.H.',
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w800,
@@ -135,6 +137,29 @@ class _LoginScreenState extends State<LoginScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
                       const SizedBox(height: 8),
+                      if (_registerMode) ...<Widget>[
+                        TextFormField(
+                          controller: _nameController,
+                          textCapitalization: TextCapitalization.words,
+                          decoration: InputDecoration(
+                            labelText: 'Nombres',
+                            prefixIcon: const Icon(Icons.badge_outlined),
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Ingresa tus nombres';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                      ],
                       TextFormField(
                         controller: _emailController,
                         decoration: InputDecoration(
@@ -194,18 +219,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ],
-                      Row(
-                        children: <Widget>[
-                          Checkbox(
-                            value: _rememberMe,
-                            activeColor: _actionGreen,
-                            onChanged: (value) {
-                              setState(() => _rememberMe = value ?? false);
-                            },
-                          ),
-                          const Text('Recordarme'),
-                        ],
-                      ),
+                      // Espaciador que conserva la distancia que ocupaba
+                      // la fila "Recordarme" (checkbox ~48px).
+                      const SizedBox(height: 48),
                       const SizedBox(height: 8),
                       FilledButton.icon(
                         onPressed: _busy ? null : _submit,

@@ -15,10 +15,15 @@ class AuthService {
   Future<String> signUp({
     required String email,
     required String password,
+    String? fullName,
   }) async {
     final response = await client.auth.signUp(
       email: email.trim(),
       password: password,
+      // Guarda el nombre en los metadatos del usuario (auth.users).
+      data: (fullName == null || fullName.trim().isEmpty)
+          ? null
+          : {'full_name': fullName.trim()},
     );
 
     if (response.session == null) {

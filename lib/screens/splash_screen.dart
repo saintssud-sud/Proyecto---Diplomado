@@ -93,7 +93,7 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
                 const SizedBox(height: 28),
                 const Text(
-                  'S.I.G.V.A.C.H.',
+                  'SI.G.VA.C.H.',
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.w800,

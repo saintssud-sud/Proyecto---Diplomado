@@ -5,20 +5,41 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../config/app_config.dart';
 import '../controllers/preferences_controller.dart';
 import '../widgets/max_width_box.dart';
-import '../widgets/mode_banner.dart';
 import 'about_adaptation_screen.dart';
+import 'ajustes/ajustes_screen.dart';
+import 'alertas/alertas_screen.dart';
 import 'context/context_lab_screen.dart';
+import 'cultivos/cultivos_screen.dart';
+import 'historial/historial_screen.dart';
 import 'records_screen.dart';
 import 'settings_screen.dart';
+import 'variables/variables_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _tabIndex = 0;
+
+  void _onTabSelected(int index) {
+    setState(() => _tabIndex = index);
+  }
 
   @override
   Widget build(BuildContext context) {
     final config = context.watch<AppConfig>();
     final preferences = context.watch<PreferencesController>();
-    final name = preferences.name.isEmpty ? 'Diplomante' : preferences.name;
+    // Prioriza el nombre guardado en Supabase (full_name) al registrarse.
+    final supabaseUser = Supabase.instance.client.auth.currentUser;
+    final supabaseName =
+        (supabaseUser?.userMetadata?['full_name'] as String?)?.trim() ?? '';
+    final name = supabaseName.isNotEmpty
+        ? supabaseName
+        : (preferences.name.isEmpty ? 'Diplomante' : preferences.name);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF2F3F5),
@@ -26,10 +47,18 @@ class HomeScreen extends StatelessWidget {
         backgroundColor: const Color(0xFF39B54A),
         foregroundColor: Colors.white,
         elevation: 0,
+        centerTitle: true,
         title: const Text(
-          'Dashboard Principal',
+          'SIGVACH',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined),
+            tooltip: 'Alertas',
+            onPressed: () => _onTabSelected(3),
+          ),
+        ],
       ),
       drawer: Drawer(
         child: ListView(
@@ -140,70 +169,41 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-      body: Column(
+      body: IndexedStack(
+        index: _tabIndex,
         children: <Widget>[
-          const ModeBanner(),
-          Expanded(
-            child: MaxWidthBox(
-              child: ListView(
-                padding: const EdgeInsets.all(16),
-                children: <Widget>[
-                  const _WelcomeBanner(),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Valores actuales del laboratorio',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  GridView.count(
-                    crossAxisCount: 2,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 1.15,
-                    children: const <Widget>[
-                      _MetricCard(
-                        icon: Icons.thermostat,
-                        color: Color(0xFF2E7D32),
-                        bgColor: Color(0xFFE8F5E9),
-                        label: 'Temperatura',
-                        value: '22.8',
-                        unit: '°C',
-                      ),
-                      _MetricCard(
-                        icon: Icons.science_outlined,
-                        color: Color(0xFFC62828),
-                        bgColor: Color(0xFFFFEBEE),
-                        label: 'pH',
-                        value: '5.9',
-                        unit: '',
-                      ),
-                      _MetricCard(
-                        icon: Icons.graphic_eq,
-                        color: Color(0xFFE65100),
-                        bgColor: Color(0xFFFFF3E0),
-                        label: 'Conductividad',
-                        value: '1.59',
-                        unit: 'mS/cm',
-                      ),
-                      _MetricCard(
-                        icon: Icons.water_drop_outlined,
-                        color: Color(0xFF1565C0),
-                        bgColor: Color(0xFFE3F2FD),
-                        label: 'Nivel de Agua',
-                        value: '72',
-                        unit: '%',
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  const _SystemStatusCard(),
-                  const SizedBox(height: 24),
-                ],
-              ),
-            ),
+          _DashboardView(preferences: preferences),
+          const VariablesScreen(),
+          const CultivosScreen(),
+          const AlertasScreen(),
+          const HistorialScreen(),
+          const AjustesScreen(),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _tabIndex,
+        onTap: _onTabSelected,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: const Color(0xFF39B54A),
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.show_chart),
+            label: 'Variables',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.eco_outlined),
+            label: 'Cultivos',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.notifications_outlined),
+            label: 'Alertas',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            label: 'Historial',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Ajustes'),
         ],
       ),
     );
@@ -235,42 +235,258 @@ class _DrawerItem extends StatelessWidget {
   }
 }
 
-class _WelcomeBanner extends StatelessWidget {
-  const _WelcomeBanner();
+class _DashboardView extends StatelessWidget {
+  const _DashboardView({required this.preferences});
+
+  final PreferencesController preferences;
+
+  static String _fmt(double value) {
+    return value == value.roundToDouble()
+        ? value.toStringAsFixed(0)
+        : value.toStringAsFixed(1);
+  }
+
+  Future<void> _editarValores(BuildContext context) async {
+    final p = context.read<PreferencesController>();
+    final temp = TextEditingController(text: p.temperature.toString());
+    final hum = TextEditingController(text: p.humidity.toString());
+    final ph = TextEditingController(text: p.ph.toString());
+    final tds = TextEditingController(text: p.tds.toString());
+    final agua = TextEditingController(text: p.waterLevel.toString());
+
+    final guardar = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Editar valores'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                controller: temp,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(
+                  labelText: 'Temperatura (°C)',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: hum,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(
+                  labelText: 'Humedad (%)',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: ph,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(
+                  labelText: 'pH',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: tds,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(
+                  labelText: 'TDS (ppm)',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: agua,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(
+                  labelText: 'Nivel de agua (%)',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFF39B54A),
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Guardar'),
+          ),
+        ],
+      ),
+    );
+
+    if (guardar == true && context.mounted) {
+      await p.actualizarValores(
+        temperatura:
+            double.tryParse(temp.text.replaceAll(',', '.')) ?? p.temperature,
+        humedad: double.tryParse(hum.text.replaceAll(',', '.')) ?? p.humidity,
+        ph: double.tryParse(ph.text.replaceAll(',', '.')) ?? p.ph,
+        tds: double.tryParse(tds.text.replaceAll(',', '.')) ?? p.tds,
+        nivelAgua:
+            double.tryParse(agua.text.replaceAll(',', '.')) ?? p.waterLevel,
+      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Valores actualizados y guardados')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    return MaxWidthBox(
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: <Widget>[
+          _StatusBanner(
+            hayAlertas: preferences.alertas.any((a) => a.estado == 'Activa'),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: _MetricCard(
+                  icon: Icons.thermostat_outlined,
+                  color: const Color(0xFFE65100),
+                  label: 'Temperatura',
+                  value: '${_fmt(preferences.temperature)} °C',
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _MetricCard(
+                  icon: Icons.water_drop_outlined,
+                  color: const Color(0xFF1565C0),
+                  label: 'Humedad',
+                  value: '${_fmt(preferences.humidity)} %',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: _MetricCard(
+                  icon: Icons.science_outlined,
+                  color: const Color(0xFFC62828),
+                  label: 'pH',
+                  value: _fmt(preferences.ph),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _MetricCard(
+                  icon: Icons.eco_outlined,
+                  color: const Color(0xFF2E7D32),
+                  label: 'TDS',
+                  value: '${_fmt(preferences.tds)} ppm',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _MetricCard(
+            icon: Icons.water_drop_outlined,
+            color: const Color(0xFF1565C0),
+            label: 'Nivel de agua',
+            value: '${_fmt(preferences.waterLevel)} %',
+          ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: () => _editarValores(context),
+              icon: const Icon(Icons.edit_outlined, size: 18),
+              label: const Text('Editar valores'),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              const Text(
+                'Última actualización:',
+                style: TextStyle(color: Colors.grey, fontSize: 13),
+              ),
+              Text(
+                preferences.lastUpdate,
+                style: const TextStyle(
+                  color: Colors.black87,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatusBanner extends StatelessWidget {
+  const _StatusBanner({required this.hayAlertas});
+
+  final bool hayAlertas;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = hayAlertas
+        ? const Color(0xFFE65100)
+        : const Color(0xFF2E7D32);
+    final icono = hayAlertas ? Icons.warning_amber_rounded : Icons.check_circle;
+    final titulo = hayAlertas ? 'Sistema con alertas' : 'Sistema normal';
+    final subtitulo = hayAlertas
+        ? 'Algunos parámetros están fuera de rango'
+        : 'Todo dentro del rango óptimo';
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF39B54A),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: const Row(
+      child: Row(
         children: <Widget>[
-          CircleAvatar(
-            radius: 26,
-            backgroundColor: Colors.white24,
-            child: Icon(Icons.insights, color: Colors.white, size: 30),
-          ),
-          SizedBox(width: 14),
+          Icon(icono, color: color, size: 32),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  'Bienvenido de nuevo',
+                  titulo,
                   style: TextStyle(
-                    color: Colors.white,
+                    color: color,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 2),
-                Text(
-                  'Estos son los valores actuales de tu laboratorio',
-                  style: TextStyle(color: Colors.white70, fontSize: 12),
-                ),
+                const SizedBox(height: 2),
+                Text(subtitulo, style: TextStyle(color: color, fontSize: 13)),
               ],
             ),
           ),
@@ -284,18 +500,14 @@ class _MetricCard extends StatelessWidget {
   const _MetricCard({
     required this.icon,
     required this.color,
-    required this.bgColor,
     required this.label,
     required this.value,
-    required this.unit,
   });
 
   final IconData icon;
   final Color color;
-  final Color bgColor;
   final String label;
   final String value;
-  final String unit;
 
   @override
   Widget build(BuildContext context) {
@@ -304,112 +516,34 @@ class _MetricCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.green.withValues(alpha: 0.25)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: bgColor,
-                  borderRadius: BorderRadius.circular(10),
+          Icon(icon, color: color, size: 28),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  value,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
-                child: Icon(icon, color: color, size: 22),
-              ),
-              const Icon(Icons.more_vert, color: Colors.grey, size: 18),
-            ],
-          ),
-          const Spacer(),
-          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 13)),
-          const SizedBox(height: 4),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: <Widget>[
-              Text(
-                value,
-                style: TextStyle(
-                  color: color,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
+                const SizedBox(height: 2),
+                Text(
+                  label,
+                  style: const TextStyle(color: Colors.grey, fontSize: 12),
                 ),
-              ),
-              if (unit.isNotEmpty) ...<Widget>[
-                const SizedBox(width: 3),
-                Text(unit, style: TextStyle(color: color, fontSize: 13)),
               ],
-            ],
+            ),
           ),
         ],
       ),
-    );
-  }
-}
-
-class _SystemStatusCard extends StatelessWidget {
-  const _SystemStatusCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            'Estado del sistema',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 12),
-          _StatusRow(
-            icon: Icons.check_circle,
-            color: Color(0xFF2E7D32),
-            text: 'Sensores operativos',
-          ),
-          SizedBox(height: 10),
-          _StatusRow(
-            icon: Icons.check_circle,
-            color: Color(0xFF2E7D32),
-            text: 'Sincronización en línea',
-          ),
-          SizedBox(height: 10),
-          _StatusRow(
-            icon: Icons.notifications_active,
-            color: Color(0xFFE65100),
-            text: '3 alertas de la última semana',
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StatusRow extends StatelessWidget {
-  const _StatusRow({
-    required this.icon,
-    required this.color,
-    required this.text,
-  });
-
-  final IconData icon;
-  final Color color;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        Icon(icon, color: color, size: 20),
-        const SizedBox(width: 10),
-        Expanded(child: Text(text, style: const TextStyle(fontSize: 14))),
-      ],
     );
   }
 }
