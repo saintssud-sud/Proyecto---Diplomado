@@ -34,6 +34,27 @@ android {
     }
 }
 
+// Crea una copia del APK de release con el nombre deseado: sigvach_1.0.0+1.apk
+// (se ejecuta después de que el plugin de Flutter copie app-release.apk a flutter-apk/)
+afterEvaluate {
+    tasks.named("assembleRelease") {
+        doLast {
+            // En este proyecto layout.buildDirectory ya apunta a build/app
+            val src = layout.buildDirectory
+                .file("outputs/flutter-apk/app-release.apk").get().asFile
+            val dst = layout.buildDirectory
+                .file("outputs/flutter-apk/sigvach_1.0.0+1.apk").get().asFile
+            if (src.exists()) {
+                if (dst.exists()) dst.delete()
+                src.copyTo(dst)
+                println("APK generado: ${dst.absolutePath}")
+            } else {
+                println("No se encontró ${src.absolutePath}")
+            }
+        }
+    }
+}
+
 kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17

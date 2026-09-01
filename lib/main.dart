@@ -17,7 +17,11 @@ import 'services/weather_service.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final config = AppConfig.fromEnvironment();
+  var config = AppConfig.fromEnvironment();
+  if (!config.hasSupabaseConfig) {
+    // Sin --dart-define: usa el asset empaquetado (APK de release).
+    config = await AppConfig.fromAsset();
+  }
   final prefs = await SharedPreferences.getInstance();
 
   final preferencesController = PreferencesController(

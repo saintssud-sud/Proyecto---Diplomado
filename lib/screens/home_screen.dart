@@ -5,14 +5,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../config/app_config.dart';
 import '../controllers/preferences_controller.dart';
 import '../widgets/max_width_box.dart';
-import 'about_adaptation_screen.dart';
 import 'ajustes/ajustes_screen.dart';
 import 'alertas/alertas_screen.dart';
-import 'context/context_lab_screen.dart';
 import 'cultivos/cultivos_screen.dart';
 import 'historial/historial_screen.dart';
-import 'records_screen.dart';
-import 'settings_screen.dart';
 import 'variables/variables_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -87,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(width: 12),
                       const Text(
-                        'S.I.G.V.A.C.H.',
+                        'SI.G.VA.C.H.',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w800,
@@ -104,57 +100,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            _DrawerItem(
-              icon: Icons.storage_outlined,
-              title: '1. Mis registros',
-              subtitle: 'CRUD de la Sesion 1',
-              onTap: () {
-                Navigator.push<void>(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (routeContext) => const RecordsScreen(),
-                  ),
-                );
-              },
-            ),
-            _DrawerItem(
-              icon: Icons.public,
-              title: '2. Conexion con el mundo',
-              subtitle: 'Future + API + JSON + error + GPS + mapa',
-              onTap: () {
-                Navigator.push<void>(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (routeContext) => const ContextLabScreen(),
-                  ),
-                );
-              },
-            ),
-            _DrawerItem(
-              icon: Icons.tune,
-              title: '3. Preferencias',
-              subtitle: 'Persistencia local',
-              onTap: () {
-                Navigator.push<void>(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (routeContext) => const SettingsScreen(),
-                  ),
-                );
-              },
-            ),
-            _DrawerItem(
-              icon: Icons.design_services_outlined,
-              title: '4. Adaptar a mi proyecto',
-              subtitle: 'API y hardware deben resolver tu problema',
-              onTap: () {
-                Navigator.push<void>(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (routeContext) => const AboutAdaptationScreen(),
-                  ),
-                );
-              },
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: Text(
+                'Sistema de Gestión de Variables '
+                'para Cultivos Hidropónicos',
+                style: TextStyle(
+                  color: Colors.black54,
+                  fontSize: 13,
+                  height: 1.4,
+                ),
+              ),
             ),
             const Divider(),
             if (config.useSupabase)
@@ -206,31 +162,6 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Ajustes'),
         ],
       ),
-    );
-  }
-}
-
-class _DrawerItem extends StatelessWidget {
-  const _DrawerItem({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: CircleAvatar(child: Icon(icon)),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-      subtitle: Text(subtitle),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: onTap,
     );
   }
 }
