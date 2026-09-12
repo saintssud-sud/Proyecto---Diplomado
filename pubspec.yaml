@@ -1,5 +1,5 @@
 name: sigvach
-description: "Proyecto SIGVACH - base adaptada del proyecto acumulativo (asincronia, API REST, GPS, mapa y Supabase)."
+description: "Proyecto SIGVACH - base adaptada del proyecto acumulativo (asincronia, API REST, GPS, mapa y Firebase)."
 publish_to: "none"
 version: 1.0.0+1
 
@@ -41,4 +41,3 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
-    - assets/config/

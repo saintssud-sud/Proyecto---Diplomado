@@ -19,11 +19,6 @@ __pycache__/
 # ==================== Credenciales y datos privados ====================
 # NUNCA subir estos archivos. Usa las plantillas *.example.* como guía.
 
-# Supabase (URL + publishable key)
-config/local.json
-config/aula.json
-assets/config/supabase.json
-
 # Firebase (project_id + API keys de cliente)
 android/app/google-services.json
 lib/firebase_options.dart

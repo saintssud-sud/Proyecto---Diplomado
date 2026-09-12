@@ -2,9 +2,10 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-if [[ ! -f config/local.json ]]; then
-  cp config/local.example.json config/local.json
-fi
-
-echo "config/local.json listo."
-echo "Edita SUPABASE_URL y SUPABASE_PUBLISHABLE_KEY."
+echo "No hay nada que configurar."
+echo "La app usa Firebase (Authentication + Cloud Firestore) y la configuracion"
+echo "va incrustada en lib/firebase_options.dart."
+echo
+echo "Solo necesitas:"
+echo "  flutter pub get"
+echo "  flutter run"

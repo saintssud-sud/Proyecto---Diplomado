@@ -1,6 +1,6 @@
 # Reglas de aula
 
-- Modo unico: SUPABASE.
+- Modo unico: FIREBASE.
 - Primero Tarija fija + API.
 - Despues error/reintento.
 - GPS real preferentemente Android.
