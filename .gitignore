@@ -27,6 +27,9 @@ assets/config/supabase.json
 # Firebase (project_id + API keys de cliente)
 android/app/google-services.json
 lib/firebase_options.dart
+# Metadata de la FlutterFire CLI: no tiene API keys, pero expone el project_id.
+# El archivo local se conserva para que flutterfire configure lo reutilice.
+firebase.json
 
 # Firma de Android (keystores + passwords)
 android/local.properties
