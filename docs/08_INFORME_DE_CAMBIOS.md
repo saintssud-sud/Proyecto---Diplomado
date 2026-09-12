@@ -246,6 +246,7 @@ Eso regenera `lib/firebase_options.dart` y `android/app/google-services.json`. L
 1. **Rotar la clave de Supabase** (sección 6.3) — es la acción más urgente.
 2. **Verificar las reglas de Firestore** publicadas, en especial las de la colección `usuarios`.
 3. **Restringir la API key de Firebase** por aplicación y por API en Google Cloud Console.
-4. **Actualizar el `README.md`**: todavía describe Supabase como único backend, `config/local.json` y el `--dart-define`; hoy ya no aplica.
+4. ✅ **Actualizar el `README.md`** — **hecho** (`9aae9be`): ya describe Firebase, `lib/firebase_options.dart` y `flutter run` sin `--dart-define`.
 5. **Revisar el mensaje "Recordarme"** del login: sigue sin guardar credenciales (limitación heredada).
-6. **Unificar los documentos de Supabase** (`docs/03_SUPABASE.md` y `docs/04_SUPABASE.md`): hoy describen un backend que ya no se usa.
+6. ✅ **Unificar los documentos de Supabase** (`docs/03_SUPABASE.md` y `docs/04_SUPABASE.md`) — **hecho** (`a0b38e5`): ambos documentos se eliminaron junto con el resto de Supabase.
+7. ✅ **Limpiar menciones desactualizadas a Supabase** — **hecho**: el hilo conductor ahora apunta a Firestore, `docs/07_FIRESTORE.md` ya no afirma que `config/local.json` y `assets/config/supabase.json` "quedaron inertes" (están borrados) y la bitácora del 30-ago lleva aviso de **OBSOLETO**.

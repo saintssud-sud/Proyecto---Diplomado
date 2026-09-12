@@ -30,8 +30,13 @@ flutter run            # elige dispositivo (chrome / windows / android)
 | `firebase_auth` | Login con correo/contraseña |
 | `cloud_firestore` | Base de datos Firestore |
 
-Se eliminó `supabase_flutter`. Los archivos `config/local.json` y
-`assets/config/supabase.json` quedaron inertes (la app ya no los lee).
+Se eliminó `supabase_flutter` y, con ella, todo el resto de Supabase salió del
+proyecto: `config/local.json` y su plantilla, `assets/config/supabase.json` y su
+plantilla, `docs/03_SUPABASE.md`, `docs/04_SUPABASE.md`,
+`lib/repositories/supabase_registro_repository.dart` y los scripts
+`supabase/*.sql`. Hoy Supabase **no aparece** ni en `pubspec.yaml` ni en el
+código; solo se conservan menciones históricas en el informe de cambios y en
+las bitácoras de la migración.
 
 ## 4. Arquitectura (patrón igual al anterior)
 

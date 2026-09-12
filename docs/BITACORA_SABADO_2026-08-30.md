@@ -5,6 +5,14 @@
 
 ---
 
+> ⚠️ **DOCUMENTO OBSOLETO** — aviso agregado el 2026-09-11.
+>
+> Esta bitácora es un **registro histórico del sábado 30 de agosto**. Menciona la
+> configuración de **Supabase** (`config/local.json`, `--dart-define-from-file`),
+> que el proyecto **ya no usa**: esos archivos se eliminaron al migrar a
+> Firebase. Para correr la app hoy bastan `flutter pub get` y `flutter run`
+> (ver `docs/07_FIRESTORE.md`). El texto original se conserva como registro.
+
 ## 1. Actividades realizadas
 
 ### 1.1 Pantalla de presentación (Splash)
