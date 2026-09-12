@@ -1,0 +1,30 @@
+{
+  "_nota": "PLANTILLA sin credenciales reales. El archivo real (android/app/google-services.json) esta IGNORADO por Git. Descargalo de Firebase Console -> Configuracion del proyecto -> Tus apps -> Android (bo.edu.uajms.sigvach), o generalo con: flutterfire configure",
+  "project_info": {
+    "project_number": "TU_PROJECT_NUMBER",
+    "project_id": "TU_PROJECT_ID",
+    "storage_bucket": "TU_PROJECT_ID.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "TU_MOBILESDK_APP_ID",
+        "android_client_info": {
+          "package_name": "bo.edu.uajms.sigvach"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "TU_API_KEY_ANDROID"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

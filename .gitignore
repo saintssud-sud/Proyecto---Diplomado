@@ -1,14 +1,46 @@
+# ==================== Flutter / Dart ====================
 .dart_tool/
 .packages
 .pub/
 build/
 coverage/
+.flutter-plugins-dependencies
+
+# ==================== IDE ====================
+.idea/
+.vscode/
+*.iml
+
+# ==================== Python (scripts de documentación) ====================
+.venv/
+__pycache__/
+*.pyc
+
+# ==================== Credenciales y datos privados ====================
+# NUNCA subir estos archivos. Usa las plantillas *.example.* como guía.
+
+# Supabase (URL + publishable key)
 config/local.json
 config/aula.json
+assets/config/supabase.json
+
+# Firebase (project_id + API keys de cliente)
+android/app/google-services.json
+lib/firebase_options.dart
+
+# Firma de Android (keystores + passwords)
 android/local.properties
 android/key.properties
 *.jks
 *.keystore
-.idea/
-.vscode/
-*.iml
+*.p12
+
+# Variables de entorno y llaves genéricas
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+serviceAccountKey.json
+firebase-adminsdk*.json
+
