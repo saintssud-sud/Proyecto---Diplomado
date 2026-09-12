@@ -3,7 +3,7 @@
 **Proyecto:** SIGVACH — Sistema de Gestión de Variables para Cultivos Hidropónicos
 **Objetivo del día:** Migrar el backend de Supabase a **Firebase** (Authentication + Cloud Firestore), conectar la app a Firestore en Android/Web/Windows, eliminar el módulo "registros" ajeno al proyecto, e implementar un **sistema completo de gestión de usuarios** con rol admin y CRUD.
 
-**Backend final del día:** Firebase (proyecto `sigvach26-bd`) — Authentication (correo/contraseña) + Cloud Firestore.
+**Backend final del día:** Firebase (proyecto `TU-PROYECTO-FIREBASE`) — Authentication (correo/contraseña) + Cloud Firestore.
 
 ---
 
@@ -22,14 +22,14 @@
   ```
 - Se re-autenticó la Firebase CLI (el token estaba vencido) con `firebase login --reauth`.
 
-### 1.2 Registro de la app en Firebase Console (proyecto sigvach26-bd)
+### 1.2 Registro de la app en Firebase Console (proyecto TU-PROYECTO-FIREBASE)
 - Se registraron las 3 apps con la FlutterFire CLI:
   ```powershell
   & "$env:...\flutter_pub_cache\bin\flutterfire" configure `
-    --project=sigvach26-bd --platforms=android,web,windows --yes
+    --project=TU-PROYECTO-FIREBASE --platforms=android,web,windows --yes
   ```
 - Resultado:
-  - App **Android** (`bo.edu.uajms.sigvach`)
+  - App **Android** (`tu.paquete.app`)
   - App **Web** (`sigvach (web)`)
   - App **Windows** (`sigvach (windows)`)
 - Se generó `lib/firebase_options.dart` con la configuración de las 3 plataformas.
@@ -80,7 +80,7 @@ Se reemplazó todo el código de Supabase por Firebase:
 
 ### 2.1 Diseño elegido (Camino B + Opción 2)
 - **Camino B** (sin Cloud Functions, plan Spark): auto-registro con datos personales + panel de admin.
-- **Opción 2**: el rol `admin` se asigna automáticamente SOLO al correo `admin@sigvach.com`; cualquier otro correo queda como `usuario`.
+- **Opción 2**: el rol `admin` se asigna automáticamente SOLO al correo `admin@tudominio.com`; cualquier otro correo queda como `usuario`.
 
 ### 2.2 Archivos nuevos
 | Archivo | Rol |
@@ -98,7 +98,7 @@ Se reemplazó todo el código de Supabase por Firebase:
 ### 2.4 Estructura de datos (Firestore)
 ```
 usuarios/{uid}
-├── email:      "operador1@sigvach.com"
+├── email:      "usuario1@tudominio.com"
 ├── nombre:     "Operador Uno"
 ├── telefono:   "71234567"
 ├── cargo:      "Operador de invernadero"
@@ -121,15 +121,15 @@ match /usuarios/{uid} {
 ### 2.6 Usuarios creados y verificados (Chrome/Web)
 | Usuario | Rol | Estado |
 |---|---|---|
-| `admin@sigvach.com` | `admin` | ✅ login + panel "Usuarios (admin)" |
-| `operador1@sigvach.com` | `usuario` | ✅ registro con datos personales |
-| `tecnico@gmail.com` | `usuario` | ✅ registro con datos personales |
+| `admin@tudominio.com` | `admin` | ✅ login + panel "Usuarios (admin)" |
+| `usuario1@tudominio.com` | `usuario` | ✅ registro con datos personales |
+| `usuario2@tudominio.com` | `usuario` | ✅ registro con datos personales |
 | `prueba.firestore@ejemplo.com` | `usuario` | ✅ registro/login (creado antes) |
 
 - Se verificó en vivo:
   - Registro con datos personales → perfil creado en Firestore con rol correcto.
   - Login como admin → aparece la opción **"Usuarios (admin)"**.
-  - Panel lista los usuarios y las acciones de editar/cambiar rol/activar-desactivar/eliminar **se reflejan en Firestore en tiempo real** (ej. cambio de nombre de "Operador Uno" a "Lucio Navarro").
+  - Panel lista los usuarios y las acciones de editar/cambiar rol/activar-desactivar/eliminar **se reflejan en Firestore en tiempo real** (ej. cambio de nombre de "Usuario Uno" a "Usuario Uno editado").
 
 ### 2.7 Límites conocidos (Camino B)
 - "Eliminar" desde el panel borra el **perfil de Firestore**, pero **no** la cuenta de **Firebase Authentication** (eso requiere Cloud Functions o hacerlo en la consola).
@@ -147,7 +147,7 @@ match /usuarios/{uid} {
 | `flutter pub add firebase_core cloud_firestore firebase_auth` | Agregar dependencias de Firebase. |
 | `flutter pub remove supabase_flutter` | Quitar Supabase. |
 | `dart pub global activate flutterfire_cli` | Instalar la FlutterFire CLI. |
-| `flutterfire configure --project=sigvach26-bd --platforms=android,web,windows --yes` | Registrar apps y generar `firebase_options.dart`. |
+| `flutterfire configure --project=TU-PROYECTO-FIREBASE --platforms=android,web,windows --yes` | Registrar apps y generar `firebase_options.dart`. |
 | `firebase login --reauth` | Re-autenticar la Firebase CLI. |
 | `flutter analyze` | Verificar que no haya errores de análisis. |
 | `flutter run -d chrome` | Ejecutar la app en Chrome. |

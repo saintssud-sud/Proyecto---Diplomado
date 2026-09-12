@@ -75,7 +75,7 @@ alter table public.registros enable row level security;
 
 ```
 usuarios/{uid}
-├── email:      "operador1@sigvach.com"
+├── email:      "usuario1@tudominio.com"
 ├── nombre:     "Operador Uno"
 ├── telefono:   "71234567"
 ├── cargo:      "Operador de invernadero"
@@ -109,7 +109,7 @@ usuarios/{uid}
 | Antes | Ahora |
 |---|---|
 | Solo se guardaba el **nombre** del usuario (en `displayName` y `SharedPreferences`) | **Perfil completo en Firestore**: nombres, apellidos, teléfono, cargo, rol, estado |
-| Sin roles: todos los usuarios eran iguales | **Rol `admin`** asignado automáticamente al correo `admin@sigvach.com`; el resto es `usuario` |
+| Sin roles: todos los usuarios eran iguales | **Rol `admin`** asignado automáticamente al correo `admin@tudominio.com`; el resto es `usuario` |
 | Sin administración desde la app | **Panel de administración** que lista y edita usuarios en tiempo real |
 | Sin control de estado | Campo **`activo`** para habilitar/deshabilitar usuarios |
 | Sin perfil para usuarios ya existentes | **Backfill automático:** si alguien inicia sesión y no tiene perfil, se le crea |

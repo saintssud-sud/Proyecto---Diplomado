@@ -4,10 +4,10 @@ Guía de referencia de la migración: **Supabase → Firebase Authentication + C
 
 ## 1. Resumen del proyecto en Firebase
 
-- Proyecto Firebase: `sigvach26-bd`
+- Proyecto Firebase: `TU-PROYECTO-FIREBASE`
 - Base de datos Firestore: `(default)` en región `southamerica-west1`
 - Firebase Authentication: proveedor **Correo electrónico/contraseña** habilitado ✅
-- Apps registradas: `android` (`bo.edu.uajms.sigvach`), `web`, `windows`
+- Apps registradas: `android` (`tu.paquete.app`), `web`, `windows`
 - Archivo de configuración: `lib/firebase_options.dart` (generado por FlutterFire CLI)
 
 ## 2. Cómo correr la app
@@ -89,13 +89,13 @@ real del SIGVACH.
 - Al registrarse se crean DOS cosas a la vez:
   1. La cuenta en **Firebase Authentication** (credenciales de acceso).
   2. Su **perfil** en Firestore → colección `usuarios/{uid}` (datos + rol).
-- **Rol automático:** solo `admin@sigvach.com` recibe rol `admin`; cualquier
+- **Rol automático:** solo `admin@tudominio.com` recibe rol `admin`; cualquier
   otro correo recibe rol `usuario`.
 
 ### 8.2 Estructura de datos (Firestore)
 ```
 usuarios/{uid}
-├── email:      "operador1@sigvach.com"
+├── email:      "usuario1@tudominio.com"
 ├── nombre:     "Operador Uno"
 ├── telefono:   "71234567"
 ├── cargo:      "Operador de invernadero"
@@ -125,7 +125,7 @@ match /usuarios/{uid} {
 ```
 
 ### 8.5 Cómo entrar como admin
-1. Crea `admin@sigvach.com` en **Authentication → Agregar usuario** (correo + contraseña).
+1. Crea `admin@tudominio.com` en **Authentication → Agregar usuario** (correo + contraseña).
 2. Inicia sesión en la app con ese correo → se crea su perfil con rol `admin`.
 3. Ve a **Ajustes → "Usuarios (admin)"** → panel de CRUD.
 
@@ -140,8 +140,8 @@ match /usuarios/{uid} {
 
 ## 9. Usuario de prueba
 
-- Admin: `admin@sigvach.com` (rol admin)
-- Operador: `operador1@sigvach.com`
-- Otro: `prueba.firestore@ejemplo.com` / `Prueba123456`
+- Admin: `admin@tudominio.com` (rol admin)
+- Operador: `usuario1@tudominio.com`
+- Otro: `usuario3@ejemplo.com`
 
 Puedes borrarlos en Firebase Console → Authentication → Usuarios.
