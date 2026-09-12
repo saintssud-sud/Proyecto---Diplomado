@@ -162,6 +162,6 @@ flutter build apk --release
 
 ## 11. Autor del proyecto
 
-- **Autor:** Freddy Carlo Santos Navarro
-- **Proyecto / materia:** Proyecto SIGVACH — Programación de aplicaciones móviles (Flutter).
+- **Autor:** Freddy Santos N.
+- **Proyecto / Materia:** Proyecto SIGVACH — Programación de aplicaciones móviles (Flutter).
 - **Año:** 2026
