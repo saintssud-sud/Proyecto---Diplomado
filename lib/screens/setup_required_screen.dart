@@ -15,13 +15,13 @@ class SetupRequiredScreen extends StatelessWidget {
               Icon(Icons.settings_suggest_outlined, size: 64),
               SizedBox(height: 16),
               Text(
-                'Supabase no esta configurado',
+                'Firebase no esta configurado',
                 style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 12),
               Text(
-                'Crea config/local.json con URL + Publishable Key '
-                'y ejecuta con --dart-define-from-file=config/local.json.',
+                'Revisa lib/firebase_options.dart y vuelve a compilar '
+                'con flutter run.',
               ),
             ],
           ),

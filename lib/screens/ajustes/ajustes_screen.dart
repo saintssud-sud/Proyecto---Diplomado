@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:provider/provider.dart';
 
+import '../../controllers/usuario_controller.dart';
+import '../../services/auth_service.dart';
 import 'opciones_screen.dart';
 import 'perfil_screen.dart';
 import 'rangos_variables_screen.dart';
+import 'usuarios_admin_screen.dart';
 
 /// Pantalla 6 — Menú de Ajustes.
 class AjustesScreen extends StatelessWidget {
@@ -11,6 +14,9 @@ class AjustesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final usuarioController = context.watch<UsuarioController>();
+    final esAdmin = usuarioController.esAdmin;
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: <Widget>[
@@ -55,18 +61,12 @@ class AjustesScreen extends StatelessWidget {
             ),
           ),
         ),
-        _OpcionTile(
-          icon: Icons.group_outlined,
-          title: 'Usuarios',
-          onTap: () => _push(
-            context,
-            const OpcionesScreen(
-              titulo: 'Usuarios',
-              icono: Icons.group_outlined,
-              descripcion: 'Administra los usuarios del sistema.',
-            ),
+        if (esAdmin)
+          _OpcionTile(
+            icon: Icons.group_outlined,
+            title: 'Usuarios (admin)',
+            onTap: () => _push(context, const UsuariosAdminScreen()),
           ),
-        ),
         _OpcionTile(
           icon: Icons.security_outlined,
           title: 'Seguridad',
@@ -99,7 +99,7 @@ class AjustesScreen extends StatelessWidget {
           icon: Icons.logout,
           title: 'Cerrar sesión',
           color: Colors.red,
-          onTap: () => Supabase.instance.client.auth.signOut(),
+          onTap: () => AuthService().signOut(),
         ),
       ],
     );

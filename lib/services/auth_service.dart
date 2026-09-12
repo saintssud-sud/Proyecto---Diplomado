@@ -1,37 +1,54 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
+/// Servicio de autenticación con Firebase Authentication.
+///
+/// Reemplaza al antiguo AuthService de Supabase. Expone las mismas
+/// operaciones (signIn, signUp, signOut) pero usando Firebase Auth
+/// con correo y contraseña.
 class AuthService {
-  AuthService(this.client);
+  AuthService({FirebaseAuth? auth}) : _auth = auth ?? FirebaseAuth.instance;
 
-  final SupabaseClient client;
+  final FirebaseAuth _auth;
 
+  /// Instancia interna de FirebaseAuth (para streams y usuario actual).
+  FirebaseAuth get auth => _auth;
+
+  /// Usuario actualmente autenticado (null si no hay sesión).
+  User? get currentUser => _auth.currentUser;
+
+  /// Stream de cambios de sesión. Emite el usuario cuando inicia/cierra
+  /// sesión. Se usa en [AuthGate] para decidir qué pantalla mostrar.
+  Stream<User?> get authStateChanges => _auth.authStateChanges();
+
+  /// Inicia sesión con correo y contraseña.
   Future<void> signIn({required String email, required String password}) async {
-    await client.auth.signInWithPassword(
+    await _auth.signInWithEmailAndPassword(
       email: email.trim(),
       password: password,
     );
   }
 
+  /// Crea una cuenta nueva y guarda el nombre en el perfil (displayName).
   Future<String> signUp({
     required String email,
     required String password,
     String? fullName,
   }) async {
-    final response = await client.auth.signUp(
+    final credential = await _auth.createUserWithEmailAndPassword(
       email: email.trim(),
       password: password,
-      // Guarda el nombre en los metadatos del usuario (auth.users).
-      data: (fullName == null || fullName.trim().isEmpty)
-          ? null
-          : {'full_name': fullName.trim()},
     );
 
-    if (response.session == null) {
-      return 'Cuenta creada. Revisa tu correo si la confirmacion esta activa.';
+    final name = fullName?.trim() ?? '';
+    if (name.isNotEmpty) {
+      // Guarda el nombre en el perfil del usuario (Firebase Auth).
+      await credential.user?.updateDisplayName(name);
+      await credential.user?.reload();
     }
 
     return 'Cuenta creada y sesion iniciada.';
   }
 
-  Future<void> signOut() => client.auth.signOut();
+  /// Cierra la sesión actual.
+  Future<void> signOut() => _auth.signOut();
 }

@@ -1,6 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:provider/provider.dart';
 
+import '../controllers/preferences_controller.dart';
+import '../repositories/usuario_repository.dart';
 import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -13,6 +16,9 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _cargoController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -24,6 +30,9 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void dispose() {
     _nameController.dispose();
+    _lastNameController.dispose();
+    _phoneController.dispose();
+    _cargoController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -38,14 +47,32 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      final service = AuthService(Supabase.instance.client);
+      final service = AuthService();
+      final userRepo = UsuarioRepository();
 
       if (_registerMode) {
         final result = await service.signUp(
           email: _emailController.text,
           password: _passwordController.text,
-          fullName: _nameController.text,
+          fullName: _nombreCompleto,
         );
+        // Guarda el perfil (datos personales + rol) en Firestore.
+        final uid = AuthService().currentUser?.uid;
+        if (uid != null) {
+          await userRepo.crearPerfilInicial(
+            uid: uid,
+            email: _emailController.text,
+            nombre: _nombreCompleto,
+            telefono: _phoneController.text,
+            cargo: _cargoController.text,
+          );
+        }
+        // Guarda el nombre tambien en preferencias locales para que el
+        // saludo del Home lo muestre de inmediato.
+        final name = _nombreCompleto;
+        if (name.isNotEmpty && mounted) {
+          await context.read<PreferencesController>().setName(name);
+        }
         if (mounted) {
           setState(() => _message = result);
         }
@@ -54,10 +81,27 @@ class _LoginScreenState extends State<LoginScreen> {
           email: _emailController.text,
           password: _passwordController.text,
         );
+        // Usuarios que ya existian (creados antes del perfil en Firestore):
+        // si no tienen documento de perfil, se crea uno con su email.
+        final uid = AuthService().currentUser?.uid;
+        if (uid != null) {
+          final existe = await userRepo.obtenerPorUid(uid);
+          if (existe == null) {
+            final nombre = AuthService().currentUser?.displayName ?? '';
+            await userRepo.crearPerfilInicial(
+              uid: uid,
+              email: _emailController.text,
+              nombre: nombre,
+            );
+            if (nombre.isNotEmpty && mounted) {
+              await context.read<PreferencesController>().setName(nombre);
+            }
+          }
+        }
       }
-    } on AuthException catch (error) {
+    } on FirebaseAuthException catch (error) {
       if (mounted) {
-        setState(() => _message = error.message);
+        setState(() => _message = _mensajeError(error.code));
       }
     } catch (error) {
       if (mounted) {
@@ -67,6 +111,38 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) {
         setState(() => _busy = false);
       }
+    }
+  }
+
+  /// Nombre completo (nombres + apellidos) en una sola cadena.
+  String get _nombreCompleto {
+    final n = _nameController.text.trim();
+    final a = _lastNameController.text.trim();
+    if (n.isEmpty) return a;
+    if (a.isEmpty) return n;
+    return '$n $a';
+  }
+
+  /// Traduce los códigos de error de Firebase Auth a mensajes claros.
+  static String _mensajeError(String code) {
+    switch (code) {
+      case 'invalid-credential':
+      case 'wrong-password':
+      case 'user-not-found':
+      case 'invalid-email':
+        return 'Correo o contraseña incorrectos.';
+      case 'email-already-in-use':
+        return 'Ya existe una cuenta con ese correo.';
+      case 'weak-password':
+        return 'La contraseña es demasiado débil.';
+      case 'user-disabled':
+        return 'La cuenta fue deshabilitada.';
+      case 'too-many-requests':
+        return 'Demasiados intentos. Espera un momento y vuelve a intentar.';
+      case 'operation-not-allowed':
+        return 'El registro con correo no está habilitado en Firebase.';
+      default:
+        return 'No se pudo completar la acción. Código: $code';
     }
   }
 
@@ -157,6 +233,51 @@ class _LoginScreenState extends State<LoginScreen> {
                             }
                             return null;
                           },
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _lastNameController,
+                          textCapitalization: TextCapitalization.words,
+                          decoration: InputDecoration(
+                            labelText: 'Apellidos',
+                            prefixIcon: const Icon(Icons.badge_outlined),
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _phoneController,
+                          keyboardType: TextInputType.phone,
+                          decoration: InputDecoration(
+                            labelText: 'Teléfono',
+                            prefixIcon: const Icon(Icons.phone_outlined),
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _cargoController,
+                          textCapitalization: TextCapitalization.words,
+                          decoration: InputDecoration(
+                            labelText: 'Cargo (opcional)',
+                            prefixIcon: const Icon(Icons.work_outline),
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
                         ),
                         const SizedBox(height: 16),
                       ],

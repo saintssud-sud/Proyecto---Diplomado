@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../controllers/preferences_controller.dart';
+import '../../services/auth_service.dart';
 import '../../screens/settings_screen.dart';
 
 /// Pantalla 6.1 — Perfil del usuario (nombre y cargo persistentes).
@@ -130,7 +130,7 @@ class PerfilScreen extends StatelessWidget {
               'Cerrar sesión',
               style: TextStyle(color: Colors.red),
             ),
-            onTap: () => Supabase.instance.client.auth.signOut(),
+            onTap: () => AuthService().signOut(),
           ),
         ],
       ),

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../config/app_config.dart';
 import '../controllers/preferences_controller.dart';
+import '../services/auth_service.dart';
 import '../widgets/max_width_box.dart';
 import 'ajustes/ajustes_screen.dart';
 import 'alertas/alertas_screen.dart';
@@ -27,14 +26,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final config = context.watch<AppConfig>();
     final preferences = context.watch<PreferencesController>();
-    // Prioriza el nombre guardado en Supabase (full_name) al registrarse.
-    final supabaseUser = Supabase.instance.client.auth.currentUser;
-    final supabaseName =
-        (supabaseUser?.userMetadata?['full_name'] as String?)?.trim() ?? '';
-    final name = supabaseName.isNotEmpty
-        ? supabaseName
+    // Nombre del usuario autenticado en Firebase (displayName o correo).
+    final authUser = AuthService().currentUser;
+    final fireName = (authUser?.displayName ?? '').trim();
+    final emailName = (authUser?.email?.split('@').first ?? '').trim();
+    final name = fireName.isNotEmpty
+        ? fireName
+        : emailName.isNotEmpty
+        ? emailName
         : (preferences.name.isEmpty ? 'Diplomante' : preferences.name);
 
     return Scaffold(
@@ -113,15 +113,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const Divider(),
-            if (config.useSupabase)
-              ListTile(
-                leading: const Icon(Icons.logout),
-                title: const Text('Cerrar sesion'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  Supabase.instance.client.auth.signOut();
-                },
-              ),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Cerrar sesion'),
+              onTap: () {
+                Navigator.of(context).pop();
+                AuthService().signOut();
+              },
+            ),
           ],
         ),
       ),

@@ -1,54 +1,18 @@
-import 'dart:convert';
-
-import 'package:flutter/services.dart' show rootBundle;
-
+/// Configuración de la aplicación.
+///
+/// Antes este proyecto dependía de Supabase (URL + publishable key) que se
+/// cargaban con --dart-define o desde un asset. Desde la migración a
+/// Firebase/Firestore la configuración va incrustada en
+/// `lib/firebase_options.dart`, así que ya no hace falta cargar claves en
+/// tiempo de ejecución.
 class AppConfig {
-  const AppConfig({
-    required this.supabaseUrl,
-    required this.supabasePublishableKey,
-  });
+  const AppConfig({this.firebaseReady = true, this.modeLabel = 'FIREBASE'});
 
-  final String supabaseUrl;
-  final String supabasePublishableKey;
+  /// Indica si Firebase se inicializó correctamente al arrancar.
+  final bool firebaseReady;
 
-  factory AppConfig.fromEnvironment() {
-    return const AppConfig(
-      supabaseUrl: String.fromEnvironment('SUPABASE_URL'),
-      supabasePublishableKey: String.fromEnvironment(
-        'SUPABASE_PUBLISHABLE_KEY',
-      ),
-    );
-  }
+  /// Etiqueta de modo que se muestra en la pantalla de preferencias.
+  final String modeLabel;
 
-  factory AppConfig.fromJson(Map<String, dynamic> json) {
-    return AppConfig(
-      supabaseUrl: json['SUPABASE_URL'] as String? ?? '',
-      supabasePublishableKey:
-          json['SUPABASE_PUBLISHABLE_KEY'] as String? ?? '',
-    );
-  }
-
-  /// Lee la configuración desde el asset empaquetado en la app
-  /// (`assets/config/supabase.json`). Se usa como respaldo cuando se
-  /// compila sin `--dart-define`, de modo que `flutter build apk --release`
-  /// genere un APK funcional con Supabase.
-  static Future<AppConfig> fromAsset() async {
-    try {
-      final raw = await rootBundle.loadString('assets/config/supabase.json');
-      final decoded = jsonDecode(raw);
-      if (decoded is Map<String, dynamic>) {
-        return AppConfig.fromJson(decoded);
-      }
-    } catch (_) {
-      // Asset ausente o inválido: se devuelve una configuración vacía.
-    }
-    return const AppConfig(supabaseUrl: '', supabasePublishableKey: '');
-  }
-
-  bool get hasSupabaseConfig =>
-      supabaseUrl.trim().isNotEmpty && supabasePublishableKey.trim().isNotEmpty;
-
-  bool get useSupabase => hasSupabaseConfig;
-
-  String get modeLabel => 'SUPABASE';
+  bool get isConfigured => firebaseReady;
 }

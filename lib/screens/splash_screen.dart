@@ -49,7 +49,7 @@ class _SplashScreenState extends State<SplashScreen>
     Navigator.of(context).pushReplacement(
       PageRouteBuilder<void>(
         transitionDuration: const Duration(milliseconds: 500),
-        pageBuilder: (_, _, _) => config.hasSupabaseConfig
+        pageBuilder: (_, _, _) => config.isConfigured
             ? const AuthGate()
             : const SetupRequiredScreen(),
         transitionsBuilder: (_, animation, _, child) =>
