@@ -552,6 +552,7 @@ def convertir(md_path: str, docx_path: str, formato_institucional: bool = False)
         _configurar_titulo_por_defecto(doc)
 
     i = 0
+    primer_titulo_nivel_uno = True
     while i < len(lineas):
         if i in lineas_omitidas:
             i += 1
@@ -628,6 +629,11 @@ def convertir(md_path: str, docx_path: str, formato_institucional: bool = False)
         # anterior, con el título general en el estilo «Title».
         base = 1 if formato_institucional else 0
         if texto.startswith("# "):
+            # En el formato institucional cada capítulo comienza en una página
+            # nueva; el primero ya la tiene por el corte de sección.
+            if formato_institucional and not primer_titulo_nivel_uno:
+                doc.add_page_break()
+            primer_titulo_nivel_uno = False
             doc.add_heading(_quitar_markdown(texto[2:]), level=base)
         elif texto.startswith("## "):
             doc.add_heading(_quitar_markdown(texto[3:]), level=base + 1)
@@ -651,13 +657,19 @@ def convertir(md_path: str, docx_path: str, formato_institucional: bool = False)
         elif texto.strip() == "":
             pass  # línea en blanco -> la gestiona el párrafo anterior
         elif re.match(r"^---+$", texto.strip()):
-            # separador horizontal
-            p = doc.add_paragraph()
-            run = p.add_run("_" * 60)
-            _configurar_fuente(run, tamano=9, color=GRIS)
+            # Separador horizontal del borrador. En el formato institucional no
+            # corresponde: los capítulos se separan con un salto de página.
+            if not formato_institucional:
+                p = doc.add_paragraph()
+                run = p.add_run("_" * 60)
+                _configurar_fuente(run, tamano=9, color=GRIS)
         else:
             # párrafo normal
             parrafo = doc.add_paragraph()
+            if formato_institucional:
+                # El cuerpo del trabajo final se presenta justificado, igual que
+                # el resumen; los títulos y los epígrafes conservan su alineación.
+                parrafo.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             run = parrafo.add_run(_quitar_markdown(texto))
             _configurar_fuente(run, tamano=cuerpo)
         i += 1
