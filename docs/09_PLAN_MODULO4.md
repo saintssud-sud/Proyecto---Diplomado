@@ -274,6 +274,25 @@ Numeración de tablas verificada: 1 a 7, en orden de aparición y con sus refere
 | `backend/app/semilla.py` | Modo de demostración con datos: perfil de lechuga con seis rangos, dos módulos (uno inactivo), doce lecturas repartidas en treinta y seis horas y tres alertas. Las lecturas se registran con **el mismo servicio que usa la ingesta real**, así que las alertas las produce la regla de negocio y no la semilla |
 | `uvicorn` 0.52.4 | Instalado; el arranque real se verificó con el comando exacto del despliegue |
 
+**Verificación automática en el repositorio** (`.github/workflows/verificacion.yml`).
+
+Se incorporó integración continua con dos trabajos independientes, de modo que un fallo en una parte no
+oculte el estado de la otra:
+
+| Trabajo | Qué comprueba |
+|---|---|
+| Servicio de la API | Instala las dependencias declaradas —incluidas `uvicorn` y `firebase-admin`, con lo que comprueba de paso que el servicio pueda desplegarse en Linux— y ejecuta las pruebas del backend |
+| Aplicación Flutter | Prepara la configuración de Firebase a partir de la plantilla (la real no está en el repositorio), analiza el código, ejecuta las pruebas y **compila la versión web**, que es el artefacto que se publica en Firebase Hosting |
+
+Dos razones para haberlo montado ahora: resuelve el problema de que **en este entorno el tool de Flutter
+no puede ejecutarse sin permisos ampliados**, de modo que la verificación deje de depender del equipo del
+autor; y su historial de ejecuciones es **evidencia de las pruebas del apartado 2.8**, con el resultado de
+cada confirmación. El repositorio muestra el distintivo de estado en su archivo README.
+
+> Para que la verificación corra hace falta **publicar las confirmaciones**: el flujo se dispara con el
+> envío a la rama principal. Mientras el trabajo esté solo en local, el código del panel conectado a la
+> API sigue sin analizar.
+
 **Verificación de extremo a extremo del servicio real** (14/09/2026, contra el repositorio en memoria):
 
 | Comprobación | Resultado |

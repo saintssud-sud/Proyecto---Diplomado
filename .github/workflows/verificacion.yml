@@ -1,0 +1,81 @@
+# Verificación automática del proyecto SIGVACH
+#
+# Se ejecuta al publicar en la rama principal y en cada propuesta de cambio.
+# Comprueba las dos partes del sistema por separado, de modo que un fallo en una
+# no oculte el estado de la otra:
+#
+#   · servicio: instala las dependencias y ejecuta las pruebas del backend;
+#   · aplicación: analiza el código, ejecuta las pruebas y compila la versión web.
+#
+# La compilación de la versión web se incluye a propósito: es el artefacto que se
+# publica en Firebase Hosting, así que conviene saber en cada cambio si sigue
+# construyéndose.
+#
+# El historial de ejecuciones de este flujo es evidencia de las pruebas del
+# apartado 2.8 de la monografía: cada confirmación queda con su resultado.
+
+name: Verificación
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  servicio:
+    name: Servicio de la API
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Instalar las dependencias
+        # Se instalan las dependencias declaradas, incluidas uvicorn y
+        # firebase-admin: así el flujo comprueba además que el servicio pueda
+        # desplegarse, aunque las pruebas no las necesiten (usan el repositorio
+        # en memoria y un verificador de identidad simulado).
+        run: pip install -r requirements-dev.txt
+
+      - name: Ejecutar las pruebas del servicio
+        run: python -m pytest -v
+
+  aplicacion:
+    name: Aplicación Flutter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.8'
+          channel: stable
+          cache: true
+
+      - name: Preparar la configuración de Firebase
+        # La configuración real no está en el repositorio (contiene el
+        # identificador del proyecto). Para analizar y probar alcanza la
+        # plantilla, que declara las mismas clases con valores de ejemplo.
+        run: cp lib/firebase_options.example.dart lib/firebase_options.dart
+
+      - name: Instalar las dependencias del proyecto
+        run: flutter pub get
+
+      - name: Analizar el código
+        run: flutter analyze
+
+      - name: Ejecutar las pruebas
+        run: flutter test --reporter expanded
+
+      - name: Compilar la versión web
+        run: flutter build web --release

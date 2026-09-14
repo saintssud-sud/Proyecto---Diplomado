@@ -1,5 +1,11 @@
 # 🌱 SIGVACH — Sistema de Gestión de Variables para Cultivos Hidropónicos
 
+[![Verificación](https://github.com/saintssud-sud/Proyecto---Diplomado/actions/workflows/verificacion.yml/badge.svg)](https://github.com/saintssud-sud/Proyecto---Diplomado/actions/workflows/verificacion.yml)
+
+> El distintivo anterior muestra el resultado de la verificación automática: análisis del código,
+> pruebas del servicio y de la aplicación, y compilación de la versión web. Se ejecuta en cada
+> confirmación publicada en la rama principal.
+
 ## 1. Nombre y descripción del proyecto
 
 **SIGVACH** es una aplicación móvil desarrollada con **Flutter** que permite monitorear y gestionar las principales variables de un cultivo hidropónico: **temperatura, humedad, pH, TDS (conductividad) y nivel de agua**.
