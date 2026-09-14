@@ -46,7 +46,7 @@ Documento interno de trabajo. No forma parte de la monografía.
 | 3.2.7 Seguridad: autenticación, autorización por rol, validación, cifrado y variables sensibles | ✅ | 2.7 |
 | 3.2.8 Pruebas: plan, ejecución y **tabla con identificador, escenario, resultado esperado, obtenido y estado** | 🟡 | Tabla 8 con 23 casos definidos y **23 resultados pendientes de ejecutar**; las pruebas automatizadas (59 del servicio y 63 de la aplicación) sí están ejecutadas y documentadas |
 | 3.2.9 Despliegue: plataforma, procedimiento, configuración y **dirección pública** | ❌ | Pendiente el despliegue. El procedimiento está completo en el Anexo B y en la guía de despliegue |
-| 3.3 Conclusiones en correspondencia con **cada** objetivo específico, con grado de cumplimiento y evidencia | 🟡 | 3.1 tiene seis conclusiones alineadas una a una con los objetivos, con marcadores de resultado pendientes; 3.2 tiene catorce recomendaciones |
+| 3.3 Conclusiones en correspondencia con **cada** objetivo específico, con grado de cumplimiento y evidencia | 🟡 | 3.1 **reescrito el 14/09**: las seis conclusiones citan su objetivo y su evidencia concreta (apartados, tablas y cifras de pruebas). Quedan dos marcadores precisos, que dependen de la ejecución de los casos y del despliegue. 3.2 tiene catorce recomendaciones, cuya reducción forma parte del plan de recorte |
 | 3.4 Bibliografía y anexos obligatorios | 🟡 | Anexos A, B, C, E y F ✅; **Anexo D pendiente** (dirección pública y archivo instalable) |
 
 ## 3. Requisitos mínimos del producto (punto 4)
@@ -76,15 +76,16 @@ Detalle y acciones en `09_PLAN_MODULO4.md`, sección 2. Resumen del estado:
 
 ## 5. Inventario de marcadores sin completar
 
-Se contaron **34 marcadores** en el cuerpo del documento:
+Se contaron **55 marcadores** en el cuerpo del documento (el recuento se corrigió el 14/09: la primera
+estimación no contemplaba la columna de estado de la tabla de casos de prueba):
 
 | Marcador | Cantidad | Qué falta |
 |---|---|---|
-| `[resultado]` en la Tabla 8 | 23 | Ejecutar los casos de prueba y registrar el resultado y la fecha |
-| `[resultado de las pruebas funcionales ejecutadas]` y `[indicar resultados]` | 2 | Cifra de casos aprobados al cerrar la iteración 3 |
-| `[plataforma de alojamiento]`, `[URL del sistema]` (dos veces), `[enlace al repositorio]` (dos veces) | 5 | Completar al desplegar |
-| `[cultivo y módulo piloto]` | 1 | Confirmar el cultivo del módulo piloto |
+| `[resultado]` y `[pendiente]` en las veintitrés filas de la Tabla 8 | 46 | Ejecutar cada caso y registrar el resultado obtenido, el estado y la fecha |
 | `[N]` (números de figura) | 3 | Asignar al ensamblar el documento |
+| `[Firebase Hosting u otra plataforma]`, `[URL del sistema]` y `[enlace al repositorio]` en el apartado 2.9 | 3 | Completar al desplegar |
+| `[pendiente: ...]` en las conclusiones 5 y 6 | 2 | Se cierran con los dos grupos anteriores |
+| `[cultivo y módulo piloto]` | 1 | Confirmar el cultivo del prototipo con el tutor |
 
 Además hay **33 notas internas de revisión** dentro del documento (`<!-- -->`), que no se imprimen y
 señalan cada punto que requiere atención antes de la entrega.
@@ -101,7 +102,7 @@ señalan cada punto que requiere atención antes de la entrega.
 6. **Aplicar el plan de recorte de extensión**, previa conformidad del tutor.
 7. **Completar los preliminares** en la plantilla oficial, cuando el contenido esté cerrado.
 
-Los puntos 3 y 4 son los que más marcadores cierran de una sola vez: 28 de los 34.
+Los puntos 3 y 4 son los que más marcadores cierran de una sola vez: **51 de los 55**.
 
 ---
 
