@@ -61,6 +61,16 @@ El sistema cuenta además con un **servicio backend** (FastAPI sobre Python 3.13
 - Ejecución local en modo de demostración, sin credenciales: desde `backend/`, con `USAR_REPOSITORIO_EN_MEMORIA=true`, ejecutar `uvicorn app.main:app --reload`
 - Contrato navegable del servicio (OpenAPI): `http://localhost:8000/docs`
 - Pruebas automatizadas del backend: `python -m pytest` desde `backend/` (54 casos, sin credenciales ni conexión)
+- Apuntar la aplicación al backend, sin editar el código:
+
+```bash
+flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000        # emulador de Android
+flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:8000
+flutter build web --dart-define=API_BASE_URL=https://TU-API.onrender.com
+```
+
+Si no se define `API_BASE_URL`, la aplicación usa una dirección local adecuada al dispositivo
+(`10.0.2.2` en el emulador de Android y `localhost` en la web y el escritorio).
 
 ## 6. Requisitos para ejecutar el proyecto
 
@@ -174,7 +184,7 @@ flutter build apk --release
 - Los valores del dashboard se editan manualmente; **aún no** están conectados a sensores reales.
 - La gráfica del historial simula el filtro por periodo (3/6/12 meses) con `take()`.
 - La casilla "Recordarme" del login aún no guarda las credenciales en preferencias.
-- La gestión de datos del dominio a través de la API todavía no está integrada en la aplicación: hoy los módulos de cultivos, lecturas, alertas y rangos persisten en el dispositivo (`SharedPreferences`) y falta migrarlos al backend. El servicio de API ya está implementado y probado.
+- La gestión de datos del dominio a través de la API todavía no está integrada en la aplicación: el servicio de API está implementado y probado (54 casos) y la aplicación ya cuenta con su cliente de API y sus pruebas (16 casos), pero falta conectar las pantallas y los repositorios, de modo que los módulos de cultivos, lecturas, alertas y rangos siguen persistiendo en el dispositivo (`SharedPreferences`).
 - Está pensado para Android/web; Windows Desktop no es requisito de la clase.
 - La confirmación por correo del registro depende de la configuración de Firebase Authentication.
 - **Eliminar** un usuario desde el panel borra su perfil de Firestore, pero **no** su cuenta de Authentication (requeriría Cloud Functions).
