@@ -44,7 +44,10 @@ const List<VariableCatalogo> catalogoVariables = <VariableCatalogo>[
   VariableCatalogo(codigo: 'ph', nombre: 'pH', unidad: ''),
   VariableCatalogo(codigo: 'tds', nombre: 'Sólidos disueltos totales', unidad: 'ppm'),
   VariableCatalogo(codigo: 'ec', nombre: 'Conductividad eléctrica', unidad: 'mS/cm'),
-  VariableCatalogo(codigo: 'temp_solucion', nombre: 'Temperatura de la solución', unidad: '°C'),
+  VariableCatalogo(
+      codigo: 'temp_solucion',
+      nombre: 'Temperatura de la solución nutritiva',
+      unidad: '°C'),
   VariableCatalogo(codigo: 'temp_ambiental', nombre: 'Temperatura ambiental', unidad: '°C'),
   VariableCatalogo(codigo: 'humedad', nombre: 'Humedad relativa', unidad: '%'),
   VariableCatalogo(codigo: 'nivel_agua', nombre: 'Nivel de agua', unidad: 'cm'),
@@ -247,6 +250,9 @@ class Lectura {
   final DateTime timestamp;
   final String? estadoRango;
 
+  /// Observación anotada al registrar la medición; nula si no se anotó.
+  final String? observacion;
+
   bool get esManual => origen == 'manual';
 
   String get nombreVariable => nombreDeVariable(variable);
@@ -261,6 +267,7 @@ class Lectura {
       origen: _texto(json, 'origen', porDefecto: 'automatico'),
       timestamp: _fecha(json, 'timestamp'),
       estadoRango: json['estado_rango']?.toString(),
+      observacion: json['observacion']?.toString(),
     );
   }
 }

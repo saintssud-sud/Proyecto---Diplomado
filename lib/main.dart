@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'app.dart';
 import 'config/app_config.dart';
 import 'controllers/context_controller.dart';
+import 'controllers/historial_controller.dart';
 import 'controllers/panel_controller.dart';
 import 'controllers/preferences_controller.dart';
 import 'controllers/usuario_controller.dart';
@@ -88,6 +89,13 @@ Future<void> main() async {
           alertas: AlertasApiRepository(cliente),
         );
       },
+    ),
+  );
+  providers.add(
+    ChangeNotifierProvider<HistorialController>(
+      create: (providerContext) => HistorialController(
+        lecturas: LecturasApiRepository(providerContext.read<ApiCliente>()),
+      ),
     ),
   );
 
