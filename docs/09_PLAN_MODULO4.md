@@ -168,3 +168,48 @@ preliminares ni anexos.
 | Disponibilidad y calibración del hardware ESP32 | Medio | El sistema se verifica sin hardware: alta manual y lecturas de prueba contra la API; se declara como limitación |
 | Documento y producto divergen al final | Medio | Cada entrega semanal actualiza el mismo archivo; ninguna cifra del documento sin evidencia |
 | Historial de repositorio concentrado | Bajo | Confirmaciones semanales con mensajes descriptivos, ya en curso |
+
+---
+
+## 7. Estado de avance
+
+### 7.1 Hecho
+
+**Repositorio (confirmaciones del 13/09).**
+
+| Confirmación | Contenido |
+|---|---|
+| `chore(firebase)` | `firestore.rules`, `firebase.json` (reglas + hosting) y `.firebaserc` incorporados al control de versiones; `.gitignore` deja de excluir la configuración de despliegue |
+| `docs(plan)` | Este documento |
+| `docs(seguridad)` | `.env.example` con las variables del backend, las claves de cliente de Firebase y la ruta de la plantilla |
+
+Las reglas de seguridad **no están publicadas todavía**: el archivo es una propuesta y debe probarse en *Rules Playground* antes de ejecutar `firebase deploy --only firestore:rules`. Las tres confirmaciones están **sin publicar** en el repositorio remoto.
+
+**Monografía.**
+
+| Apartado | Estado |
+|---|---|
+| 1.3 | Se agregó el párrafo de limitaciones, con la declaración de que el cumplimiento de los requisitos mínimos no depende del hardware |
+| 2.1.3 · 2.1.4 · 2.1.5 | Primera mención de cada tecnología con su versión, conforme al punto 5 de los Lineamientos Técnicos |
+| 2.2 | Reescrito: iteración semanal justificada, Tabla 3 con fechas reales y estado, evidencia de aplicación y declaración del uso de asistentes de IA |
+| 2.3.1 | Actores sin cambios: queda como punto único de decisión, con una nota que indica los cuatro lugares a ajustar según la opción que se apruebe |
+| 2.3.2 | Trece requisitos funcionales reescritos con criterio de aceptación, alineados con la arquitectura de la API |
+| 2.3.3 | Ocho requisitos no funcionales con magnitud verificable y mecanismo de comprobación |
+| 2.3.4 | Diez casos de uso, cada uno ligado a su requisito |
+| 2.3.5 | Priorización MoSCoW (Tabla 4), con el alcance excluido declarado de forma expresa |
+| 2.4.1 | Arquitectura de monolito modular, con la justificación del descarte de microservicios y de cómputo sin servidor |
+| 2.4.4 | Contrato de la API versión 1 (Tabla 5), con formato de peticiones, de errores, autenticación y versionado |
+| 2.5 | Tabla 6 con las versiones reales del stack, tomadas de `pubspec.lock` y del SDK de Flutter |
+| 2.7 | Reescrito: sesión, autorización en servidor, autenticación del dispositivo, doble validación, cifrado y variables sensibles |
+| 2.8 | Tabla 7 con veintitrés casos de prueba vinculados a los requisitos, listos para registrar resultado y fecha |
+
+Numeración de tablas verificada: 1 a 7, en orden de aparición y con sus referencias en el texto coherentes.
+
+**Herramientas y versiones verificadas.** Flutter 3.44.8 (canal estable), Dart 3.12.2, `cloud_firestore` 6.9.0, `firebase_core` 4.14.0, `firebase_auth` 6.6.1, `provider` 6.1.5+1, `http` 1.6.0, `shared_preferences` 2.5.5, `geolocator` 14.0.3, `flutter_map` 8.3.2, `latlong2` 0.10.1.
+
+### 7.2 Pendiente, en orden
+
+1. **Tutoría del 14/09** — cerrar las tres decisiones de la ficha: alcance de roles, backend con API propia y recortes.
+2. **Documento (E1)** — ajustar 1.5 y 2.3.1 a la decisión de roles y revisar que el objetivo específico 1 y el apartado 3.2 queden coherentes; confirmar cuál es el archivo maestro del documento: el borrador en Markdown o el documento de Word generado con la plantilla oficial.
+3. **Repositorio** — publicar las tres confirmaciones; confirmar el acceso del docente; probar y publicar las reglas.
+4. **Iteración 2 (E2)** — backend FastAPI con el contrato de la API, CRUD del dominio sobre Firestore, migración de la capa de datos de Flutter, y despliegue de la API y de la aplicación web.
