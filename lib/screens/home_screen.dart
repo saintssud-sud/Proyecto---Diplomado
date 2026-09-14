@@ -115,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const Divider(),
             ListTile(
               leading: const Icon(Icons.logout),
-              title: const Text('Cerrar sesion'),
+              title: const Text('Cerrar sesión'),
               onTap: () {
                 Navigator.of(context).pop();
                 AuthService().signOut();

@@ -245,6 +245,20 @@ Numeración de tablas verificada: 1 a 7, en orden de aparición y con sus refere
 
 `flutter analyze` sin problemas y `flutter test` con 63 casos aprobados. Los casos CP-16 y CP-17 de la tabla del apartado 2.8 (estado vacío y estado con error del panel) ya tienen cobertura automatizada a nivel de componente; quedarán completos cuando las pantallas queden conectadas a los repositorios.
 
+**Documento · entregables del 14/09 (fuera del repositorio, en la raíz del proyecto).**
+
+| Pieza | Estado |
+|---|---|
+| Apartado 1.1.2 | Reescrito con **cuatro soluciones concretas** del dominio (Bluelab, Hanna Instruments, TrolMaster y MyCodo), cada una con qué resuelve y qué deja sin resolver, con fuente citada. Antes solo había categorías genéricas, que es lo que el punto 3.1.1 de los Lineamientos no admite |
+| Tabla 1 | Ampliada con las cuatro soluciones y retitulada «Matriz de antecedentes y soluciones existentes»: 11 filas y 6 columnas coherentes. No se agregó una tabla nueva para no renumerar las siete del documento |
+| Bibliografía | Cuatro entradas nuevas en el estilo ISO 690-2 del documento; **19 entradas con orden alfabético verificado** |
+| `Diagramas Mermaid - Modulo 4.md` | Las tres figuras que exigen los Lineamientos y que no existían: casos de uso (con la correspondencia uno a uno con los requisitos funcionales), arquitectura de componentes y **secuencia del registro de una lectura**, que es la que conviene mostrar en la defensa cuando pregunten por el contrato |
+| `Diagrama Mermaid - Antecedentes y Propuesta.md` | Corregido: describía el envío de lecturas «directamente a Cloud Firestore» y listaba cuatro roles, ambas cosas superadas |
+| `Anexo A - Manual de usuario.md` | **Entregable obligatorio del lineamiento que no existía.** Quince apartados: qué es el sistema, requisitos, perfiles, acceso, navegación y una sección por pantalla con los rótulos reales verificados contra el código, más los cuatro estados de las vistas, preguntas frecuentes, glosario de las siete variables y buenas prácticas |
+| Rótulo «Cerrar sesion» | Corregido a «Cerrar sesión» en la barra lateral; verificado con `flutter analyze` y las 63 pruebas |
+
+**Recomendación pendiente de decisión.** El repositorio versiona el código y las bitácoras, pero **la monografía y los anexos no están bajo control de versiones**: viven como archivos sueltos en la raíz. Con cuatro semanas de escritura por delante, conviene incorporarlos al repositorio (o a uno propio para el documento) para no depender de copias manuales.
+
 **Despliegue preparado y comando de arranque verificado.**
 
 | Pieza | Estado |
