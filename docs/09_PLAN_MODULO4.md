@@ -234,8 +234,12 @@ Numeración de tablas verificada: 1 a 7, en orden de aparición y con sus refere
 | `lib/services/api_errores.dart` | Dos tipos de error distintos — `ErrorApi` (rechazo del servidor, con código, mensaje y detalle por campo) y `ErrorConexion` (la petición no se completó) — cada uno con su mensaje para el usuario |
 | `lib/services/api_cliente.dart` | Adjunta el token de identidad, traduce el formato de error del contrato, distingue red de negocio, falla sin salir a la red cuando no hay sesión, y decodifica en UTF-8 explícitamente |
 | `test/api_cliente_test.dart` | 16 pruebas con un servicio simulado, incluida la del UTF-8 y la de «sin sesión no se llama al servicio» |
+| `lib/models/api/modelos_api.dart` | Modelos fieles al contrato del backend: módulo, perfil, rango, lectura, resumen y alerta, con el catálogo de variables y un error propio para las respuestas que no cumplen el contrato |
+| `lib/repositories/api/` | Cinco repositorios —módulos, lecturas, rangos, alertas y perfiles— que arman las rutas del contrato, envían solo los campos declarados y convierten las respuestas en modelos |
+| `lib/utils/formato_fecha.dart` | Formato de fecha y hora en un solo lugar; antes cada pantalla lo escribía a mano y producía etiquetas distintas para la misma fecha |
+| `test/repositorios_api_test.dart` | 25 pruebas: rutas, nombres de campo del contrato, filtros, conversión de modelos y propagación de los errores del servidor |
 
-`flutter analyze` sin problemas y `flutter test` con 16 casos aprobados.
+`flutter analyze` sin problemas y `flutter test` con 41 casos aprobados (16 del cliente, 25 de los modelos y repositorios).
 
 **Herramientas y versiones verificadas.** Flutter 3.44.8 (canal estable), Dart 3.12.2, `cloud_firestore` 6.9.0, `firebase_core` 4.14.0, `firebase_auth` 6.6.1, `provider` 6.1.5+1, `http` 1.6.0, `shared_preferences` 2.5.5, `geolocator` 14.0.3, `flutter_map` 8.3.2, `latlong2` 0.10.1.
 
@@ -250,4 +254,4 @@ Numeración de tablas verificada: 1 a 7, en orden de aparición y con sus refere
    - migrar la capa de datos de Flutter para que consuma la API en lugar de `SharedPreferences`;
    - desplegar la API en Render y publicar la aplicación web en Firebase Hosting, con su dirección pública;
    - registrar las capturas del panel de la plataforma (compilación, variables de entorno y registros) para el apartado 2.9.
-5. **Capa de API de la aplicación (en curso)** — el cliente está implementado y probado. Falta: los repositorios por recurso (módulos, lecturas, rangos, alertas), la conexión de las pantallas con sus **cuatro estados de vista** (carga, con datos, vacío y error) y la retirada de la persistencia local para los datos del dominio. Es lo que cierra el requisito mínimo 3.
+5. **Capa de API de la aplicación (en curso)** — el cliente, los modelos del contrato y los cinco repositorios están implementados y probados. Falta: **conectar las pantallas** con sus cuatro estados de vista (carga, con datos, vacío y error) y retirar la persistencia local de los datos del dominio. Es lo que cierra el requisito mínimo 3. Los modelos locales (`Cultivo`, `Medicion`, `Alerta`, `VariableRango`) se retiran a medida que cada pantalla migra; no se convierten entre sí porque su forma es distinta y la conversión perdería datos.
