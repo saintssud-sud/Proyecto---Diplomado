@@ -11,10 +11,14 @@ coverage/
 .vscode/
 *.iml
 
-# ==================== Python (scripts de documentación) ====================
+# ==================== Python (scripts y backend) ====================
 .venv/
 __pycache__/
 *.pyc
+.pytest_cache/
+**/pytest-cache-files-*/
+.tmp-pip/
+.coverage
 
 # ==================== Credenciales y datos privados ====================
 # NUNCA subir estos archivos. Usa las plantillas *.example.* como guía.

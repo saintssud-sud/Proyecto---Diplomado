@@ -1,0 +1,12 @@
+# Dependencias para ejecutar las pruebas del backend
+#
+# Ejecución:  python -m pytest
+#
+# Las pruebas no requieren credenciales ni conexión: sustituyen el repositorio
+# de Cloud Firestore por el de memoria y el verificador de identidad por uno
+# simulado, de modo que puedan ejecutarse en cualquier equipo.
+
+-r requirements.txt
+
+pytest>=8
+httpx>=0.27

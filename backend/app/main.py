@@ -1,0 +1,67 @@
+"""Punto de entrada del backend.
+
+Ejecución en local::
+
+    uvicorn app.main:app --reload --port 8000
+
+Documentación navegable del contrato (OpenAPI): http://localhost:8000/docs
+"""
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from . import __version__
+from .config import obtener_configuracion
+from .errores import registrar_manejadores_de_error
+from .rutas import enrutador_api
+
+DESCRIPCION = """
+API del sistema SI.G.VA.C.H. (Sistema de Gestión de Variables para Cultivos Hidropónicos).
+
+El backend concentra la validación de los datos, la autorización por rol y las reglas
+de negocio; es el único componente que accede a Cloud Firestore. La documentación que
+sigue es el contrato de la API descrito en el apartado 2.4.4 de la monografía.
+
+Identidades admitidas:
+* **Usuarios**: token de identidad de Firebase Authentication en la cabecera `Authorization`.
+* **Módulo de adquisición**: clave de dispositivo en la cabecera `X-Device-Key`.
+"""
+
+
+def crear_aplicacion() -> FastAPI:
+    """Construye la aplicación con sus rutas, su CORS y sus manejadores de error."""
+    configuracion = obtener_configuracion()
+
+    aplicacion = FastAPI(
+        title="SIGVACH — API",
+        description=DESCRIPCION,
+        version=__version__,
+        openapi_url="/api/v1/openapi.json",
+        docs_url="/docs",
+        redoc_url="/redoc",
+    )
+
+    aplicacion.add_middleware(
+        CORSMiddleware,
+        allow_origins=configuracion.origenes,
+        allow_credentials=False,
+        allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+        allow_headers=["Authorization", "Content-Type", "X-Device-Key"],
+    )
+
+    registrar_manejadores_de_error(aplicacion)
+    aplicacion.include_router(enrutador_api, prefix="/api/v1")
+
+    @aplicacion.get("/", include_in_schema=False)
+    def raiz() -> dict[str, str]:
+        """Respuesta informativa para comprobar que el servicio está en pie."""
+        return {
+            "servicio": "SIGVACH API",
+            "version_api": configuracion.version_api,
+            "documentacion": "/docs",
+        }
+
+    return aplicacion
+
+
+app = crear_aplicacion()

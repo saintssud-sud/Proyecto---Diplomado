@@ -4,6 +4,8 @@
 
 **SIGVACH** es una aplicación móvil desarrollada con **Flutter** que permite monitorear y gestionar las principales variables de un cultivo hidropónico: **temperatura, humedad, pH, TDS (conductividad) y nivel de agua**.
 
+Se compone de dos piezas: la **aplicación Flutter** y el **servicio backend** que expone la API y concentra la validación, la autorización y las reglas de negocio (apartado 5).
+
 Forma parte de una **práctica de aula acumulativa** en la que se integran conceptos como asincronía, consumo de API REST, GPS, mapas, persistencia local y autenticación con **Firebase** (Authentication + Cloud Firestore).
 
 > Este proyecto **no es otro proyecto distinto**: es el mismo sistema que crece sesión a sesión (Sesión 1 → Sesión 2 → Proyecto Final 360).
@@ -38,25 +40,41 @@ Forma parte de una **práctica de aula acumulativa** en la que se integran conce
 | Provider | Gestión de estado. |
 | Firebase Authentication | Registro e inicio de sesión (correo/contraseña). |
 | Cloud Firestore | Base de datos NoSQL (perfiles de usuario en `usuarios/{uid}`). |
+| FastAPI sobre Python 3.13 | Backend del sistema: expone el contrato de la API, valida los datos, autoriza por rol y aplica las reglas de negocio. |
 | SharedPreferences | Persistencia local en el dispositivo. |
 | HTTP + Open-Meteo | Consumo de API REST para el clima. |
 | flutter_launcher_icons | Generación de iconos de la app. |
 
 **Versiones principales (`pubspec.yaml`):** `provider 6.1.5+1`, `shared_preferences 2.5.5`, `firebase_core ^4.14.0`, `firebase_auth ^6.6.1`, `cloud_firestore ^6.9.0`, `http 1.6.0`, `geolocator 14.0.3`, `flutter_map 8.3.2`, `latlong2 0.10.1`.
 
-## 5. Requisitos para ejecutar el proyecto
+## 5. Backend de la API
+
+El sistema cuenta además con un **servicio backend** (FastAPI sobre Python 3.13) que expone el contrato de la API, valida los datos de entrada, autoriza cada operación según el rol y es el único componente que accede a Cloud Firestore. Ni la aplicación ni el módulo de adquisición tocan la base de datos directamente.
+
+| Componente | Responsabilidad |
+|---|---|
+| Aplicación Flutter | Presenta la información y recoge los datos del usuario; no decide reglas de negocio |
+| Backend (API REST) | Autentica, valida, autoriza y aplica las reglas de negocio |
+| Cloud Firestore | Guarda el estado del dominio |
+
+- Código y documentación del servicio: [`backend/README.md`](backend/README.md)
+- Ejecución local en modo de demostración, sin credenciales: desde `backend/`, con `USAR_REPOSITORIO_EN_MEMORIA=true`, ejecutar `uvicorn app.main:app --reload`
+- Contrato navegable del servicio (OpenAPI): `http://localhost:8000/docs`
+- Pruebas automatizadas del backend: `python -m pytest` desde `backend/` (54 casos, sin credenciales ni conexión)
+
+## 6. Requisitos para ejecutar el proyecto
 
 - Flutter SDK **>= 3.35.0** y Dart **>= 3.9.0**.
 - Editor (VS Code con extensión Flutter, o Android Studio).
 - Un proyecto **Firebase** con **Authentication** (correo/contraseña) y **Cloud Firestore** habilitados.
-- Los archivos de configuración de Firebase: `lib/firebase_options.dart` y `android/app/google-services.json`. **No se publican en el repositorio**: se generan con `flutterfire configure` (ver sección 6).
+- Los archivos de configuración de Firebase: `lib/firebase_options.dart` y `android/app/google-services.json`. **No se publican en el repositorio**: se generan con `flutterfire configure` (ver sección 7).
 - Dispositivo **Android** (o Chrome para probar).
 
 > ℹ️ La configuración de Firebase va **incrustada** en la app: no hace falta `--dart-define` ni archivos `.json` sueltos.
 
 > ⚠️ Regla de estabilidad del aula: `flutter pub get` **SÍ** — `flutter pub upgrade` **NO** (podría romper dependencias).
 
-## 6. Instrucciones de instalación y ejecución
+## 7. Instrucciones de instalación y ejecución
 
 ### Windows
 
@@ -95,9 +113,9 @@ flutterfire configure --project=TU-PROYECTO-FIREBASE
 
 Eso crea `lib/firebase_options.dart` y `android/app/google-services.json`. Las plantillas `lib/firebase_options.example.dart` y `android/app/google-services.example.json` muestran el formato esperado.
 
-> ⚠️ Los archivos con las API keys de Firebase (`lib/firebase_options.dart` y `android/app/google-services.json`) están en `.gitignore`: **nunca** se suben al repositorio.
+> ⚠️ Los archivos con las API keys de Firebase (`lib/firebase_options.dart` y `android/app/google-services.json`) están en `.gitignore`: **nunca** se suben al repositorio. La plantilla de las variables de entorno, incluida la del backend, está en `.env.example` (ver sección 7).
 
-## 7. Estructura general del proyecto
+## 8. Estructura general del proyecto
 
 ```
 lib/
@@ -114,12 +132,13 @@ lib/
 │                            #   LocationService, PreferencesService
 └── widgets/                 # context_card, max_width_box, mode_banner
 
+backend/                     # servicio de la API (FastAPI): app/ y pruebas/
 assets/images/               # logo e iconos de la app
 scripts/                     # scripts de preparación y menú (Windows / Linux)
 docs/                        # documentación e hilo conductor del proyecto
 ```
 
-## 8. Procedimiento para generar el APK
+## 9. Procedimiento para generar el APK
 
 ### APK de depuración (rápido para probar)
 
@@ -144,23 +163,23 @@ flutter build apk --release
 
 > 📌 El APK de release incluye la configuración de Firebase compilada dentro de la app (vía `lib/firebase_options.dart`). No es necesario usar `--dart-define`.
 
-## 9. Versión entregada
+## 10. Versión entregada
 
 - **Versión:** `1.0.0+1` (definida en `pubspec.yaml`).
 - **Sesión / etapa:** Sesión 2 — Proyecto Final SIGVACH.
 - **Plataforma objetivo:** Android (y web para pruebas).
 
-## 10. Limitaciones conocidas
+## 11. Limitaciones conocidas
 
 - Los valores del dashboard se editan manualmente; **aún no** están conectados a sensores reales.
 - La gráfica del historial simula el filtro por periodo (3/6/12 meses) con `take()`.
 - La casilla "Recordarme" del login aún no guarda las credenciales en preferencias.
-- El backend es **Firebase** (no hay modo demo).
+- La gestión de datos del dominio a través de la API todavía no está integrada en la aplicación: hoy los módulos de cultivos, lecturas, alertas y rangos persisten en el dispositivo (`SharedPreferences`) y falta migrarlos al backend. El servicio de API ya está implementado y probado.
 - Está pensado para Android/web; Windows Desktop no es requisito de la clase.
 - La confirmación por correo del registro depende de la configuración de Firebase Authentication.
 - **Eliminar** un usuario desde el panel borra su perfil de Firestore, pero **no** su cuenta de Authentication (requeriría Cloud Functions).
 
-## 11. Autor del proyecto
+## 12. Autor del proyecto
 
 - **Autor:** Freddy Santos N.
 - **Proyecto / Materia:** Proyecto SIGVACH — Programación de aplicaciones móviles (Flutter).

@@ -1,0 +1,22 @@
+# Dependencias del backend de SIGVACH (servicio de la API)
+#
+# Instalación:      pip install -r requirements.txt
+# Ejecución local:  uvicorn app.main:app --reload --port 8000
+# Documentación:    http://localhost:8000/docs
+#
+# El módulo de adquisición no declara dependencias aquí: vive en el firmware
+# del dispositivo, no en este servicio.
+
+# --- Verificadas con la batería de pruebas del backend (54 casos) -----------
+fastapi==0.141.1
+pydantic==2.13.5
+pydantic-settings==2.15.0
+
+# --- Necesarias en el despliegue, pendientes de verificar en local ----------
+# uvicorn: servidor que expone la aplicación. La plataforma de alojamiento lo
+#   invoca con el comando indicado en el archivo README de este directorio.
+# firebase-admin: SDK con el que el backend accede a Cloud Firestore y verifica
+#   los tokens de identidad. Requiere las credenciales de la cuenta de servicio,
+#   que se reciben por variables de entorno y nunca están en el repositorio.
+uvicorn[standard]>=0.30
+firebase-admin>=6.5
