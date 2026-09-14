@@ -1,0 +1,36 @@
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "sigvach26-bd",
+          "appId": "1:1068988591438:android:be6a94641895f81cf9c21f",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "sigvach26-bd",
+          "configurations": {
+            "android": "1:1068988591438:android:be6a94641895f81cf9c21f",
+            "web": "1:1068988591438:web:24a20a2e4fd5b02ef9c21f",
+            "windows": "1:1068988591438:web:2afc83aee5981750f9c21f"
+          }
+        }
+      }
+    }
+  }
+}

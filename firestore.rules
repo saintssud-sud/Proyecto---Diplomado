@@ -1,0 +1,153 @@
+rules_version = '2';
+
+// =============================================================================
+// SIGVACH — Reglas de seguridad de Cloud Firestore
+// Proyecto: SIGVACH · Módulo 4 (Diplomado en Desarrollo Web y Aplicaciones Móviles)
+//
+// Cómo se publican:
+//   firebase deploy --only firestore:rules
+//
+// Antes de publicar, probar cada caso en la pestaña "Rules Playground" de la
+// consola de Firebase (con sesión de administrador y de operador).
+//
+// Diseño:
+//   · `usuarios` es la única colección que la aplicación cliente escribe
+//     directamente, porque el perfil se crea al registrarse.
+//   · Las colecciones del dominio (módulos de cultivo, lecturas, rangos y
+//     alertas) NO son accesibles desde el cliente: únicamente las escribe el
+//     backend con su cuenta de servicio, que no está sujeta a estas reglas.
+//     Esto materializa la regla de diseño del módulo: nadie toca la base de
+//     datos sin pasar por el backend, que es quien valida y autoriza.
+//   · Todo lo que no esté permitido explícitamente queda denegado.
+// =============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // -------------------------------------------------------------------------
+    // Funciones auxiliares
+    // -------------------------------------------------------------------------
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function uid() {
+      return request.auth.uid;
+    }
+
+    function profilePath() {
+      return /databases/$(database)/documents/usuarios/$(uid());
+    }
+
+    function hasProfile() {
+      return signedIn() && exists(profilePath());
+    }
+
+    function currentRole() {
+      return hasProfile() ? get(profilePath()).data.rol : '';
+    }
+
+    // Un perfil sin el campo `activo` se considera habilitado: solo la
+    // desactivación explícita (activo == false) bloquea el acceso.
+    function isEnabled() {
+      return hasProfile() && get(profilePath()).data.activo != false;
+    }
+
+    function isAdmin() {
+      return isEnabled() && currentRole() == 'admin';
+    }
+
+    function replyEmail() {
+      return request.auth.token.email;
+    }
+
+    // -------------------------------------------------------------------------
+    // usuarios — perfil del usuario, con id de documento = uid de Authentication
+    // -------------------------------------------------------------------------
+    match /usuarios/{userId} {
+
+      // Cada usuario lee su propio perfil; el administrador, todos.
+      allow read: if signedIn() && (userId == uid() || isAdmin());
+
+      // El perfil se crea una sola vez, al registrarse: el id debe coincidir con
+      // el uid, el correo con el del token y el rol solo puede ser 'usuario'.
+      // El rol de administrador se asigna después desde el panel o desde la
+      // consola, nunca en el alta.
+      allow create: if signedIn()
+        && userId == uid()
+        && request.resource.data.email == replyEmail()
+        && request.resource.data.activo == true
+        && (
+             request.resource.data.rol == 'usuario'
+             || (request.resource.data.rol == 'admin'
+                 && replyEmail() == 'admin@sigvach.com')
+           );
+
+      // El usuario edita sus datos personales, pero NO puede cambiar su propio
+      // rol ni su estado (evita la escalada de privilegios). El administrador
+      // sí puede cambiar rol y estado de cualquier usuario.
+      allow update: if signedIn() && (
+        (
+          userId == uid()
+          && request.resource.data.rol == resource.data.rol
+          && request.resource.data.activo == resource.data.activo
+        )
+        || isAdmin()
+      );
+
+      // Solo el administrador elimina perfiles.
+      allow delete: if isAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // Colecciones del dominio — acceso exclusivo del backend
+    //
+    // El backend escribe con la cuenta de servicio, que no pasa por estas
+    // reglas. Ningún cliente (ni la aplicación Flutter ni el ESP32) escribe
+    // aquí directamente: el ESP32 publica contra la API con su clave de
+    // dispositivo y la aplicación consume la API con su token de identidad.
+    // -------------------------------------------------------------------------
+    match /modulos_cultivo/{document=**} {
+      allow read, write: if false;
+    }
+
+    match /perfiles_cultivo/{document=**} {
+      allow read, write: if false;
+    }
+
+    match /variables/{document=**} {
+      allow read, write: if false;
+    }
+
+    match /lecturas/{document=**} {
+      allow read, write: if false;
+    }
+
+    match /alertas/{document=**} {
+      allow read, write: if false;
+    }
+
+    // -------------------------------------------------------------------------
+    // Colecciones heredadas del proyecto base del aula — cerradas
+    //
+    // `registros` y `firestore_demo` provienen del proyecto acumulativo y no
+    // forman parte del dominio de SIGVACH. Se cierran para no dejar superficie
+    // expuesta.
+    // -------------------------------------------------------------------------
+    match /registros/{document=**} {
+      allow read, write: if false;
+    }
+
+    match /firestore_demo/{document=**} {
+      allow read, write: if false;
+    }
+
+    // -------------------------------------------------------------------------
+    // Denegación por defecto: cualquier colección no contemplada queda cerrada.
+    // -------------------------------------------------------------------------
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -22,9 +22,15 @@ __pycache__/
 # Firebase (project_id + API keys de cliente)
 android/app/google-services.json
 lib/firebase_options.dart
-# Metadata de la FlutterFire CLI: no tiene API keys, pero expone el project_id.
-# El archivo local se conserva para que flutterfire configure lo reutilice.
-firebase.json
+
+# firebase.json y .firebaserc SÍ se versionan: son la configuración de
+# despliegue del proyecto (reglas de Firestore y hosting). No contienen claves
+# privadas; el identificador del proyecto y las claves de cliente de Firebase
+# son públicos por diseño y viajan dentro del paquete web desplegado. La
+# protección real está en firestore.rules y en el backend.
+#
+# OJO: si se vuelve a ejecutar `flutterfire configure`, revisar que firebase.json
+# conserve las claves "firestore" y "hosting" después de la regeneración.
 
 # Firma de Android (keystores + passwords)
 android/local.properties
