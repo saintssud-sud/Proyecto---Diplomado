@@ -205,6 +205,23 @@ Las reglas de seguridad **no están publicadas todavía**: el archivo es una pro
 
 Numeración de tablas verificada: 1 a 7, en orden de aparición y con sus referencias en el texto coherentes.
 
+**Backend de la API** (confirmación `c37792e`, 34 archivos, 3176 líneas).
+
+| Pieza | Estado |
+|---|---|
+| Contrato de la API versión 1 | 26 operaciones sobre 11 rutas, con documentación OpenAPI generada desde el propio código (`/docs`) |
+| Validación en servidor | Esquemas que rechazan variable fuera del catálogo, valor fuera del límite físico, unidad incoherente, marca de tiempo futura y campos ajenos al contrato; la respuesta 422 indica el campo rechazado |
+| Autenticación | Token de identidad verificado con Firebase Authentication para las personas; clave de dispositivo en `X-Device-Key` para el módulo de adquisición |
+| Autorización | Resuelta en el servidor a partir del perfil y del rol; una cuenta desactivada o sin perfil recibe 403 |
+| Reglas de negocio | Evaluación de cada lectura contra el rango vigente, generación de una alerta por lectura fuera de rango, referenciada a su lectura, resumen de series y exportación en CSV |
+| Persistencia | Interfaz de repositorio con dos implementaciones: Cloud Firestore para el despliegue y memoria para el desarrollo y las pruebas |
+| Pruebas | 54 casos automatizados, todos aprobados, ejecutables sin credenciales ni conexión |
+| Modo de demostración | `USAR_REPOSITORIO_EN_MEMORIA=true` permite demostrar la API completa sin Firebase, útil para la defensa |
+
+**Bloqueos de entorno resueltos.** La instalación de paquetes con `pip` fallaba con «Permission denied» al desempaquetar, en tres configuraciones distintas; se resolvió con una única ejecución de acceso ampliado, autorizada por el usuario. `uvicorn` y `firebase-admin` quedaron declarados en `requirements.txt` pero **no instalados ni verificados** en este equipo: el arranque real del servidor y la conexión con Firestore deben comprobarse en el despliegue.
+
+**Restos que no se pudieron borrar.** Las carpetas `.tmp-pip/` (raíz) y `backend/pytest-cache-files-*/` quedaron con permisos que el entorno no permite modificar; están excluidas por `.gitignore` para que no entren al repositorio, pero conviene eliminarlas a mano.
+
 **Herramientas y versiones verificadas.** Flutter 3.44.8 (canal estable), Dart 3.12.2, `cloud_firestore` 6.9.0, `firebase_core` 4.14.0, `firebase_auth` 6.6.1, `provider` 6.1.5+1, `http` 1.6.0, `shared_preferences` 2.5.5, `geolocator` 14.0.3, `flutter_map` 8.3.2, `latlong2` 0.10.1.
 
 ### 7.2 Pendiente, en orden
@@ -212,4 +229,9 @@ Numeración de tablas verificada: 1 a 7, en orden de aparición y con sus refere
 1. **Tutoría del 14/09** — cerrar las tres decisiones de la ficha: alcance de roles, backend con API propia y recortes.
 2. **Documento (E1)** — ajustar 1.5 y 2.3.1 a la decisión de roles y revisar que el objetivo específico 1 y el apartado 3.2 queden coherentes; confirmar cuál es el archivo maestro del documento: el borrador en Markdown o el documento de Word generado con la plantilla oficial.
 3. **Repositorio** — publicar las tres confirmaciones; confirmar el acceso del docente; probar y publicar las reglas.
-4. **Iteración 2 (E2)** — backend FastAPI con el contrato de la API, CRUD del dominio sobre Firestore, migración de la capa de datos de Flutter, y despliegue de la API y de la aplicación web.
+4. **Iteración 2 (E2)** — lo que falta del vertical funcional:
+   - instalar `uvicorn` y `firebase-admin`, arrancar el servicio y verificar la conexión con Cloud Firestore;
+   - crear los índices compuestos de Firestore que exigen las consultas de lecturas y alertas;
+   - migrar la capa de datos de Flutter para que consuma la API en lugar de `SharedPreferences`;
+   - desplegar la API en Render y publicar la aplicación web en Firebase Hosting, con su dirección pública;
+   - registrar las capturas del panel de la plataforma (compilación, variables de entorno y registros) para el apartado 2.9.
