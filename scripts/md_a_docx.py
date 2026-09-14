@@ -413,6 +413,44 @@ def _agregar_preliminares(doc) -> None:
     _indices(doc)
 
 
+def _extraer_resumen(lineas):
+    """Separa el bloque «RESUMEN» del Markdown.
+
+    El resumen es una parte preliminar: en el documento final va después de los
+    índices y con numeración romana, no al comienzo del cuerpo. Por eso se extrae
+    del Markdown y se inserta en los preliminares, y el bucle principal omite esas
+    líneas para no repetirlo.
+
+    Devuelve el texto y el conjunto de índices que hay que omitir.
+    """
+    inicio = None
+    for indice, linea in enumerate(lineas):
+        if linea.strip().upper().startswith("# RESUMEN"):
+            inicio = indice
+            break
+    if inicio is None:
+        return None, set()
+
+    fin = len(lineas)
+    for indice in range(inicio + 1, len(lineas)):
+        if lineas[indice].startswith("# ") or lineas[indice].strip() == "---":
+            fin = indice
+            break
+
+    parrafos = [linea.strip() for linea in lineas[inicio + 1:fin] if linea.strip()]
+    return " ".join(parrafos), set(range(inicio, fin))
+
+
+def _resumen_preliminar(doc, texto: str) -> None:
+    """Inserta el resumen como última parte preliminar."""
+    _linea_centrada(doc, "RESUMEN", 14, negrita=True, espacio_despues=18)
+    parrafo = doc.add_paragraph()
+    parrafo.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    run = parrafo.add_run(texto)
+    _configurar_fuente(run, tamano=12)
+    doc.add_page_break()
+
+
 # ---------- construcción del documento ----------
 def _configurar_titulos_institucionales(doc) -> None:
     """Ajusta los estilos de título al formato institucional.
@@ -441,9 +479,27 @@ def _configurar_titulos_institucionales(doc) -> None:
         titulo.paragraph_format.line_spacing = 1.5
 
 
+def _quitar_comentarios(texto: str) -> str:
+    """Elimina las notas internas escritas entre marcas de comentario.
+
+    Las notas del borrador (`<!-- ... -->`) son para el autor y no deben
+    imprimirse: sin este paso el documento de Word las muestra como texto, con
+    todo lo que revelan del proceso de trabajo.
+    """
+    return re.sub(r"(?s)<!--.*?-->", "", texto)
+
+
 def convertir(md_path: str, docx_path: str, formato_institucional: bool = False) -> None:
     with open(md_path, encoding="utf-8") as f:
-        lineas = f.read().splitlines()
+        lineas = _quitar_comentarios(f.read()).splitlines()
+
+    # En el formato institucional el resumen es una parte preliminar: se extrae
+    # del cuerpo para insertarlo después de los índices, y esas líneas se omiten
+    # en el bucle principal.
+    resumen = None
+    lineas_omitidas: set = set()
+    if formato_institucional:
+        resumen, lineas_omitidas = _extraer_resumen(lineas)
 
     doc = Document()
 
@@ -475,6 +531,8 @@ def convertir(md_path: str, docx_path: str, formato_institucional: bool = False)
         # tablas y de figuras). Los índices son campos que Word completa al
         # actualizarlos, de modo que sigan siendo correctos tras cada corrección.
         _agregar_preliminares(doc)
+        if resumen:
+            _resumen_preliminar(doc, resumen)
         _configurar_titulo_por_defecto(doc)
         _configurar_titulos_institucionales(doc)
         # Numeración romana en los preliminares y arábiga en el cuerpo, con el
@@ -495,6 +553,9 @@ def convertir(md_path: str, docx_path: str, formato_institucional: bool = False)
 
     i = 0
     while i < len(lineas):
+        if i in lineas_omitidas:
+            i += 1
+            continue
         linea = lineas[i]
         texto = linea.rstrip()
 
