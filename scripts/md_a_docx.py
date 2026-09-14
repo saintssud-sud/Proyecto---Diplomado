@@ -22,6 +22,7 @@ import re
 import sys
 
 from docx import Document
+from docx.enum.section import WD_SECTION
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml.ns import qn
@@ -189,38 +190,227 @@ def _es_imagen_vertical(ruta: str) -> bool:
 
 
 def _insertar_figura(doc, ruta: str, epigrafe: str, fuente: str, cuerpo: int) -> None:
-    """Inserta una imagen centrada con su epígrafe debajo.
+    """Inserta una imagen con su título arriba y su fuente debajo.
 
-    El formato institucional pide el epígrafe **debajo** de la figura (a
-    diferencia de las tablas, cuyo título va encima). El ancho se elige según la
-    orientación: las imágenes verticales —los bocetos de pantalla— se insertan a
-    7 cm para que no ocupen una página entera, y las horizontales a 14 cm, que es
-    el ancho útil de la caja de texto.
+    El formato institucional precisa, para las figuras, que «el título va arriba,
+    al margen izquierdo, letra de 10 puntos y la fuente se indica debajo», igual
+    que en las tablas. El ancho se elige según la orientación: las imágenes
+    verticales —los bocetos de pantalla— se insertan a 7 cm para que no ocupen
+    una página entera, y las horizontales a 14 cm, que es el ancho útil de la caja
+    de texto.
     """
+    if epigrafe:
+        # El epígrafe llega como «Figura N. Descripción»: se destaca la
+        # identificación y se deja la descripción en cursiva.
+        texto_epigrafe = doc.add_paragraph()
+        identificacion, _, descripcion = epigrafe.partition(". ")
+        run = texto_epigrafe.add_run(identificacion + ".")
+        _configurar_fuente(run, tamano=10, negrita=True)
+        if descripcion:
+            run = texto_epigrafe.add_run(" " + descripcion)
+            _configurar_fuente(run, tamano=10)
+            run.italic = True
+
     ancho_cm = 7.0 if _es_imagen_vertical(ruta) else 14.0
     parrafo = doc.add_paragraph()
     parrafo.alignment = WD_ALIGN_PARAGRAPH.CENTER
     parrafo.add_run().add_picture(ruta, width=Cm(ancho_cm))
 
-    if epigrafe:
-        # El epígrafe llega como «Figura N. Descripción»: se destaca la
-        # identificación y se deja la descripción en cursiva.
-        texto_epigrafe = doc.add_paragraph()
-        texto_epigrafe.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        identificacion, _, descripcion = epigrafe.partition(". ")
-        run = texto_epigrafe.add_run(identificacion + ".")
-        _configurar_fuente(run, tamano=11, negrita=True)
-        if descripcion:
-            run = texto_epigrafe.add_run(" " + descripcion)
-            _configurar_fuente(run, tamano=11)
-            run.italic = True
-
     if fuente:
         texto_fuente = doc.add_paragraph()
-        texto_fuente.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        texto_fuente.alignment = WD_ALIGN_PARAGRAPH.LEFT
         run = texto_fuente.add_run(fuente)
         _configurar_fuente(run, tamano=10, color=GRIS)
         run.italic = True
+
+
+def _bordes_horizontales(tabla) -> None:
+    """Deja en la tabla solo las líneas horizontales.
+
+    El formato institucional precisa que «las tablas no llevan líneas
+    verticales»: se conservan el borde superior, el inferior y las líneas entre
+    filas, y se quitan los bordes laterales.
+    """
+    tblPr = tabla._tbl.tblPr
+    for anterior in tblPr.findall(qn("w:tblBorders")):
+        tblPr.remove(anterior)
+    bordes = tblPr.makeelement(qn("w:tblBorders"), {})
+    for lado in ("top", "left", "bottom", "right", "insideH", "insideV"):
+        visible = lado in ("top", "bottom", "insideH")
+        bordes.append(
+            bordes.makeelement(
+                qn("w:" + lado),
+                {
+                    qn("w:val"): "single" if visible else "none",
+                    qn("w:sz"): "6",
+                    qn("w:space"): "0",
+                    qn("w:color"): "000000",
+                },
+            )
+        )
+    tblPr.insert_element_before(
+        bordes,
+        "w:shd",
+        "w:tblLayout",
+        "w:tblCellMar",
+        "w:tblLook",
+        "w:tblCaption",
+        "w:tblDescription",
+    )
+
+
+# ---------- partes preliminares ----------
+TITULO_OFICIAL = "SI.G.VA.C.H.: SISTEMA DE GESTIÓN DE VARIABLES PARA CULTIVOS HIDROPÓNICOS"
+AUTOR_OFICIAL = "FREDDY SANTOS N."
+CIUDAD_OFICIAL = "Tarija – Bolivia"
+ANIO_OFICIAL = "2026"
+UNIVERSIDAD = "UNIVERSIDAD AUTÓNOMA JUAN MISAEL SARACHO"
+SECRETARIA = "SECRETARÍA DE EDUCACIÓN CONTINUA – DIRECCIÓN DE POSGRADO"
+TEXTO_PRESENTACION = (
+    "Trabajo de diplomado, presentado a consideración de la Universidad Autónoma Juan Misael Saracho, "
+    "como requisito para optar el título de Diplomado en Desarrollo Web y Aplicaciones Móviles."
+)
+TEXTO_ADVERTENCIA = (
+    "El Tribunal Calificador del presente trabajo de diplomado no se solidariza ni responsabiliza con la "
+    "forma, términos, modos y expresiones vertidas en el mismo, siendo esta responsabilidad del autor."
+)
+
+
+def _linea_centrada(doc, texto: str, tamano: int, negrita: bool = False, espacio_despues: int = 6):
+    parrafo = doc.add_paragraph()
+    parrafo.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run = parrafo.add_run(texto)
+    _configurar_fuente(run, tamano=tamano, negrita=negrita)
+    parrafo.paragraph_format.space_after = Pt(espacio_despues)
+    return parrafo
+
+
+def _campo_indice(doc, instruccion: str, texto_guia: str) -> None:
+    """Inserta un campo de índice que Word actualiza al abrirlo.
+
+    Los índices de contenido, de tablas y de figuras no se escriben a mano: se
+    generan desde los estilos de título y desde los epígrafes, de modo que sigan
+    siendo correctos después de cada corrección.
+    """
+    parrafo = doc.add_paragraph()
+
+    def con_elemento(elemento):
+        run = parrafo.add_run()
+        run._r.append(elemento)
+        return run
+
+    con_elemento(parrafo._p.makeelement(qn("w:fldChar"), {qn("w:fldCharType"): "begin"}))
+    instruccion_el = parrafo._p.makeelement(qn("w:instrText"), {})
+    instruccion_el.text = instruccion
+    con_elemento(instruccion_el)
+    con_elemento(parrafo._p.makeelement(qn("w:fldChar"), {qn("w:fldCharType"): "separate"}))
+    run_texto = parrafo.add_run(texto_guia)
+    _configurar_fuente(run_texto, tamano=11)
+    con_elemento(parrafo._p.makeelement(qn("w:fldChar"), {qn("w:fldCharType"): "end"}))
+    parrafo.paragraph_format.space_after = Pt(10)
+
+
+def _portada(doc) -> None:
+    """Portada y contratapa, con la estructura y los tamaños de la plantilla."""
+    for _ in range(2):
+        _linea_centrada(doc, UNIVERSIDAD, 16, negrita=True)
+        _linea_centrada(doc, SECRETARIA, 16, negrita=True, espacio_despues=18)
+        _linea_centrada(doc, "[Escudo de la Universidad]", 12, espacio_despues=18)
+        _linea_centrada(doc, "TRABAJO FINAL DE DIPLOMADO", 14, negrita=True, espacio_despues=24)
+        _linea_centrada(doc, TITULO_OFICIAL, 14, negrita=True, espacio_despues=24)
+        _linea_centrada(doc, AUTOR_OFICIAL, 14, negrita=True, espacio_despues=24)
+        _linea_centrada(doc, TEXTO_PRESENTACION, 12, espacio_despues=24)
+        _linea_centrada(doc, CIUDAD_OFICIAL + ", " + ANIO_OFICIAL, 12, espacio_despues=12)
+        doc.add_page_break()
+
+
+def _hoja_de_aprobacion(doc) -> None:
+    _linea_centrada(doc, TITULO_OFICIAL, 14, negrita=True, espacio_despues=18)
+    _linea_centrada(doc, AUTOR_OFICIAL, 14, negrita=True, espacio_despues=30)
+    _linea_centrada(doc, "Aprobado por:", 12, negrita=True, espacio_despues=36)
+    for cargo in ("Tribunal Calificador:", "", "Tribunal Calificador:", ""):
+        if cargo:
+            _linea_centrada(doc, cargo, 12, negrita=True, espacio_despues=36)
+        _linea_centrada(doc, "_" * 52, 12, espacio_despues=4)
+        _linea_centrada(doc, "Nombre y apellidos", 11, espacio_despues=30)
+    _linea_centrada(doc, CIUDAD_OFICIAL + ", " + ANIO_OFICIAL, 12, espacio_despues=12)
+    doc.add_page_break()
+
+
+def _hoja_de_advertencia(doc) -> None:
+    _linea_centrada(doc, "ADVERTENCIA", 14, negrita=True, espacio_despues=30)
+    parrafo = doc.add_paragraph()
+    parrafo.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    run = parrafo.add_run(TEXTO_ADVERTENCIA)
+    _configurar_fuente(run, tamano=12)
+    doc.add_page_break()
+
+
+def _indices(doc) -> None:
+    for titulo, instruccion, guia in (
+        ("ÍNDICE DE CONTENIDO", 'TOC \\o "1-3" \\h \\z \\u', "Actualice el índice en Word: clic derecho → Actualizar campo."),
+        ("ÍNDICE DE TABLAS", 'TOC \\h \\z \\c "Tabla"', "Se completa al actualizar los campos en Word."),
+        ("ÍNDICE DE FIGURAS", 'TOC \\h \\z \\c "Figura"', "Se completa al actualizar los campos en Word."),
+    ):
+        _linea_centrada(doc, titulo, 14, negrita=True, espacio_despues=18)
+        _campo_indice(doc, instruccion, guia)
+        doc.add_page_break()
+
+
+def _numeracion_de_paginas(seccion, formato: str, inicio: int = 1) -> None:
+    """Fija el formato de numeración de una sección.
+
+    El formato institucional pide numeración romana en minúsculas para las partes
+    preliminares y arábiga a partir del Capítulo 1. El elemento se inserta en la
+    posición que exige el esquema de Word, no al final.
+    """
+    sectPr = seccion._sectPr
+    for anterior in sectPr.findall(qn("w:pgNumType")):
+        sectPr.remove(anterior)
+    elemento = sectPr.makeelement(
+        qn("w:pgNumType"), {qn("w:fmt"): formato, qn("w:start"): str(inicio)}
+    )
+    sectPr.insert_element_before(
+        elemento,
+        "w:cols",
+        "w:formProt",
+        "w:vAlign",
+        "w:noEndnote",
+        "w:titlePg",
+        "w:textDirection",
+        "w:bidi",
+        "w:rtlGutter",
+        "w:docGrid",
+        "w:printerSettings",
+    )
+
+
+def _numero_en_el_pie(seccion) -> None:
+    """Escribe el número de página en la esquina inferior derecha."""
+    parrafo = seccion.footer.paragraphs[0]
+    parrafo.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+
+    def con_elemento(elemento):
+        run = parrafo.add_run()
+        run._r.append(elemento)
+        return run
+
+    con_elemento(parrafo._p.makeelement(qn("w:fldChar"), {qn("w:fldCharType"): "begin"}))
+    instruccion = parrafo._p.makeelement(qn("w:instrText"), {})
+    instruccion.text = "PAGE"
+    con_elemento(instruccion)
+    con_elemento(parrafo._p.makeelement(qn("w:fldChar"), {qn("w:fldCharType"): "separate"}))
+    run_texto = parrafo.add_run("1")
+    _configurar_fuente(run_texto, tamano=11)
+    con_elemento(parrafo._p.makeelement(qn("w:fldChar"), {qn("w:fldCharType"): "end"}))
+
+
+def _agregar_preliminares(doc) -> None:
+    """Genera las partes preliminares según la plantilla institucional."""
+    _portada(doc)
+    _hoja_de_aprobacion(doc)
+    _hoja_de_advertencia(doc)
+    _indices(doc)
 
 
 # ---------- construcción del documento ----------
@@ -279,14 +469,29 @@ def convertir(md_path: str, docx_path: str, formato_institucional: bool = False)
         estilo.paragraph_format.line_spacing = 1.5
         estilo.paragraph_format.space_after = Pt(8)
 
-    # Portada (normaliza el logo por si el .png es en realidad JPEG)
-    logo_real = _normalizar_logo()
-    _agregar_portada(doc, os.path.basename(docx_path), logo_real)
-    if logo_real and logo_real != LOGO and os.path.exists(logo_real):
-        os.remove(logo_real)
-    _configurar_titulo_por_defecto(doc)
     if formato_institucional:
+        # Partes preliminares según la plantilla oficial: portada, contratapa,
+        # hoja de aprobación, hoja de advertencia e índices (de contenido, de
+        # tablas y de figuras). Los índices son campos que Word completa al
+        # actualizarlos, de modo que sigan siendo correctos tras cada corrección.
+        _agregar_preliminares(doc)
+        _configurar_titulo_por_defecto(doc)
         _configurar_titulos_institucionales(doc)
+        # Numeración romana en los preliminares y arábiga en el cuerpo, con el
+        # número en la esquina inferior derecha.
+        _numeracion_de_paginas(doc.sections[0], "lowerRoman", 1)
+        _numero_en_el_pie(doc.sections[0])
+        # El cuerpo comienza en una sección nueva: es lo que permite numerar los
+        # preliminares en romanos y el cuerpo en arábigos.
+        cuerpo_seccion = doc.add_section(WD_SECTION.NEW_PAGE)
+        _numeracion_de_paginas(cuerpo_seccion, "decimal", 1)
+    else:
+        # Portada (normaliza el logo por si el .png es en realidad JPEG)
+        logo_real = _normalizar_logo()
+        _agregar_portada(doc, os.path.basename(docx_path), logo_real)
+        if logo_real and logo_real != LOGO and os.path.exists(logo_real):
+            os.remove(logo_real)
+        _configurar_titulo_por_defecto(doc)
 
     i = 0
     while i < len(lineas):
@@ -328,6 +533,8 @@ def convertir(md_path: str, docx_path: str, formato_institucional: bool = False)
                 tabla = doc.add_table(rows=len(filas), cols=ncols)
                 tabla.style = "Table Grid"
                 tabla.alignment = WD_TABLE_ALIGNMENT.CENTER
+                if formato_institucional:
+                    _bordes_horizontales(tabla)
                 for r, fila in enumerate(filas):
                     for c, celda in enumerate(fila):
                         parrafo = tabla.cell(r, c).paragraphs[0]
