@@ -245,6 +245,26 @@ Numeración de tablas verificada: 1 a 7, en orden de aparición y con sus refere
 
 `flutter analyze` sin problemas y `flutter test` con 63 casos aprobados. Los casos CP-16 y CP-17 de la tabla del apartado 2.8 (estado vacío y estado con error del panel) ya tienen cobertura automatizada a nivel de componente; quedarán completos cuando las pantallas queden conectadas a los repositorios.
 
+**Despliegue preparado y comando de arranque verificado.**
+
+| Pieza | Estado |
+|---|---|
+| `backend/render.yaml` | Blueprint del servicio para Render, validado con PyYAML: nombre, runtime, plan, región, directorio raíz, comandos de compilación y arranque, ruta de salud y las siete variables de entorno (cuatro de ellas se cargan a mano en el panel, ninguna en el repositorio) |
+| `docs/10_DESPLIEGUE.md` | Guía paso a paso del despliegue completo (API, aplicación web y APK), con la obtención de la clave de la cuenta de servicio, la verificación de los ocho requisitos mínimos, las nueve capturas que exige el apartado 2.9, los problemas previsibles y lo que no debe hacerse |
+| `backend/app/semilla.py` | Modo de demostración con datos: perfil de lechuga con seis rangos, dos módulos (uno inactivo), doce lecturas repartidas en treinta y seis horas y tres alertas. Las lecturas se registran con **el mismo servicio que usa la ingesta real**, así que las alertas las produce la regla de negocio y no la semilla |
+| `uvicorn` 0.52.4 | Instalado; el arranque real se verificó con el comando exacto del despliegue |
+
+**Verificación de extremo a extremo del servicio real** (14/09/2026, contra el repositorio en memoria):
+
+| Comprobación | Resultado |
+|---|---|
+| `GET /api/v1/salud` | 200 · `{"estado":"ok","version_api":"v1","entorno":"desarrollo","base_de_datos":"conectada"}` |
+| `POST /api/v1/lecturas` con clave de dispositivo válida | 201 · lectura almacenada con `estado_rango: "alto"`, es decir la evaluación del rango ocurrió de extremo a extremo |
+| `POST /api/v1/lecturas` con clave equivocada | 401 · «La clave del módulo de adquisición no es válida.» |
+| `GET /api/v1/lecturas` sin token | 401 |
+| `GET /api/v1/openapi.json` | 200 · 31 KB de contrato publicado |
+| Pruebas del backend | 59 casos aprobados |
+
 **Herramientas y versiones verificadas.** Flutter 3.44.8 (canal estable), Dart 3.12.2, `cloud_firestore` 6.9.0, `firebase_core` 4.14.0, `firebase_auth` 6.6.1, `provider` 6.1.5+1, `http` 1.6.0, `shared_preferences` 2.5.5, `geolocator` 14.0.3, `flutter_map` 8.3.2, `latlong2` 0.10.1.
 
 ### 7.2 Pendiente, en orden

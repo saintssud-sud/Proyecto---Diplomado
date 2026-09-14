@@ -1,0 +1,48 @@
+# Configuración del despliegue del backend en Render (Infraestructura como código).
+#
+# Uso: en Render, "New" → "Blueprint" → elegir este repositorio. Render lee este
+# archivo y crea el servicio con la configuración indicada.
+#
+# Las variables marcadas con `sync: false` no llevan valor aquí a propósito:
+# Render las pide al crear el servicio y las guarda cifradas. Ninguna credencial
+# se escribe en el repositorio.
+#
+# Procedimiento completo: docs/10_DESPLIEGUE.md
+
+services:
+  - type: web
+    name: sigvach-api
+    runtime: python
+    plan: free
+    region: oregon
+    branch: main
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    # El servicio debe escuchar en el puerto que la plataforma asigna en $PORT.
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    # Ruta pública que la plataforma consulta para saber si el servicio está vivo.
+    healthCheckPath: /api/v1/salud
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.12
+      - key: ENTORNO
+        value: produccion
+      # El modo de demostración se desactiva en el despliegue real: la base de
+      # datos es Cloud Firestore y los datos no se pierden al reiniciar.
+      - key: USAR_REPOSITORIO_EN_MEMORIA
+        value: "false"
+      # --- Valores que se cargan en el panel de Render (sync: false) ----------
+      # Clave que autentica al módulo de adquisición (ESP32) al publicar lecturas.
+      - key: DEVICE_API_KEY
+        sync: false
+      # Identificador del proyecto de Firebase.
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      # Contenido completo del archivo de la cuenta de servicio, en una línea.
+      - key: FIREBASE_SERVICE_ACCOUNT_JSON
+        sync: false
+      # Orígenes autorizados para las peticiones del navegador: la dirección del
+      # despliegue web de la aplicación, separada por comas si hay varias.
+      - key: ALLOWED_ORIGINS
+        sync: false

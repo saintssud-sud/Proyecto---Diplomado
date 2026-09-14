@@ -7,13 +7,18 @@ Ejecución en local::
 Documentación navegable del contrato (OpenAPI): http://localhost:8000/docs
 """
 
+from contextlib import asynccontextmanager
+from typing import AsyncIterator
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from . import __version__
 from .config import obtener_configuracion
 from .errores import registrar_manejadores_de_error
+from .dependencias import obtener_repositorio
 from .rutas import enrutador_api
+from .semilla import sembrar_demostracion
 
 DESCRIPCION = """
 API del sistema SI.G.VA.C.H. (Sistema de Gestión de Variables para Cultivos Hidropónicos).
@@ -28,6 +33,20 @@ Identidades admitidas:
 """
 
 
+@asynccontextmanager
+async def ciclo_de_vida(_: FastAPI) -> AsyncIterator[None]:
+    """Prepara los datos de demostración cuando no hay base de datos real.
+
+    Con `USAR_REPOSITORIO_EN_MEMORIA=true` el servicio arranca sin credenciales,
+    de modo que el sistema pueda recorrerse completo en la demostración o en una
+    revisión del tribunal sin depender de Firebase ni de los sensores.
+    """
+    configuracion = obtener_configuracion()
+    if configuracion.usar_repositorio_en_memoria:
+        sembrar_demostracion(obtener_repositorio(configuracion))
+    yield
+
+
 def crear_aplicacion() -> FastAPI:
     """Construye la aplicación con sus rutas, su CORS y sus manejadores de error."""
     configuracion = obtener_configuracion()
@@ -39,6 +58,7 @@ def crear_aplicacion() -> FastAPI:
         openapi_url="/api/v1/openapi.json",
         docs_url="/docs",
         redoc_url="/redoc",
+        lifespan=ciclo_de_vida,
     )
 
     aplicacion.add_middleware(

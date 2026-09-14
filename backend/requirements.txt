@@ -7,16 +7,16 @@
 # El módulo de adquisición no declara dependencias aquí: vive en el firmware
 # del dispositivo, no en este servicio.
 
-# --- Verificadas con la batería de pruebas del backend (54 casos) -----------
+# --- Verificadas con las pruebas y con el arranque real del servicio --------
+# (59 casos automatizados y arranque del servidor con el comando de despliegue,
+#  verificados el 14/09/2026)
 fastapi==0.141.1
 pydantic==2.13.5
 pydantic-settings==2.15.0
+uvicorn[standard]==0.52.4
 
-# --- Necesarias en el despliegue, pendientes de verificar en local ----------
-# uvicorn: servidor que expone la aplicación. La plataforma de alojamiento lo
-#   invoca con el comando indicado en el archivo README de este directorio.
+# --- Necesaria en el despliegue, pendiente de verificar en local ------------
 # firebase-admin: SDK con el que el backend accede a Cloud Firestore y verifica
 #   los tokens de identidad. Requiere las credenciales de la cuenta de servicio,
 #   que se reciben por variables de entorno y nunca están en el repositorio.
-uvicorn[standard]>=0.30
 firebase-admin>=6.5
