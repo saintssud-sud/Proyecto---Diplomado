@@ -71,17 +71,18 @@ service cloud.firestore {
       allow read: if signedIn() && (userId == uid() || isAdmin());
 
       // El perfil se crea una sola vez, al registrarse: el id debe coincidir con
-      // el uid, el correo con el del token y el rol solo puede ser 'usuario'.
+      // el uid, el correo con el del token (sin distinguir mayúsculas, porque el
+      // formulario no normaliza el correo) y el rol solo puede ser 'usuario'.
       // El rol de administrador se asigna después desde el panel o desde la
       // consola, nunca en el alta.
       allow create: if signedIn()
         && userId == uid()
-        && request.resource.data.email == replyEmail()
+        && request.resource.data.email.lower() == replyEmail().lower()
         && request.resource.data.activo == true
         && (
              request.resource.data.rol == 'usuario'
              || (request.resource.data.rol == 'admin'
-                 && replyEmail() == 'admin@sigvach.com')
+                 && replyEmail().lower() == 'admin@sigvach.com')
            );
 
       // El usuario edita sus datos personales, pero NO puede cambiar su propio
