@@ -6,9 +6,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'app.dart';
 import 'config/app_config.dart';
 import 'controllers/context_controller.dart';
+import 'controllers/panel_controller.dart';
 import 'controllers/preferences_controller.dart';
 import 'controllers/usuario_controller.dart';
+import 'repositories/api/alertas_api_repository.dart';
+import 'repositories/api/lecturas_api_repository.dart';
+import 'repositories/api/modulos_api_repository.dart';
+import 'repositories/api/rangos_api_repository.dart';
 import 'repositories/usuario_repository.dart';
+import 'services/api_cliente.dart';
 import 'services/auth_service.dart';
 import 'services/firestore_service.dart';
 import 'services/location_service.dart';
@@ -66,6 +72,24 @@ Future<void> main() async {
       ),
     );
   }
+
+  // Acceso al servicio de la API. Se registra siempre: si el proveedor de
+  // identidad no estuviera disponible, el cliente lo informa como un fallo de
+  // conexión y la pantalla lo presenta con su acción de reintento.
+  providers.add(Provider<ApiCliente>(create: (providerContext) => ApiCliente()));
+  providers.add(
+    ChangeNotifierProvider<PanelController>(
+      create: (providerContext) {
+        final ApiCliente cliente = providerContext.read<ApiCliente>();
+        return PanelController(
+          modulos: ModulosApiRepository(cliente),
+          lecturas: LecturasApiRepository(cliente),
+          rangos: RangosApiRepository(cliente),
+          alertas: AlertasApiRepository(cliente),
+        );
+      },
+    ),
+  );
 
   providers.add(
     Provider<LocationService>(

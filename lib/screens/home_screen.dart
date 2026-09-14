@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../controllers/estado_de_vista.dart';
+import '../controllers/panel_controller.dart';
 import '../controllers/preferences_controller.dart';
+import '../models/api/modelos_api.dart';
+import '../services/api_errores.dart';
 import '../services/auth_service.dart';
+import '../utils/formato_fecha.dart';
 import '../widgets/max_width_box.dart';
+import '../widgets/vista_con_estados.dart';
 import 'ajustes/ajustes_screen.dart';
 import 'alertas/alertas_screen.dart';
 import 'cultivos/cultivos_screen.dart';
@@ -49,6 +55,11 @@ class _HomeScreenState extends State<HomeScreen> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Actualizar',
+            onPressed: () => context.read<PanelController>().cargar(),
+          ),
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
             tooltip: 'Alertas',
@@ -127,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: IndexedStack(
         index: _tabIndex,
         children: <Widget>[
-          _DashboardView(preferences: preferences),
+          const _PanelView(),
           const VariablesScreen(),
           const CultivosScreen(),
           const AlertasScreen(),
@@ -165,214 +176,423 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _DashboardView extends StatelessWidget {
-  const _DashboardView({required this.preferences});
+/// Panel principal: presenta el estado de las variables del módulo.
+///
+/// Consume la API a través de [PanelController] y resuelve los cuatro estados
+/// de la vista. Al registrarse una medición, el servidor evalúa cada valor
+/// contra su rango y genera las alertas que correspondan; el panel se vuelve a
+/// consultar para reflejar ese resultado.
+class _PanelView extends StatefulWidget {
+  const _PanelView();
 
-  final PreferencesController preferences;
+  @override
+  State<_PanelView> createState() => _PanelViewState();
+}
 
-  static String _fmt(double value) {
-    return value == value.roundToDouble()
-        ? value.toStringAsFixed(0)
-        : value.toStringAsFixed(1);
+class _PanelViewState extends State<_PanelView> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<PanelController>().cargar();
+      }
+    });
   }
 
-  Future<void> _editarValores(BuildContext context) async {
-    final p = context.read<PreferencesController>();
-    final temp = TextEditingController(text: p.temperature.toString());
-    final hum = TextEditingController(text: p.humidity.toString());
-    final ph = TextEditingController(text: p.ph.toString());
-    final tds = TextEditingController(text: p.tds.toString());
-    final agua = TextEditingController(text: p.waterLevel.toString());
+  String _mensajeVacio(PanelController panel) {
+    if (panel.modulosDisponibles.isEmpty) {
+      return 'No hay módulos de cultivo activos. Cree uno en la sección '
+          'Cultivos para comenzar a registrar variables.';
+    }
+    if (panel.modulo == null) {
+      return 'No hay un módulo seleccionado. Elija uno para ver sus variables.';
+    }
+    return 'El módulo ${panel.modulo!.nombre} todavía no tiene lecturas '
+        'registradas. Registre la primera medición o espere el envío del '
+        'módulo de adquisición.';
+  }
 
-    final guardar = await showDialog<bool>(
+  Future<void> _registrarMedicion() async {
+    final PanelController panel = context.read<PanelController>();
+    final Map<String, double>? valores = await showDialog<Map<String, double>>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Editar valores'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              TextField(
-                controller: temp,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                decoration: const InputDecoration(
-                  labelText: 'Temperatura (°C)',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: hum,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                decoration: const InputDecoration(
-                  labelText: 'Humedad (%)',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: ph,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                decoration: const InputDecoration(
-                  labelText: 'pH',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: tds,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                decoration: const InputDecoration(
-                  labelText: 'TDS (ppm)',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: agua,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                decoration: const InputDecoration(
-                  labelText: 'Nivel de agua (%)',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ],
+      builder: (BuildContext dialogContext) =>
+          _DialogoMedicion(variables: panel.variables),
+    );
+    if (valores == null || valores.isEmpty || !mounted) {
+      return;
+    }
+
+    final ScaffoldMessengerState mensajero = ScaffoldMessenger.of(context);
+    try {
+      final int registradas = await panel.registrarMedicion(valores);
+      mensajero.showSnackBar(
+        SnackBar(
+          content: Text(
+            registradas == 1
+                ? 'Lectura registrada y evaluada por el servidor'
+                : '$registradas lecturas registradas y evaluadas por el servidor',
           ),
         ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFF39B54A),
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Guardar'),
-          ),
-        ],
-      ),
-    );
-
-    if (guardar == true && context.mounted) {
-      await p.actualizarValores(
-        temperatura:
-            double.tryParse(temp.text.replaceAll(',', '.')) ?? p.temperature,
-        humedad: double.tryParse(hum.text.replaceAll(',', '.')) ?? p.humidity,
-        ph: double.tryParse(ph.text.replaceAll(',', '.')) ?? p.ph,
-        tds: double.tryParse(tds.text.replaceAll(',', '.')) ?? p.tds,
-        nivelAgua:
-            double.tryParse(agua.text.replaceAll(',', '.')) ?? p.waterLevel,
       );
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Valores actualizados y guardados')),
-        );
-      }
+    } on ErrorApi catch (error) {
+      // El servidor rechazó la operación: se informa el campo señalado.
+      final String campos = error.campos.keys.isEmpty
+          ? ''
+          : ' Revise: ${error.campos.keys.join(', ')}.';
+      mensajero.showSnackBar(
+        SnackBar(content: Text('${error.mensajeParaUsuario}$campos')),
+      );
+    } catch (error) {
+      mensajero.showSnackBar(
+        SnackBar(content: Text(FalloDeVista.desde(error).mensaje)),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final PanelController panel = context.watch<PanelController>();
+
     return MaxWidthBox(
-      child: ListView(
-        padding: const EdgeInsets.all(16),
+      child: VistaConEstados<List<EstadoDeVariable>>(
+        estado: panel.estado,
+        datos: panel.variables,
+        errorDeConexion: panel.errorDeConexion,
+        mensajeError: panel.mensajeError,
+        mensajeVacio: _mensajeVacio(panel),
+        alReintentar: () => panel.cargar(),
+        alMostrarDatos: (BuildContext contexto, List<EstadoDeVariable> variables) {
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: <Widget>[
+              _StatusBanner(hayAlertas: panel.alertasActivas > 0),
+              const SizedBox(height: 12),
+              _EncabezadoModulo(panel: panel),
+              const SizedBox(height: 12),
+              ..._filasDeVariables(variables),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton.icon(
+                  onPressed: _registrarMedicion,
+                  icon: const Icon(Icons.add_circle_outline, size: 18),
+                  label: const Text('Registrar medición'),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  const Text(
+                    'Última actualización:',
+                    style: TextStyle(color: Colors.grey, fontSize: 13),
+                  ),
+                  Text(
+                    panel.ultimaLectura == null
+                        ? 'Sin lecturas'
+                        : formatearFechaHora(panel.ultimaLectura!),
+                    style: const TextStyle(
+                      color: Colors.black87,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  List<Widget> _filasDeVariables(List<EstadoDeVariable> variables) {
+    final List<Widget> filas = <Widget>[];
+    for (int indice = 0; indice < variables.length; indice += 2) {
+      final EstadoDeVariable izquierda = variables[indice];
+      final EstadoDeVariable? derecha =
+          indice + 1 < variables.length ? variables[indice + 1] : null;
+      filas.add(
+        Row(
+          children: <Widget>[
+            Expanded(child: _TarjetaVariable(variable: izquierda)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: derecha == null
+                  ? const SizedBox.shrink()
+                  : _TarjetaVariable(variable: derecha),
+            ),
+          ],
+        ),
+      );
+      filas.add(const SizedBox(height: 12));
+    }
+    return filas;
+  }
+}
+
+/// Nombre del módulo en uso y selector, cuando hay más de uno.
+class _EncabezadoModulo extends StatelessWidget {
+  const _EncabezadoModulo({required this.panel});
+
+  final PanelController panel;
+
+  @override
+  Widget build(BuildContext context) {
+    final ModuloCultivo? modulo = panel.modulo;
+    if (modulo == null) {
+      return const SizedBox.shrink();
+    }
+
+    final String detalle = <String>[
+      modulo.tipoCultivo,
+      if ((modulo.ubicacion ?? '').isNotEmpty) modulo.ubicacion!,
+    ].join(' · ');
+
+    if (panel.modulosDisponibles.length <= 1) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          _StatusBanner(
-            hayAlertas: preferences.alertas.any((a) => a.estado == 'Activa'),
+          Text(
+            modulo.nombre,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 16),
+          Text(detalle, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+        ],
+      );
+    }
+
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: DropdownButtonFormField<String>(
+            initialValue: modulo.id,
+            decoration: const InputDecoration(
+              labelText: 'Módulo de cultivo',
+              border: OutlineInputBorder(),
+            ),
+            items: panel.modulosDisponibles
+                .map(
+                  (ModuloCultivo opcion) => DropdownMenuItem<String>(
+                    value: opcion.id,
+                    child: Text(opcion.nombre),
+                  ),
+                )
+                .toList(),
+            onChanged: (String? seleccionado) {
+              if (seleccionado != null) {
+                panel.seleccionarModulo(seleccionado);
+              }
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Tarjeta de una variable: último valor, nombre y estado.
+class _TarjetaVariable extends StatelessWidget {
+  const _TarjetaVariable({required this.variable});
+
+  final EstadoDeVariable variable;
+
+  static const Map<String, IconData> _iconos = <String, IconData>{
+    'ph': Icons.science_outlined,
+    'tds': Icons.eco_outlined,
+    'ec': Icons.bolt_outlined,
+    'temp_solucion': Icons.thermostat_outlined,
+    'temp_ambiental': Icons.thermostat_outlined,
+    'humedad': Icons.water_drop_outlined,
+    'nivel_agua': Icons.water_drop_outlined,
+  };
+
+  static const Map<String, Color> _colores = <String, Color>{
+    'ph': Color(0xFFC62828),
+    'tds': Color(0xFF2E7D32),
+    'ec': Color(0xFF00695C),
+    'temp_solucion': Color(0xFFE65100),
+    'temp_ambiental': Color(0xFFEF6C00),
+    'humedad': Color(0xFF1565C0),
+    'nivel_agua': Color(0xFF0277BD),
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final Color color = _colores[variable.codigo] ?? Colors.grey;
+    final IconData icono = _iconos[variable.codigo] ?? Icons.insights;
+    final bool fuera = variable.fueraDeRango;
+    final Color colorEstado = fuera
+        ? Colors.red
+        : (variable.tieneRango ? const Color(0xFF2E7D32) : Colors.grey);
+
+    final String valor = variable.tieneValor
+        ? '${formatearValor(variable.valor!)} ${variable.unidad}'.trim()
+        : '—';
+    final String rango = variable.tieneRango
+        ? 'Rango: ${formatearValor(variable.minimo!)} – '
+            '${formatearValor(variable.maximo!)} ${variable.unidad}'.trim()
+        : 'Sin rango configurado';
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: fuera ? Colors.red.withValues(alpha: 0.4) : const Color(0xFF39B54A).withValues(alpha: 0.25),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
           Row(
             children: <Widget>[
+              Icon(icono, color: color, size: 24),
+              const SizedBox(width: 8),
               Expanded(
-                child: _MetricCard(
-                  icon: Icons.thermostat_outlined,
-                  color: const Color(0xFFE65100),
-                  label: 'Temperatura',
-                  value: '${_fmt(preferences.temperature)} °C',
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _MetricCard(
-                  icon: Icons.water_drop_outlined,
-                  color: const Color(0xFF1565C0),
-                  label: 'Humedad',
-                  value: '${_fmt(preferences.humidity)} %',
+                child: Text(
+                  valor,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: _MetricCard(
-                  icon: Icons.science_outlined,
-                  color: const Color(0xFFC62828),
-                  label: 'pH',
-                  value: _fmt(preferences.ph),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _MetricCard(
-                  icon: Icons.eco_outlined,
-                  color: const Color(0xFF2E7D32),
-                  label: 'TDS',
-                  value: '${_fmt(preferences.tds)} ppm',
-                ),
-              ),
-            ],
+          const SizedBox(height: 6),
+          Text(
+            variable.nombre,
+            style: const TextStyle(color: Colors.grey, fontSize: 12),
           ),
-          const SizedBox(height: 12),
-          _MetricCard(
-            icon: Icons.water_drop_outlined,
-            color: const Color(0xFF1565C0),
-            label: 'Nivel de agua',
-            value: '${_fmt(preferences.waterLevel)} %',
-          ),
-          const SizedBox(height: 8),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton.icon(
-              onPressed: () => _editarValores(context),
-              icon: const Icon(Icons.edit_outlined, size: 18),
-              label: const Text('Editar valores'),
+          const SizedBox(height: 6),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: colorEstado.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              variable.etiquetaEstado,
+              style: TextStyle(
+                color: colorEstado,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              const Text(
-                'Última actualización:',
-                style: TextStyle(color: Colors.grey, fontSize: 13),
-              ),
-              Text(
-                preferences.lastUpdate,
-                style: const TextStyle(
-                  color: Colors.black87,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
+          const SizedBox(height: 4),
+          Text(
+            rango,
+            style: const TextStyle(color: Colors.grey, fontSize: 11),
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Diálogo para registrar a mano las variables que se hayan medido.
+///
+/// Solo se envían las variables que el usuario completa: dejar un campo vacío
+/// no registra una lectura con valor cero, que sería un dato falso.
+class _DialogoMedicion extends StatefulWidget {
+  const _DialogoMedicion({required this.variables});
+
+  final List<EstadoDeVariable> variables;
+
+  @override
+  State<_DialogoMedicion> createState() => _DialogoMedicionState();
+}
+
+class _DialogoMedicionState extends State<_DialogoMedicion> {
+  late final Map<String, TextEditingController> _controles =
+      <String, TextEditingController>{
+    for (final EstadoDeVariable variable in widget.variables)
+      variable.codigo: TextEditingController(),
+  };
+
+  @override
+  void dispose() {
+    for (final TextEditingController control in _controles.values) {
+      control.dispose();
+    }
+    super.dispose();
+  }
+
+  void _guardar() {
+    final Map<String, double> valores = <String, double>{};
+    _controles.forEach((String codigo, TextEditingController control) {
+      final String texto = control.text.trim().replaceAll(',', '.');
+      if (texto.isEmpty) {
+        return;
+      }
+      final double? valor = double.tryParse(texto);
+      if (valor != null) {
+        valores[codigo] = valor;
+      }
+    });
+    Navigator.of(context).pop(valores);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Registrar medición'),
+      content: SizedBox(
+        width: 380,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const Padding(
+                padding: EdgeInsets.only(bottom: 12),
+                child: Text(
+                  'Complete únicamente las variables que haya medido. El '
+                  'servidor evaluará cada valor contra su rango de referencia.',
+                  style: TextStyle(fontSize: 12, color: Colors.black54),
+                ),
+              ),
+              for (final EstadoDeVariable variable in widget.variables)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: TextField(
+                    controller: _controles[variable.codigo],
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    decoration: InputDecoration(
+                      labelText: '${variable.nombre} ${variable.unidad}'.trim(),
+                      helperText: variable.tieneRango
+                          ? 'Rango: ${formatearValor(variable.minimo!)} – '
+                              '${formatearValor(variable.maximo!)} ${variable.unidad}'
+                              .trim()
+                          : 'Sin rango configurado',
+                      border: const OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancelar'),
+        ),
+        FilledButton(
+          onPressed: _guardar,
+          style: FilledButton.styleFrom(
+            backgroundColor: const Color(0xFF39B54A),
+            foregroundColor: Colors.white,
+          ),
+          child: const Text('Guardar'),
+        ),
+      ],
     );
   }
 }
@@ -417,58 +637,6 @@ class _StatusBanner extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(subtitulo, style: TextStyle(color: color, fontSize: 13)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MetricCard extends StatelessWidget {
-  const _MetricCard({
-    required this.icon,
-    required this.color,
-    required this.label,
-    required this.value,
-  });
-
-  final IconData icon;
-  final Color color;
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.green.withValues(alpha: 0.25)),
-      ),
-      child: Row(
-        children: <Widget>[
-          Icon(icon, color: color, size: 28),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  value,
-                  style: TextStyle(
-                    color: color,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  label,
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
-                ),
               ],
             ),
           ),

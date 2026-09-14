@@ -268,6 +268,25 @@ void main() {
       }
     });
 
+    test('si el proveedor de identidad falla, se informa como fallo de conexión', () async {
+      int llamadas = 0;
+      final ApiCliente cliente = ApiCliente(
+        cliente: MockClient((http.Request peticion) async {
+          llamadas++;
+          return _json(<dynamic>[]);
+        }),
+        obtenerToken: () async => throw StateError('El proveedor de identidad no está disponible'),
+        baseUrl: 'https://api.ejemplo.test',
+        espera: const Duration(seconds: 2),
+      );
+
+      expect(
+        cliente.obtenerLista('/api/v1/lecturas'),
+        throwsA(isA<ErrorConexion>()),
+      );
+      expect(llamadas, 0, reason: 'Sin sesión no debe intentarse la petición');
+    });
+
     test('una respuesta con forma inesperada se informa con claridad', () async {
       final ApiCliente cliente = _cliente(
         (http.Request peticion) async => _json(<String, dynamic>{'id': 'M-1'}),

@@ -162,7 +162,17 @@ class ApiCliente {
     };
 
     if (autenticada) {
-      final String? token = await _obtenerToken();
+      final String? token;
+      try {
+        token = await _obtenerToken();
+      } catch (error) {
+        // Si el proveedor de identidad no está disponible, el acceso se niega
+        // con un mensaje claro en lugar de propagar un error inesperado.
+        throw ErrorConexion(
+          'No se pudo obtener la sesión del usuario.',
+          causa: error,
+        );
+      }
       if (token == null || token.isEmpty) {
         // Se resuelve antes de salir a la red: sin sesión no hay nada que pedir.
         throw const ErrorApi(

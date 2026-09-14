@@ -7,19 +7,12 @@
 /// porque su forma es distinta y forzar la conversión perdería información.
 library;
 
-/// Error de lectura de una respuesta del servicio.
-///
-/// Se produce cuando el servicio devuelve un campo obligatorio ausente o con un
-/// tipo distinto al del contrato. Es distinto de un error de conexión y de un
-/// rechazo del servidor.
-class ErrorDeContrato implements Exception {
-  const ErrorDeContrato(this.mensaje);
+import '../../services/api_errores.dart';
 
-  final String mensaje;
-
-  @override
-  String toString() => 'ErrorDeContrato: $mensaje';
-}
+// Los errores de la capa de API viven en `services/api_errores.dart`, junto con
+// el resto de los errores de esa capa. Se reexporta [ErrorDeContrato] porque es
+// el error que produce la lectura de estos modelos.
+export '../../services/api_errores.dart' show ErrorDeContrato;
 
 // ---------------------------------------------------------------------------
 // Catálogo de variables

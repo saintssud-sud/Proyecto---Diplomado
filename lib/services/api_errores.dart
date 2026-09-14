@@ -57,6 +57,25 @@ class ErrorApi implements Exception {
   String toString() => 'ErrorApi($estado, $codigo): $mensaje';
 }
 
+/// Error de contrato: el servicio respondió con una forma distinta a la pactada.
+///
+/// Se produce cuando la respuesta no trae un campo obligatorio o lo trae con un
+/// tipo distinto al del contrato. No es un rechazo del servidor —la operación
+/// pudo haberse realizado— pero tampoco puede interpretarse como un resultado
+/// válido, de modo que se presenta como un fallo con reintento.
+class ErrorDeContrato implements Exception {
+  const ErrorDeContrato(this.mensaje);
+
+  final String mensaje;
+
+  @override
+  String toString() => 'ErrorDeContrato: $mensaje';
+}
+
+///
+/// Se produce cuando no hay red, cuando el servicio no responde o cuando la
+/// respuesta tarda más de lo admitido. No es un rechazo del servidor: el
+/// servidor puede no haberse enterado de la petición.
 /// Error de conexión: la petición no llegó a completarse.
 ///
 /// Se produce cuando no hay red, cuando el servicio no responde o cuando la

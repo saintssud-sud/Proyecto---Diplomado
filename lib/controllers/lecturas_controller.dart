@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 
 import '../models/api/modelos_api.dart';
 import '../repositories/api/lecturas_api_repository.dart';
-import '../services/api_errores.dart';
 import '../widgets/vista_con_estados.dart';
+import 'estado_de_vista.dart';
 
 /// Controlador de las lecturas que consume la API.
 ///
@@ -79,24 +79,12 @@ class LecturasController extends ChangeNotifier {
       );
       _lecturas = lecturas;
       _estado = lecturas.isEmpty ? EstadoVista.vacio : EstadoVista.conDatos;
-    } on ErrorConexion catch (error) {
-      // La petición no llegó al servidor: el usuario puede reintentar.
+    } catch (error) {
+      // La traducción distingue el fallo de conexión del rechazo del servidor.
+      final FalloDeVista fallo = FalloDeVista.desde(error);
       _lecturas = const <Lectura>[];
-      _mensajeError = error.mensajeParaUsuario;
-      _errorDeConexion = true;
-      _estado = EstadoVista.error;
-    } on ErrorApi catch (error) {
-      // El servidor respondió y rechazó la operación.
-      _lecturas = const <Lectura>[];
-      _mensajeError = error.mensajeParaUsuario;
-      _errorDeConexion = false;
-      _estado = EstadoVista.error;
-    } on ErrorDeContrato {
-      // El servicio respondió, pero con una forma distinta a la del contrato.
-      _lecturas = const <Lectura>[];
-      _mensajeError =
-          'La respuesta del servidor no pudo interpretarse. Vuelva a intentarlo.';
-      _errorDeConexion = true;
+      _mensajeError = fallo.mensaje;
+      _errorDeConexion = fallo.deConexion;
       _estado = EstadoVista.error;
     } finally {
       _cargando = false;
