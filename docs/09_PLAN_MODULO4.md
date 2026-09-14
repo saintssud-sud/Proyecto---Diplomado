@@ -10,21 +10,50 @@ Base normativa: *P1 Apertura Módulo 4* (UAJMS, 2026), *Lineamientos Técnicos C
 
 **Grupo 3 · franja martes de 17:00 a 18:00**, sin cambios salvo la excepción del 9 de octubre.
 
+**Cierre interno un día antes.** Por razones de trabajo, los sábados no hay tiempo disponible, así que
+**cada entrega se cierra el viernes anterior a las 23:59** y no el sábado. El cierre oficial sigue siendo
+el sábado a las 23:59 y funciona como colchón: si algo se atrasa, queda un día completo de margen antes
+de que empiece a correr la penalización de 10 puntos porcentuales por día. **Objetivo realista: tener la
+entrega subida el viernes por la tarde**, para que la noche quede libre si hay que corregir algo.
+
 | Fecha | Hito | Qué debe estar cerrado |
 |---|---|---|
 | Dom 13 sep | Preparación | Ficha de proyecto, arreglos de repositorio, backend y capa de API de la aplicación |
 | **Mar 15 sep, 17:00** | Tutoría 1 (Grupo 3) | Problema en una frase, tres objetivos, pantallas, decisiones de alcance. Ocurre **antes** del cierre de E1: el borrador puede corregirse con el tutor |
-| Sáb 19 sep 23:59 | **E1 · Perfil de proyecto** | Capítulo 1, 2.2 metodología, 2.3 requisitos, repositorio inicializado |
+| **Vie 18 sep 23:59** | **E1 · Perfil de proyecto** — *cierre interno* | Capítulo 1, 2.2 metodología, 2.3 requisitos, repositorio inicializado |
+| Sáb 19 sep 23:59 | Cierre oficial de E1 (colchón) | — |
 | Mar 22 sep, 17:00 | Tutoría 2 | Revisa el avance hacia E2 |
-| Sáb 26 sep 23:59 | **E2 · Vertical funcional** | 2.4 diseño técnico, frontend navegable, API con CRUD, **primer despliegue público** |
+| **Vie 25 sep 23:59** | **E2 · Vertical funcional** — *cierre interno* | 2.4 diseño técnico, frontend navegable, API con CRUD, **primer despliegue público** |
+| Sáb 26 sep 23:59 | Cierre oficial de E2 (colchón) | — |
 | Mar 29 sep, 17:00 | Tutoría 3 | Revisa el avance hacia E3 |
-| Sáb 3 oct 23:59 | **E3 · Checkpoint técnico** | 2.7 seguridad, 2.8 pruebas con evidencia, borrador de los Capítulos 1 y 2 |
-| **Vie 9 oct, 17:00** | Tutoría 4 — **franja excepcional** | El martes 6 no hay clase; los Grupos 3 y 4 pasan al viernes. Único cambio de franja del módulo |
-| Sáb 10 oct 23:59 | **E4 · Documento y sistema** | Documento completo, despliegue verificado, manuales y anexos |
+| **Vie 2 oct 23:59** | **E3 · Checkpoint técnico** — *cierre interno* | 2.7 seguridad, 2.8 pruebas con evidencia, borrador de los Capítulos 1 y 2 |
+| Sáb 3 oct 23:59 | Cierre oficial de E3 (colchón) | — |
+| **Vie 9 oct, 17:00** | Tutoría 4 — **franja excepcional** | El martes 6 no hay clase; los Grupos 3 y 4 pasan al viernes. **El mismo día del cierre interno de E4**: la tutoría es a las 17:00 y conviene llegar con el documento ya subido |
+| **Vie 9 oct 23:59** | **E4 · Documento y sistema** — *cierre interno* | Documento completo, despliegue verificado, manuales y anexos |
+| Sáb 10 oct 23:59 | Cierre oficial de E4 (colchón) | — |
 | **Mar 13 oct, 17:00** | **Defensa técnica** | 7 minutos de demostración en vivo del sistema desplegado + 5 de preguntas |
+
+**Consecuencia de adelantar el cierre: la ventana de trabajo de cada entrega es de viernes a viernes.** El
+sábado, que no está disponible, deja de ser el día de cierre; las horas de trabajo quedan repartidas entre
+el domingo y el viernes, con la clase teórica del martes abriendo el contenido de la semana.
+
+**Fecha a vigilar: el viernes 9 de octubre.** Coinciden la tutoría de las 17:00 y el cierre interno de E4.
+La recomendación es tener E4 subido antes de la tutoría y usar esas reuniones —que en esa semana llegan
+después del cierre oficial de E3— para resolver las últimas dudas sobre el documento.
 
 Penalización por entrega tardía: 10 puntos porcentuales por día, hasta 72 horas. Nota mínima de
 aprobación: 70 sobre 100. El Módulo 4 es condición necesaria, no suficiente.
+
+### 1.1 Plan de la semana de E1
+
+| Día | Qué toca |
+|---|---|
+| **Lunes 14** | Publicar las confirmaciones (dispara la verificación automática), revisar el Word generado con `--institucional` y completar el correo institucional en la ficha |
+| **Martes 15, 17:00** | Tutoría: llevar las cuatro decisiones (roles, backend, recortes de alcance, plan de extensión) y confirmar el acceso al repositorio |
+| **Martes 15 (noche) y miércoles 16** | Con la respuesta del tutor, cerrar los cuatro puntos que dependen de ella —1.5, 2.3.1, 2.7 y 3.2— y regenerar el documento |
+| **Jueves 17** | Insertar las 12 figuras en Word, completar los preliminares según la plantilla y actualizar el índice de contenido |
+| **Viernes 18** | Revisión final y subida. **Objetivo: por la tarde**, para dejar la noche libre por si hay que corregir algo |
+| Sábado 19 | Solo si algo se atrasó: es el colchón, no el día previsto de trabajo |
 
 ---
 
@@ -142,21 +171,21 @@ predicciones con aprendizaje automático; reportes en PDF o Excel; calibración 
 
 ## 5. Checklist de evidencias por entrega
 
-**E1 (19/09).** Capítulo 1 en formato oficial · 2.2 metodología con cronograma real y declaración de IA ·
+**E1 · cierre interno viernes 18/09** (oficial 19/09). Capítulo 1 en formato oficial · 2.2 metodología con cronograma real y declaración de IA ·
 2.3 requisitos con criterios de aceptación y MoSCoW · `firestore.rules` y configuración de despliegue en el
 repositorio · acceso del docente confirmado · confirmaciones de la semana.
 
-**E2 (26/09).** 2.4 arquitectura con diagrama de componentes, modelo de datos y contrato de la API ·
+**E2 · cierre interno viernes 25/09** (oficial 26/09). 2.4 arquitectura con diagrama de componentes, modelo de datos y contrato de la API ·
 2.5 tabla del stack con versiones reales · frontend navegable · backend con CRUD desplegado · URL pública
 operativa · capturas del panel de la plataforma (build, variables de entorno y registros) · README
 actualizado.
 
-**E3 (03/10).** 2.7 seguridad con autenticación, autorización por rol, validación y gestión de variables
+**E3 · cierre interno viernes 2/10** (oficial 3/10). 2.7 seguridad con autenticación, autorización por rol, validación y gestión de variables
 sensibles · reglas de seguridad publicadas y versionadas · 2.8 con la tabla de casos de prueba ejecutados
 (identificador, escenario, resultado esperado, resultado obtenido, estado, fecha) · pruebas automatizadas
 del backend · capturas legibles con datos de prueba · borrador de los Capítulos 1 y 2.
 
-**E4 (10/10).** 2.9 despliegue con plataforma, procedimiento, configuración de entornos y dirección pública ·
+**E4 · cierre interno viernes 9/10** (oficial 10/10). 2.9 despliegue con plataforma, procedimiento, configuración de entornos y dirección pública ·
 Capítulo 3 con una conclusión por objetivo específico · Anexo A manual de usuario · Anexo B manual de
 instalación y despliegue · Anexo C enlace al repositorio con acceso para el tribunal · Anexo D dirección
 pública y APK · Anexo E diagramas en tamaño legible · documento en editable y PDF, de 30 a 40 páginas sin
