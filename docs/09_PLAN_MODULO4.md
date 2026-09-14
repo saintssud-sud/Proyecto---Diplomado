@@ -8,15 +8,20 @@ Base normativa: *P1 Apertura Módulo 4* (UAJMS, 2026), *Lineamientos Técnicos C
 
 ## 1. Calendario real
 
+**Grupo 3 · franja martes de 17:00 a 18:00**, sin cambios salvo la excepción del 9 de octubre.
+
 | Fecha | Hito | Qué debe estar cerrado |
 |---|---|---|
-| Dom 13 sep | Preparación de la tutoría | Ficha de proyecto, arreglos de repositorio |
-| Lun 14 sep | Primera tutoría | Problema en una frase, tres objetivos, pantallas, decisiones de alcance |
+| Dom 13 sep | Preparación | Ficha de proyecto, arreglos de repositorio, backend y capa de API de la aplicación |
+| **Mar 15 sep, 17:00** | Tutoría 1 (Grupo 3) | Problema en una frase, tres objetivos, pantallas, decisiones de alcance. Ocurre **antes** del cierre de E1: el borrador puede corregirse con el tutor |
 | Sáb 19 sep 23:59 | **E1 · Perfil de proyecto** | Capítulo 1, 2.2 metodología, 2.3 requisitos, repositorio inicializado |
+| Mar 22 sep, 17:00 | Tutoría 2 | Revisa el avance hacia E2 |
 | Sáb 26 sep 23:59 | **E2 · Vertical funcional** | 2.4 diseño técnico, frontend navegable, API con CRUD, **primer despliegue público** |
+| Mar 29 sep, 17:00 | Tutoría 3 | Revisa el avance hacia E3 |
 | Sáb 3 oct 23:59 | **E3 · Checkpoint técnico** | 2.7 seguridad, 2.8 pruebas con evidencia, borrador de los Capítulos 1 y 2 |
+| **Vie 9 oct, 17:00** | Tutoría 4 — **franja excepcional** | El martes 6 no hay clase; los Grupos 3 y 4 pasan al viernes. Único cambio de franja del módulo |
 | Sáb 10 oct 23:59 | **E4 · Documento y sistema** | Documento completo, despliegue verificado, manuales y anexos |
-| Lun 12 – jue 15 oct | Defensa | 7 minutos de demostración en vivo + 5 de preguntas |
+| **Mar 13 oct, 17:00** | **Defensa técnica** | 7 minutos de demostración en vivo del sistema desplegado + 5 de preguntas |
 
 Penalización por entrega tardía: 10 puntos porcentuales por día, hasta 72 horas. Nota mínima de
 aprobación: 70 sobre 100. El Módulo 4 es condición necesaria, no suficiente.
