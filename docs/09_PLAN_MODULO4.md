@@ -238,8 +238,12 @@ Numeración de tablas verificada: 1 a 7, en orden de aparición y con sus refere
 | `lib/repositories/api/` | Cinco repositorios —módulos, lecturas, rangos, alertas y perfiles— que arman las rutas del contrato, envían solo los campos declarados y convierten las respuestas en modelos |
 | `lib/utils/formato_fecha.dart` | Formato de fecha y hora en un solo lugar; antes cada pantalla lo escribía a mano y producía etiquetas distintas para la misma fecha |
 | `test/repositorios_api_test.dart` | 25 pruebas: rutas, nombres de campo del contrato, filtros, conversión de modelos y propagación de los errores del servidor |
+| `lib/widgets/vista_con_estados.dart` | La vista con sus **cuatro estados** (carga, con datos, vacío y con error), reutilizable por todas las pantallas. El estado de error se presenta distinto según sea fallo de conexión o rechazo del servidor |
+| `lib/controllers/lecturas_controller.dart` | Controlador que consulta la API y publica el estado de la vista, el mensaje del fallo y la lista de lecturas fuera de rango |
+| `test/vista_con_estados_test.dart` | 11 pruebas de widget de los cuatro estados, incluidas las dos que fijan la diferencia entre «no se pudo conectar» y «la operación fue rechazada» |
+| `test/lecturas_controller_test.dart` | 11 pruebas del controlador con el servicio simulado, más la prueba de widget que recorre la caída de la conexión, el reintento y la recuperación |
 
-`flutter analyze` sin problemas y `flutter test` con 41 casos aprobados (16 del cliente, 25 de los modelos y repositorios).
+`flutter analyze` sin problemas y `flutter test` con 63 casos aprobados. Los casos CP-16 y CP-17 de la tabla del apartado 2.8 (estado vacío y estado con error del panel) ya tienen cobertura automatizada a nivel de componente; quedarán completos cuando las pantallas queden conectadas a los repositorios.
 
 **Herramientas y versiones verificadas.** Flutter 3.44.8 (canal estable), Dart 3.12.2, `cloud_firestore` 6.9.0, `firebase_core` 4.14.0, `firebase_auth` 6.6.1, `provider` 6.1.5+1, `http` 1.6.0, `shared_preferences` 2.5.5, `geolocator` 14.0.3, `flutter_map` 8.3.2, `latlong2` 0.10.1.
 
