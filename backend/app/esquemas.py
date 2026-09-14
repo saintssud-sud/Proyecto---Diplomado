@@ -245,6 +245,9 @@ class LecturaSalida(_BaseSalida):
     origen: str
     timestamp: datetime
     estado_rango: str | None = None
+    # La observación se registra con la medición manual y forma parte de su
+    # trazabilidad: se devuelve para que el cliente pueda mostrarla.
+    observacion: str | None = None
 
 
 class ModuloSalida(_BaseSalida):
@@ -283,6 +286,10 @@ class AlertaSalida(_BaseSalida):
     estado: str
     timestamp: datetime
     observacion: str | None = None
+    # Unidad de la variable y sentido de la desviación: el documento de la alerta
+    # ya los guarda, y el cliente los presenta en la lista de alertas.
+    unidad: str = ""
+    desviacion: str | None = None
 
 
 class ResumenVariable(_BaseSalida):
