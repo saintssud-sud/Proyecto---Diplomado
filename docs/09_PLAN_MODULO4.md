@@ -222,6 +222,21 @@ Numeración de tablas verificada: 1 a 7, en orden de aparición y con sus refere
 
 **Restos que no se pudieron borrar.** Las carpetas `.tmp-pip/` (raíz) y `backend/pytest-cache-files-*/` quedaron con permisos que el entorno no permite modificar; están excluidas por `.gitignore` para que no entren al repositorio, pero conviene eliminarlas a mano.
 
+**Entorno de Flutter (hallazgo operativo).** El tool de Flutter se colgaba sin dar error porque necesita escribir en `C:\src\flutter\bin\cache\lockfile`, fuera del workspace, y el modo de sandbox `workspace-write` lo impide. Invocando la instantánea directamente, el mensaje es explícito: «Flutter failed to open a file at C:\src\flutter\bin\cache\lockfile». **Consecuencia práctica: toda orden de Flutter (analizar, probar, compilar web, generar APK) requiere aprobación de acceso ampliado en esta sesión.** Alternativa: ejecutarlas el propio usuario en su terminal, que no está sujeta al sandbox.
+
+**Línea base verificada del proyecto Flutter** (con acceso ampliado): Flutter 3.44.8 estable, Dart 3.12.2, DevTools 2.57.0; `flutter pub get` correcto; `flutter analyze` sin ningún problema; `flutter test` con los casos existentes aprobados.
+
+**Capa de API de la aplicación Flutter** (confirmación `acae25c`).
+
+| Pieza | Estado |
+|---|---|
+| `lib/config/api_config.dart` | Dirección del servicio recibida con `--dart-define=API_BASE_URL`; si no se define, usa `10.0.2.2` en el emulador de Android y `localhost` en web y escritorio. Centraliza el prefijo de versión del contrato |
+| `lib/services/api_errores.dart` | Dos tipos de error distintos — `ErrorApi` (rechazo del servidor, con código, mensaje y detalle por campo) y `ErrorConexion` (la petición no se completó) — cada uno con su mensaje para el usuario |
+| `lib/services/api_cliente.dart` | Adjunta el token de identidad, traduce el formato de error del contrato, distingue red de negocio, falla sin salir a la red cuando no hay sesión, y decodifica en UTF-8 explícitamente |
+| `test/api_cliente_test.dart` | 16 pruebas con un servicio simulado, incluida la del UTF-8 y la de «sin sesión no se llama al servicio» |
+
+`flutter analyze` sin problemas y `flutter test` con 16 casos aprobados.
+
 **Herramientas y versiones verificadas.** Flutter 3.44.8 (canal estable), Dart 3.12.2, `cloud_firestore` 6.9.0, `firebase_core` 4.14.0, `firebase_auth` 6.6.1, `provider` 6.1.5+1, `http` 1.6.0, `shared_preferences` 2.5.5, `geolocator` 14.0.3, `flutter_map` 8.3.2, `latlong2` 0.10.1.
 
 ### 7.2 Pendiente, en orden
@@ -235,3 +250,4 @@ Numeración de tablas verificada: 1 a 7, en orden de aparición y con sus refere
    - migrar la capa de datos de Flutter para que consuma la API en lugar de `SharedPreferences`;
    - desplegar la API en Render y publicar la aplicación web en Firebase Hosting, con su dirección pública;
    - registrar las capturas del panel de la plataforma (compilación, variables de entorno y registros) para el apartado 2.9.
+5. **Capa de API de la aplicación (en curso)** — el cliente está implementado y probado. Falta: los repositorios por recurso (módulos, lecturas, rangos, alertas), la conexión de las pantallas con sus **cuatro estados de vista** (carga, con datos, vacío y error) y la retirada de la persistencia local para los datos del dominio. Es lo que cierra el requisito mínimo 3.
