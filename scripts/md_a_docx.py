@@ -1,10 +1,21 @@
-"""Convierte la bitácora Markdown a un documento Word (.docx) con formato.
+"""Convierte un documento Markdown a Word (.docx) con formato.
 
 Uso:
     python scripts/md_a_docx.py docs/BITACORA_MARTES_2026-09-08.md docs/BITACORA_MARTES_2026-09-08.docx
 
+    # Con el formato institucional del trabajo final (Arial 12, interlineado 1,5,
+    # margenes de 4 y 3 cm, papel carta):
+    python scripts/md_a_docx.py monografia.md monografia.docx --institucional
+
 Genera una portada con logo (si existe assets/images/logo.png), estilos de
 títulos, párrafos, listas, tablas y bloques de código.
+
+La opción `--institucional` aplica el formato exigido por el *Formato para la
+Elaboración del Trabajo Final de Diplomado*: los títulos quedan con los estilos
+Título 1, 2 y 3 de Word, de modo que el índice de contenido y la numeración se
+generen solos. Las páginas preliminares (portada, contratapa, hoja de aprobación,
+hoja de advertencia, dedicatoria, agradecimientos e índices) se completan en Word:
+la plantilla oficial describe su contenido.
 """
 import os
 import re
@@ -14,7 +25,7 @@ from docx import Document
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml.ns import qn
-from docx.shared import Inches, Pt, RGBColor
+from docx.shared import Cm, Inches, Pt, RGBColor
 
 
 # ---------- utilidades de estilo ----------
@@ -166,16 +177,60 @@ def _configurar_fuente(run, tamano=11, negrita=False, color=None, mono=False):
 
 
 # ---------- construcción del documento ----------
-def convertir(md_path: str, docx_path: str) -> None:
+def _configurar_titulos_institucionales(doc) -> None:
+    """Ajusta los estilos de título al formato institucional.
+
+    Se aplica después de la configuración por defecto del script, que escribe los
+    títulos en otra familia tipográfica y en verde; el formato del trabajo final
+    pide la misma familia del cuerpo y texto en negro.
+    """
+    for nombre, tamano in (
+        ("Heading 1", 14),
+        ("Heading 2", 13),
+        ("Heading 3", 12),
+        ("Heading 4", 12),
+        ("Heading 5", 12),
+    ):
+        try:
+            titulo = doc.styles[nombre]
+        except KeyError:
+            continue
+        titulo.font.name = "Arial"
+        titulo.font.size = Pt(tamano)
+        titulo.font.bold = True
+        titulo.font.color.rgb = RGBColor(0x00, 0x00, 0x00)
+        titulo.paragraph_format.space_before = Pt(12)
+        titulo.paragraph_format.space_after = Pt(6)
+        titulo.paragraph_format.line_spacing = 1.5
+
+
+def convertir(md_path: str, docx_path: str, formato_institucional: bool = False) -> None:
     with open(md_path, encoding="utf-8") as f:
         lineas = f.read().splitlines()
 
     doc = Document()
 
+    # Tamaño del cuerpo: 12 puntos en el formato institucional, 11 en el resto.
+    cuerpo = 12 if formato_institucional else 11
+
+    if formato_institucional:
+        # Formato institucional: papel carta y margenes de 4 cm a la izquierda y
+        # 3 cm en el resto.
+        seccion = doc.sections[0]
+        seccion.left_margin = Cm(4)
+        seccion.right_margin = Cm(3)
+        seccion.top_margin = Cm(3)
+        seccion.bottom_margin = Cm(3)
+        seccion.page_width = Cm(21.59)
+        seccion.page_height = Cm(27.94)
+
     # Estilo base
     estilo = doc.styles["Normal"]
-    estilo.font.name = "Calibri"
-    estilo.font.size = Pt(11)
+    estilo.font.name = "Arial" if formato_institucional else "Calibri"
+    estilo.font.size = Pt(cuerpo)
+    if formato_institucional:
+        estilo.paragraph_format.line_spacing = 1.5
+        estilo.paragraph_format.space_after = Pt(8)
 
     # Portada (normaliza el logo por si el .png es en realidad JPEG)
     logo_real = _normalizar_logo()
@@ -183,6 +238,8 @@ def convertir(md_path: str, docx_path: str) -> None:
     if logo_real and logo_real != LOGO and os.path.exists(logo_real):
         os.remove(logo_real)
     _configurar_titulo_por_defecto(doc)
+    if formato_institucional:
+        _configurar_titulos_institucionales(doc)
 
     i = 0
     while i < len(lineas):
@@ -223,32 +280,36 @@ def convertir(md_path: str, docx_path: str) -> None:
             shd = shade.makeelement(qn("w:shd"), {qn("w:val"): "clear", qn("w:fill"): "F2F2F2"})
             shade.append(shd)
             run = parrafo.add_run("\n".join(codigo))
-            _configurar_fuente(run, tamano=9, color=AZUL_CODIGO, mono=True)
+            _configurar_fuente(run, tamano=10 if formato_institucional else 9, color=AZUL_CODIGO, mono=True)
             doc.add_paragraph()
             continue
 
-        # Títulos
+        # Títulos. En el formato institucional, el capítulo queda como Título 1 y
+        # sus apartados como Título 2 y 3, que es la jerarquía que el índice de
+        # contenido espera; en el resto de los documentos se mantiene el nivel
+        # anterior, con el título general en el estilo «Title».
+        base = 1 if formato_institucional else 0
         if texto.startswith("# "):
-            doc.add_heading(_quitar_markdown(texto[2:]), level=0)
+            doc.add_heading(_quitar_markdown(texto[2:]), level=base)
         elif texto.startswith("## "):
-            doc.add_heading(_quitar_markdown(texto[3:]), level=1)
+            doc.add_heading(_quitar_markdown(texto[3:]), level=base + 1)
         elif texto.startswith("### "):
-            doc.add_heading(_quitar_markdown(texto[4:]), level=2)
+            doc.add_heading(_quitar_markdown(texto[4:]), level=base + 2)
         elif texto.startswith("#### "):
-            doc.add_heading(_quitar_markdown(texto[5:]), level=3)
+            doc.add_heading(_quitar_markdown(texto[5:]), level=base + 3)
         elif texto.startswith("##### "):
-            doc.add_heading(_quitar_markdown(texto[6:]), level=4)
+            doc.add_heading(_quitar_markdown(texto[6:]), level=base + 4)
         elif texto.startswith("- ") or texto.startswith("* "):
             # viñeta (con sangría según cantidad de espacios previos)
             contenido = _quitar_markdown(texto[2:])
             parrafo = doc.add_paragraph(style="List Bullet")
             run = parrafo.add_run(contenido)
-            _configurar_fuente(run, tamano=11)
+            _configurar_fuente(run, tamano=cuerpo)
         elif re.match(r"^\s*\d+\.\s", texto):
             contenido = _quitar_markdown(re.sub(r"^\s*\d+\.\s", "", texto))
             parrafo = doc.add_paragraph(style="List Number")
             run = parrafo.add_run(contenido)
-            _configurar_fuente(run, tamano=11)
+            _configurar_fuente(run, tamano=cuerpo)
         elif texto.strip() == "":
             pass  # línea en blanco -> la gestiona el párrafo anterior
         elif re.match(r"^---+$", texto.strip()):
@@ -260,7 +321,7 @@ def convertir(md_path: str, docx_path: str) -> None:
             # párrafo normal
             parrafo = doc.add_paragraph()
             run = parrafo.add_run(_quitar_markdown(texto))
-            _configurar_fuente(run, tamano=11)
+            _configurar_fuente(run, tamano=cuerpo)
         i += 1
 
     doc.save(docx_path)
@@ -268,7 +329,7 @@ def convertir(md_path: str, docx_path: str) -> None:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Uso: python md_a_docx.py <entrada.md> <salida.docx>")
+    if len(sys.argv) < 3:
+        print("Uso: python md_a_docx.py <entrada.md> <salida.docx> [--institucional]")
         sys.exit(1)
-    convertir(sys.argv[1], sys.argv[2])
+    convertir(sys.argv[1], sys.argv[2], "--institucional" in sys.argv[3:])
