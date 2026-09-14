@@ -354,6 +354,36 @@ cada confirmación. El repositorio muestra el distintivo de estado en su archivo
 
 **Herramientas y versiones verificadas.** Flutter 3.44.8 (canal estable), Dart 3.12.2, `cloud_firestore` 6.9.0, `firebase_core` 4.14.0, `firebase_auth` 6.6.1, `provider` 6.1.5+1, `http` 1.6.0, `shared_preferences` 2.5.5, `geolocator` 14.0.3, `flutter_map` 8.3.2, `latlong2` 0.10.1.
 
+**Migración del historial a la API** (14/09/2026). El historial era el caso más engañoso de la capa
+local: la gráfica tenía un filtro por período **simulado** —tomaba las tres, cuatro o todas las
+mediciones de una lista en memoria, con un comentario que lo admitía— y el rango de fechas que el
+usuario elegía en la pantalla anterior no llegaba a ninguna consulta. Se sustituyó por una consulta
+real:
+
+| Antes | Ahora |
+|---|---|
+| `GraficaHistoricaScreen` filtraba con `take(3)`, `take(4)` sobre datos locales | Consulta al servicio por variable y rango; los períodos rápidos aplican un rango de fechas real |
+| El rango de fechas se recogía y se descartaba | Viaja al servicio como `desde` y `hasta` |
+| El resumen se calculaba en el cliente | Lo devuelve `GET /api/v1/lecturas/resumen`, que es la única fuente del promedio, máximo y mínimo |
+| La lista mostraba todas las mediciones locales, sin filtro | Muestra las lecturas de la consulta vigente, con su origen, su observación y el estado del rango evaluado por el servidor |
+| El desplegable de variables ofrecía cuatro nombres inventados (`Temperatura`, `Humedad`, …) | Ofrece el **catálogo real de siete variables** con sus códigos y unidades |
+| Sin estados de vista | Los cuatro estados, con la distinción entre fallo de conexión y rechazo del servidor |
+
+Cambio de contrato asociado: `LecturaSalida` no declaraba la observación, de modo que el servicio la
+guardaba —`POST /api/v1/lecturas` la acepta— y la descartaba al responder; `AlertaSalida` no declaraba
+la unidad ni el sentido de la desviación, que el documento de la alerta sí guarda. Se declararon en el
+esquema de salida para que el contrato coincida con lo que se almacena y con lo que la aplicación
+espera. Las 59 pruebas del servicio siguen aprobando.
+
+**Verificador estructural de Dart** (`scripts/verificar_dart.py`). El analizador de Flutter no puede
+ejecutarse en este entorno, así que se escribió un verificador que cubre los tres defectos que más
+veces aparecieron al escribir las pantallas: un delimitador sin cerrar, una importación relativa que
+dejó de resolver y un campo declarado que nadie lee. Se comprobó contra dos archivos con defectos
+deliberados —`scripts/_prueba_del_verificador*.dart.txt`— y tiene una autoprueba
+(`--autoprueba`) que exige volver a encontrarlos: la primera versión del verificador **no era fiable**
+y marcaba como no leído un campo que sí se usaba. Con eso se revisaron los 74 archivos de `lib/` y
+`test/` sin hallazgos. No sustituye al analizador: no comprueba tipos.
+
 ### 7.2 Pendiente, en orden
 
 1. **Tutoría del 14/09** — cerrar las tres decisiones de la ficha: alcance de roles, backend con API propia y recortes.
@@ -365,5 +395,15 @@ cada confirmación. El repositorio muestra el distintivo de estado en su archivo
    - migrar la capa de datos de Flutter para que consuma la API en lugar de `SharedPreferences`;
    - desplegar la API en Render y publicar la aplicación web en Firebase Hosting, con su dirección pública;
    - registrar las capturas del panel de la plataforma (compilación, variables de entorno y registros) para el apartado 2.9.
-5. **Capa de API de la aplicación (en curso)** — el cliente, los modelos del contrato y los cinco repositorios están implementados y probados. Falta: **conectar las pantallas** con sus cuatro estados de vista (carga, con datos, vacío y error) y retirar la persistencia local de los datos del dominio. Es lo que cierra el requisito mínimo 3. Los modelos locales (`Cultivo`, `Medicion`, `Alerta`, `VariableRango`) se retiran a medida que cada pantalla migra; no se convierten entre sí porque su forma es distinta y la conversión perdería datos.
-6. **Extensión del documento** — el cuerpo excede el límite institucional en unas seis páginas. El plan de recorte está medido y escrito dentro del borrador; hay que validarlo con el tutor y aplicarlo antes del cierre de la iteración 4. Es la única tarea del proyecto que **crece sola** si no se atiende.
+5. **Capa de API de la aplicación (en curso)** — el cliente, los modelos del contrato y los cinco repositorios están implementados y probados. El **panel** y el **historial** ya consumen el servicio; falta el resto. Inventario exacto de las pantallas que todavía leen datos locales de `PreferencesController`:
+
+   | Pantalla | Qué lee hoy | Qué debe consumir |
+   |---|---|---|
+   | `alertas/alertas_screen.dart` y `alerta_detalle_screen.dart` | `preferences` | `GET /api/v1/alertas` y `PATCH /api/v1/alertas/{id}` |
+   | `cultivos/*` (lista, detalle, variables) | `preferences.addCultivo` / `removeCultivo` | `GET`, `POST`, `PATCH`, `DELETE /api/v1/modulos` |
+   | `variables/*` (lista, detalle, rango óptimo) | `preferences` | `GET /api/v1/rangos`, `PATCH /api/v1/rangos/{id}` |
+   | `ajustes/rangos_variables_screen.dart` | `preferences` | `GET` y `PATCH /api/v1/rangos` |
+
+   Es el trabajo que cierra el requisito mínimo 3 y el que hace demostrable el guion de la defensa: hoy el paso «registrar una medición fuera de rango y ver la alerta» funciona en el panel —que sí consulta el servicio— pero la pantalla de alertas muestra datos locales. Los modelos locales (`Cultivo`, `Medicion`, `Alerta`, `VariableRango`) se retiran a medida que cada pantalla migra; no se convierten entre sí porque su forma es distinta y la conversión perdería datos. El patrón está fijado por `PanelController` e `HistorialController`: un controlador por dominio, que expone los cuatro estados y traduce los fallos con `FalloDeVista`, y una pantalla que solo presenta.
+6. **Exportación en CSV desde la aplicación** — el servicio publica `GET /api/v1/exportaciones/lecturas.csv` y el repositorio de la aplicación ya sabe descargarlo (`exportarCsv`), pero ninguna pantalla lo ofrece: guardar el archivo requiere una dependencia de almacenamiento que no se puede añadir sin ejecutar `flutter pub get`, que en este entorno no está disponible. Queda para cuando el equipo del autor pueda ejecutar la herramienta. Mientras tanto, la descarga se demuestra desde el navegador contra la dirección del servicio.
+7. **Extensión del documento** — el cuerpo excede el límite institucional en unas seis páginas. El plan de recorte está medido y escrito dentro del borrador; hay que validarlo con el tutor y aplicarlo antes del cierre de la iteración 4. Es la única tarea del proyecto que **crece sola** si no se atiende.
