@@ -1,0 +1,7 @@
+/// Archivo de prueba del verificador: tiene un paréntesis sin cerrar.
+class _Delimitadores {
+  void construir() {
+    final List<int> valores = <int>[1, 2, 3];
+    print(valores.length;
+  }
+}

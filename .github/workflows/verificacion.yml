@@ -68,6 +68,15 @@ jobs:
         # plantilla, que declara las mismas clases con valores de ejemplo.
         run: cp lib/firebase_options.example.dart lib/firebase_options.dart
 
+      - name: Verificar la estructura del código Dart
+        # Comprueba lo que el analizador no llega a ver cuando el entorno del
+        # autor no puede ejecutarlo: delimitadores sin cerrar, importaciones que
+        # no resuelven y campos que nadie lee. Su autoprueba se ejecuta antes,
+        # para no dar por bueno un verificador que no encuentre nada.
+        run: |
+          python3 scripts/verificar_dart.py --autoprueba
+          python3 scripts/verificar_dart.py
+
       - name: Instalar las dependencias del proyecto
         run: flutter pub get
 

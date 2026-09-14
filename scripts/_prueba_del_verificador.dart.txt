@@ -1,0 +1,18 @@
+import 'paquete_que_no_existe.dart';
+import '../ruta/inexistente.dart';
+
+/// Archivo de prueba del verificador: contiene tres defectos deliberados.
+class _Caja extends StatelessWidget {
+  const _Caja({required this.algo, required this.sobrante});
+
+  final String algo;
+
+  /// Campo que nadie lee: debe detectarse.
+  final String sobrante;
+
+  @override
+  Widget build(BuildContext context) {
+    // Delimitador sin cerrar: debe detectarse.
+    return Text(algo, style: TextStyle(fontSize: 12));
+  }
+}
