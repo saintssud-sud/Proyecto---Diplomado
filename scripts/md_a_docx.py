@@ -176,6 +176,53 @@ def _configurar_fuente(run, tamano=11, negrita=False, color=None, mono=False):
         run.font.color.rgb = color
 
 
+def _es_imagen_vertical(ruta: str) -> bool:
+    """Indica si la imagen es más alta que ancha, para elegir su ancho al insertarla."""
+    try:
+        from PIL import Image
+
+        with Image.open(ruta) as imagen:
+            ancho, alto = imagen.size
+        return alto > ancho
+    except Exception:
+        return False
+
+
+def _insertar_figura(doc, ruta: str, epigrafe: str, fuente: str, cuerpo: int) -> None:
+    """Inserta una imagen centrada con su epígrafe debajo.
+
+    El formato institucional pide el epígrafe **debajo** de la figura (a
+    diferencia de las tablas, cuyo título va encima). El ancho se elige según la
+    orientación: las imágenes verticales —los bocetos de pantalla— se insertan a
+    7 cm para que no ocupen una página entera, y las horizontales a 14 cm, que es
+    el ancho útil de la caja de texto.
+    """
+    ancho_cm = 7.0 if _es_imagen_vertical(ruta) else 14.0
+    parrafo = doc.add_paragraph()
+    parrafo.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    parrafo.add_run().add_picture(ruta, width=Cm(ancho_cm))
+
+    if epigrafe:
+        # El epígrafe llega como «Figura N. Descripción»: se destaca la
+        # identificación y se deja la descripción en cursiva.
+        texto_epigrafe = doc.add_paragraph()
+        texto_epigrafe.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        identificacion, _, descripcion = epigrafe.partition(". ")
+        run = texto_epigrafe.add_run(identificacion + ".")
+        _configurar_fuente(run, tamano=11, negrita=True)
+        if descripcion:
+            run = texto_epigrafe.add_run(" " + descripcion)
+            _configurar_fuente(run, tamano=11)
+            run.italic = True
+
+    if fuente:
+        texto_fuente = doc.add_paragraph()
+        texto_fuente.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        run = texto_fuente.add_run(fuente)
+        _configurar_fuente(run, tamano=10, color=GRIS)
+        run.italic = True
+
+
 # ---------- construcción del documento ----------
 def _configurar_titulos_institucionales(doc) -> None:
     """Ajusta los estilos de título al formato institucional.
@@ -245,6 +292,29 @@ def convertir(md_path: str, docx_path: str, formato_institucional: bool = False)
     while i < len(lineas):
         linea = lineas[i]
         texto = linea.rstrip()
+
+        # Figura: ![Figura N. Descripción | Fuente: ...](ruta/de/la/imagen.png)
+        figura = re.match(r"^!\[(?P<alt>[^\]]*)\]\((?P<ruta>[^)]+)\)\s*$", texto.strip())
+        if figura:
+            ruta_imagen = figura.group("ruta")
+            epigrafe, _, fuente_texto = figura.group("alt").partition("|")
+            if os.path.exists(ruta_imagen):
+                _insertar_figura(
+                    doc,
+                    ruta_imagen,
+                    epigrafe.strip(),
+                    fuente_texto.strip(),
+                    cuerpo,
+                )
+            else:
+                # Si la imagen no está, se deja constancia en el documento en
+                # lugar de romper la conversión.
+                aviso = doc.add_paragraph()
+                aviso.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                run = aviso.add_run("[Falta la imagen: %s]" % ruta_imagen)
+                _configurar_fuente(run, tamano=cuerpo, color=RGBColor(0xC0, 0x00, 0x00))
+            i += 1
+            continue
 
         # Tabla
         if _es_fila_tabla(texto):
