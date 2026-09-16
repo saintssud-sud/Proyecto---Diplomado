@@ -42,6 +42,17 @@ def asegurar_sdk_firebase(configuracion: Configuracion) -> None:
     if firebase_admin._apps:
         return
 
+    # Se deja constancia, sin exponer la clave, de si las credenciales llegaron:
+    # es el primer dato que hay que mirar cuando el servicio arranca en la nube y
+    # no puede acceder a la base de datos.
+    logging.getLogger("sigvach").info(
+        "Firebase: proyecto='%s', credenciales de servicio %s",
+        configuracion.proyecto_firebase or "(sin indicar)",
+        "presentes (%d caracteres)" % len(configuracion.credenciales_servicio)
+        if configuracion.credenciales_servicio
+        else "AUSENTES (se intentara con las credenciales por defecto)",
+    )
+
     try:
         if configuracion.credenciales_servicio:
             datos = json.loads(configuracion.credenciales_servicio)
