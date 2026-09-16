@@ -11,6 +11,7 @@ disponibles.
 """
 
 import json
+import logging
 from datetime import datetime, timezone
 from typing import Any
 
@@ -289,8 +290,18 @@ class RepositorioFirestore:
 
     # --- Diagnóstico --------------------------------------------------------
     def verificar_conexion(self) -> bool:
+        """Comprueba que la base de datos responde.
+
+        El fallo se registra con su causa: sin ese registro, una credencial
+        ausente y un problema de permisos producen el mismo resultado visible —el
+        servicio informa que la base no está disponible— y no hay forma de
+        distinguirlos desde fuera.
+        """
         try:
             next(self._coleccion(COLECCION_LECTURAS).limit(1).stream(), None)
             return True
-        except Exception:
+        except Exception as error:  # noqa: BLE001 - se informa como no disponible
+            logging.getLogger("sigvach").warning(
+                "La base de datos no responde: %s: %s", type(error).__name__, error
+            )
             return False

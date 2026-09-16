@@ -66,6 +66,15 @@ def asegurar_sdk_firebase(configuracion: Configuracion) -> None:
             else None
         )
         firebase_admin.initialize_app(credencial, opciones)
+
+        # El proyecto con el que quedó vinculado el SDK y la cuenta que se está
+        # usando: son datos públicos (no secretos) y permiten detectar de
+        # inmediato un proyecto mal indicado en la configuración del despliegue.
+        logging.getLogger("sigvach").info(
+            "Firebase: SDK inicializado (proyecto='%s', cuenta='%s')",
+            firebase_admin.get_app().project_id,
+            getattr(credencial, "service_account_email", "(credenciales por defecto)"),
+        )
     except Exception as error:  # noqa: BLE001 - la demostración debe seguir en pie
         logging.getLogger("sigvach").warning(
             "No se pudo inicializar el SDK de Firebase al arrancar: %s: %s",
