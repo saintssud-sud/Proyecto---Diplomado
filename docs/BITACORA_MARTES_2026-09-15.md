@@ -388,3 +388,43 @@ Tres defectos reales, dos pendientes de corregir:
 2. Corregir el criterio de selección de módulo y el indicador de estado del panel.
 3. Ejecutar el analizador y las pruebas de la aplicación en el equipo del autor.
 4. Confirmar en el repositorio los archivos nuevos: el tablero, el entregable E1 y las figuras generadas.
+
+---
+
+# Tercera parte — miércoles 16: despliegue del servicio
+
+## 23. Publicación del servicio en la plataforma
+
+El servicio quedó desplegado en **Render**, en su capa gratuita, con la definición declarada en el repositorio (`render.yaml`) y creado a partir del repositorio de GitHub.
+
+| Elemento | Valor |
+|---|---|
+| Nombre del servicio | `sigvach-api` |
+| Repositorio y rama | `saintssud-sud/Proyecto---Diplomado` · `main` |
+| Directorio raíz | `backend` |
+| Construcción | `pip install -r requirements.txt` |
+| Arranque | `uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips="*"` |
+| Comprobación de salud | `/api/v1/salud` |
+| Tipo de instancia | Gratuita |
+| Variables de entorno | `ENTORNO`, `FIREBASE_PROJECT_ID`, `ALLOWED_ORIGINS`, `DEVICE_API_KEY` y `FIREBASE_SERVICE_ACCOUNT_JSON` |
+| Despliegue automático | Al confirmar cambios en el repositorio |
+
+**Decisiones tomadas durante la publicación.**
+
+- Se eligió el nombre `sigvach-api` para que la dirección pública sea legible y citable en la monografía.
+- El **directorio raíz** se fijó en `backend` porque el servicio y sus dependencias viven en esa carpeta: sin esa indicación la construcción falla.
+- El **comando de arranque** obliga a escuchar en `0.0.0.0` y en el puerto que asigna la plataforma (`$PORT`), y a confiar en las cabeceras del proxy (`--proxy-headers`), condición para funcionar detrás del terminador TLS de la plataforma.
+- Los secretos se declararon como **variables de entorno** en el panel y no como archivos: la clave de la cuenta de servicio se cargó en una sola línea JSON (2330 caracteres) y la clave del módulo de adquisición con su valor vigente.
+- Se concedió a la plataforma acceso **solo al repositorio del proyecto**, según el criterio de mínimo privilegio.
+
+**Hallazgo de seguridad.** Al revisar la configuración se detectó que el archivo de entorno local conservaba el **valor de ejemplo** de la clave del módulo de adquisición (`cambiar-por-una-cadena-aleatoria-larga`), que está publicado en la plantilla del repositorio: cualquier persona que accediera al repositorio podía enviar lecturas al servicio. Se generó una clave aleatoria de 64 caracteres con `secrets.token_urlsafe`, se actualizó el archivo de entorno local y la configuración del despliegue, y se conservó un respaldo del archivo anterior. La comprobación inicial no lo detectó porque solo medía la longitud del valor, que coincidía con la de una clave real.
+
+**Hallazgo de disponibilidad.** La plataforma advierte que, en su capa gratuita, la instancia se suspende por inactividad y que la primera petición posterior puede demorar **cincuenta segundos o más**. El requisito RNF-05 declaraba treinta segundos, de modo que se corrigió a **sesenta segundos** —en la monografía y en el entregable E1— y el tiempo máximo de espera del cliente se elevó de 45 a **60 segundos**, para que esa primera petición no se interprete como un fallo de conexión.
+
+**Archivos de apoyo generados.** Se prepararon dos utilidades reproducibles: una que convierte la clave de la cuenta de servicio en una sola línea y comprueba que sirve para autenticar, y otra que reúne las cinco variables de entorno en un archivo para cargarlas de una vez en la plataforma. Ese archivo contiene secretos, se guardó **fuera del repositorio** y se elimina una vez cargado.
+
+**Pendiente de esta fase.** Publicar la aplicación web en Firebase Hosting con la dirección del servicio, cerrar los orígenes permitidos (CORS) con la dirección pública de la aplicación, publicar las reglas de seguridad de Firestore y generar el archivo instalable de Android. Se recomienda además **rotar la clave de la cuenta de servicio**, porque una captura de pantalla mostró su encabezado durante la configuración.
+
+---
+
+*Bitácora de trabajo del Módulo 4. Elaborada al cierre de las sesiones del lunes 14, del martes 15 y del miércoles 16 de septiembre de 2026.*

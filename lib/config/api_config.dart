@@ -53,12 +53,15 @@ class ApiConfig {
 
   /// Tiempo máximo de espera de una petición.
   ///
-  /// Se admiten 45 segundos y no 20 porque la **primera** consulta después de
-  /// arrancar el servicio abre la conexión con Cloud Firestore, y ese arranque
-  /// en frío puede tardar entre 25 y 30 segundos. Un límite menor hacía que la
-  /// primera pantalla fallara con «la petición excedió el tiempo de espera»
-  /// aunque el servicio estuviera funcionando: el usuario veía un fallo de
-  /// conexión donde solo había una espera. Las consultas siguientes responden en
-  /// pocos segundos, de modo que el límite amplio solo actúa en ese primer caso.
-  static const Duration esperaMaxima = Duration(seconds: 45);
+  /// Se admiten 60 segundos y no 20 porque la **primera** consulta después de
+  /// arrancar el servicio abre la conexión con Cloud Firestore, y ese arranque en
+  /// frío puede tardar entre 25 y 30 segundos. A eso se suma que, en la capa
+  /// gratuita de la plataforma de despliegue, el servicio se suspende por
+  /// inactividad y la primera petición posterior puede demorar **hasta 50 o 60
+  /// segundos**, según advierte la propia plataforma. Un límite menor hacía que la
+  /// primera pantalla fallara con «la petición excedió el tiempo de espera» aunque
+  /// el servicio estuviera funcionando: el usuario veía un fallo de conexión donde
+  /// solo había una espera. Las consultas siguientes responden en pocos segundos,
+  /// de modo que el límite amplio solo actúa en ese primer caso.
+  static const Duration esperaMaxima = Duration(seconds: 60);
 }
