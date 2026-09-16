@@ -11,7 +11,8 @@ import '../utils/formato_fecha.dart';
 import '../widgets/max_width_box.dart';
 import '../widgets/vista_con_estados.dart';
 import 'ajustes/ajustes_screen.dart';
-import 'alertas/alertas_screen.dart';
+import 'ajustes/cultivos_screen.dart';
+import 'alertas/pantalla_alertas.dart';
 import 'cultivos/cultivos_screen.dart';
 import 'historial/historial_screen.dart';
 import 'variables/variables_screen.dart';
@@ -28,6 +29,30 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _onTabSelected(int index) {
     setState(() => _tabIndex = index);
+  }
+
+  /// Abre la pantalla de alertas, que ya no ocupa un lugar en el menú inferior.
+  void _abrirAlertas(BuildContext context) {
+    Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(builder: (_) => const PantallaAlertas()),
+    );
+  }
+
+  /// Icono de notificaciones con el número de alertas activas.
+  ///
+  /// El contador evita que el usuario tenga que entrar para saber si hay algo que
+  /// atender, que es la razón por la que el aviso vive en la barra superior.
+  Widget _iconoDeAlertas(BuildContext context) {
+    final int activas = context.watch<PanelController>().alertasActivas;
+    if (activas <= 0) {
+      return const Icon(Icons.notifications_outlined);
+    }
+    return Badge.count(
+      count: activas,
+      backgroundColor: const Color(0xFFC62828),
+      textColor: Colors.white,
+      child: const Icon(Icons.notifications_outlined),
+    );
   }
 
   @override
@@ -60,10 +85,13 @@ class _HomeScreenState extends State<HomeScreen> {
             tooltip: 'Actualizar',
             onPressed: () => context.read<PanelController>().cargar(),
           ),
+          // Las alertas se consultan desde aquí y no desde el menú inferior: así
+          // el menú puede dedicar un lugar al catálogo de cultivos. El contador
+          // del icono informa cuántas alertas activas hay.
           IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            tooltip: 'Alertas',
-            onPressed: () => _onTabSelected(3),
+            tooltip: 'Alertas activas',
+            onPressed: () => _abrirAlertas(context),
+            icon: _iconoDeAlertas(context),
           ),
         ],
       ),
@@ -141,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const _PanelView(),
           const VariablesScreen(),
           const CultivosScreen(),
-          const AlertasScreen(),
+          const CultivosCatalogoScreen(),
           const HistorialScreen(),
           const AjustesScreen(),
         ],
@@ -158,12 +186,12 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Variables',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.eco_outlined),
-            label: 'Cultivos',
+            icon: Icon(Icons.sensors),
+            label: 'Módulo',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.notifications_outlined),
-            label: 'Alertas',
+            icon: Icon(Icons.eco_outlined),
+            label: 'Cultivos',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.history),

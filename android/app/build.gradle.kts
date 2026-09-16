@@ -18,11 +18,12 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "bo.edu.uajms.sigvach"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        // La versión mínima se declara de forma explícita, y no con el valor
+        // predeterminado del SDK de Flutter, porque el requisito no funcional
+        // RNF-04 exige Android 8.0 (API 26) o superior y esa condición debe
+        // quedar verificable en el propio archivo de construcción.
+        minSdk = 26
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

@@ -30,13 +30,16 @@ class ApiConfig {
 
   static String get _localPorDefecto {
     if (kIsWeb) {
-      return 'http://localhost:8000';
+      // 127.0.0.1 y no "localhost": en Windows, "localhost" puede resolverse
+      // como IPv6 (::1) y el servicio escucha solo en IPv4, de modo que la
+      // petición se rechaza aunque el servicio esté en pie.
+      return 'http://127.0.0.1:8011';
     }
     if (defaultTargetPlatform == TargetPlatform.android) {
       // El emulador de Android alcanza al equipo anfitrión por 10.0.2.2.
-      return 'http://10.0.2.2:8000';
+      return 'http://10.0.2.2:8011';
     }
-    return 'http://localhost:8000';
+    return 'http://127.0.0.1:8011';
   }
 
   /// Prefijo de versión del contrato que consume la aplicación.
@@ -49,5 +52,13 @@ class ApiConfig {
   }
 
   /// Tiempo máximo de espera de una petición.
-  static const Duration esperaMaxima = Duration(seconds: 20);
+  ///
+  /// Se admiten 45 segundos y no 20 porque la **primera** consulta después de
+  /// arrancar el servicio abre la conexión con Cloud Firestore, y ese arranque
+  /// en frío puede tardar entre 25 y 30 segundos. Un límite menor hacía que la
+  /// primera pantalla fallara con «la petición excedió el tiempo de espera»
+  /// aunque el servicio estuviera funcionando: el usuario veía un fallo de
+  /// conexión donde solo había una espera. Las consultas siguientes responden en
+  /// pocos segundos, de modo que el límite amplio solo actúa en ese primer caso.
+  static const Duration esperaMaxima = Duration(seconds: 45);
 }

@@ -1,142 +1,156 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../controllers/preferences_controller.dart';
-import '../../models/alerta.dart';
+import '../../controllers/alertas_controller.dart';
+import '../../controllers/estado_de_vista.dart';
+import '../../models/api/modelos_api.dart';
+import '../../utils/formato_fecha.dart';
 
 /// Pantalla 4.1 — Detalle de una alerta.
-class AlertaDetalleScreen extends StatelessWidget {
+///
+/// Muestra el valor que se registró, el rango del perfil, la desviación y la
+/// **lectura de origen** (la trazabilidad). La acción de atender la alerta se
+/// envía al servicio y después la lista se vuelve a consultar, de modo que lo
+/// que se muestra es lo que quedó guardado.
+class AlertaDetalleScreen extends StatefulWidget {
   const AlertaDetalleScreen({super.key, required this.alerta});
 
-  final Alerta alerta;
+  final AlertaServidor alerta;
+
+  @override
+  State<AlertaDetalleScreen> createState() => _AlertaDetalleScreenState();
+}
+
+class _AlertaDetalleScreenState extends State<AlertaDetalleScreen> {
+  bool _procesando = false;
+
+  Future<void> _cambiarEstado({required bool atender}) async {
+    setState(() => _procesando = true);
+    final AlertasController controller = context.read<AlertasController>();
+    final ScaffoldMessengerState mensajero = ScaffoldMessenger.of(context);
+    final NavigatorState navegador = Navigator.of(context);
+
+    try {
+      if (atender) {
+        await controller.marcarAtendida(widget.alerta.id);
+      } else {
+        await controller.marcarActiva(widget.alerta.id);
+      }
+      if (!mounted) {
+        return;
+      }
+      navegador.pop();
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      mensajero.showSnackBar(
+        SnackBar(content: Text(FalloDeVista.desde(error).mensaje)),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _procesando = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final color = alerta.critica ? Colors.red : const Color(0xFF2E7D32);
-    final icono = alerta.critica
-        ? Icons.warning_amber_rounded
-        : Icons.check_circle_outline;
+    final AlertaServidor alerta = widget.alerta;
+    final bool activa = alerta.estaActiva;
+    final Color color =
+        activa ? const Color(0xFFC62828) : const Color(0xFF2E7D32);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Detalle de alerta')),
+      appBar: AppBar(
+        title: Text(alerta.nombreVariable),
+        backgroundColor: color,
+        foregroundColor: Colors.white,
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: <Widget>[
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: color.withValues(alpha: 0.4)),
-            ),
-            child: Column(
-              children: <Widget>[
-                Icon(icono, color: color, size: 44),
-                const SizedBox(height: 12),
-                Text(
-                  alerta.titulo,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: color,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(alerta.nivelActual, style: const TextStyle(fontSize: 15)),
-                Text(
-                  alerta.rangoPermitido,
-                  style: const TextStyle(fontSize: 15),
-                ),
-              ],
-            ),
+          _Fila(
+            etiqueta: 'Estado',
+            valor: activa ? 'Activa' : 'Atendida',
+            color: color,
+          ),
+          _Fila(etiqueta: 'Variable', valor: alerta.nombreVariable),
+          _Fila(
+            etiqueta: 'Valor registrado',
+            valor: '${formatearValor(alerta.valor)} ${alerta.unidad}'.trim(),
+          ),
+          _Fila(
+            etiqueta: 'Rango del perfil',
+            valor: '${formatearValor(alerta.rangoMinimo)} – '
+                '${formatearValor(alerta.rangoMaximo)} ${alerta.unidad}'.trim(),
+          ),
+          _Fila(
+            etiqueta: 'Desviación',
+            valor: alerta.desviacion == 'alto'
+                ? 'Por encima del rango'
+                : (alerta.desviacion == 'bajo'
+                    ? 'Por debajo del rango'
+                    : 'Sin clasificar'),
+          ),
+          _Fila(
+            etiqueta: 'Fecha de la lectura',
+            valor: formatearFechaHora(alerta.timestamp),
+          ),
+          _Fila(etiqueta: 'Lectura de origen', valor: alerta.lecturaId),
+          if (alerta.observacion != null && alerta.observacion!.isNotEmpty)
+            _Fila(etiqueta: 'Observación', valor: alerta.observacion!),
+          const SizedBox(height: 8),
+          const Text(
+            'Cada alerta conserva la referencia a la lectura que la originó: el '
+            'servicio asigna esa trazabilidad al evaluar el valor contra el rango '
+            'de referencia del perfil de cultivo.',
+            style: TextStyle(color: Colors.grey, fontSize: 12),
           ),
           const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    const Icon(Icons.event, color: Colors.grey, size: 20),
-                    const SizedBox(width: 10),
-                    const Text('Fecha', style: TextStyle(fontSize: 14)),
-                    const Spacer(),
-                    Text(
-                      alerta.fecha,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                ),
-                const Divider(),
-                Row(
-                  children: <Widget>[
-                    const Icon(
-                      Icons.info_outline,
-                      color: Colors.grey,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 10),
-                    const Text('Estado', style: TextStyle(fontSize: 14)),
-                    const Spacer(),
-                    Text(
-                      alerta.estado,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
-                        color: color,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          if (alerta.estado == 'Activa')
+          if (_procesando)
+            const Center(child: CircularProgressIndicator())
+          else
             FilledButton.icon(
-              onPressed: () async {
-                await context
-                    .read<PreferencesController>()
-                    .marcarAlertaResuelta(alerta.id);
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Alerta marcada como resuelta'),
-                    ),
-                  );
-                  Navigator.of(context).pop();
-                }
-              },
-              icon: const Icon(Icons.done),
-              label: const Text('Marcar como resuelta'),
-              style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFF39B54A),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-              ),
+              onPressed: () => _cambiarEstado(atender: activa),
+              icon: Icon(activa
+                  ? Icons.check_circle_outline
+                  : Icons.restore),
+              label: Text(activa
+                  ? 'Marcar como atendida'
+                  : 'Devolver a alertas activas'),
             ),
-          const SizedBox(height: 8),
-          OutlinedButton.icon(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Historial completo disponible próximamente'),
-                ),
-              );
-            },
-            icon: const Icon(Icons.history),
-            label: const Text('Ver historial'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF39B54A),
-              padding: const EdgeInsets.symmetric(vertical: 14),
+        ],
+      ),
+    );
+  }
+}
+
+class _Fila extends StatelessWidget {
+  const _Fila({required this.etiqueta, required this.valor, this.color});
+
+  final String etiqueta;
+  final String valor;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            etiqueta,
+            style: const TextStyle(color: Colors.grey, fontSize: 12),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            valor,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: color ?? Colors.black87,
             ),
           ),
         ],

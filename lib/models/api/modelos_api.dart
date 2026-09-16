@@ -42,13 +42,26 @@ class VariableCatalogo {
 /// y la evaluación contra los rangos las realiza siempre el servidor.
 const List<VariableCatalogo> catalogoVariables = <VariableCatalogo>[
   VariableCatalogo(codigo: 'ph', nombre: 'pH', unidad: ''),
-  VariableCatalogo(codigo: 'tds', nombre: 'Sólidos disueltos totales', unidad: 'ppm'),
-  VariableCatalogo(codigo: 'ec', nombre: 'Conductividad eléctrica', unidad: 'mS/cm'),
   VariableCatalogo(
-      codigo: 'temp_solucion',
-      nombre: 'Temperatura de la solución nutritiva',
-      unidad: '°C'),
-  VariableCatalogo(codigo: 'temp_ambiental', nombre: 'Temperatura ambiental', unidad: '°C'),
+    codigo: 'tds',
+    nombre: 'Sólidos disueltos totales',
+    unidad: 'ppm',
+  ),
+  VariableCatalogo(
+    codigo: 'ec',
+    nombre: 'Conductividad eléctrica',
+    unidad: 'mS/cm',
+  ),
+  VariableCatalogo(
+    codigo: 'temp_solucion',
+    nombre: 'Temperatura de la solución nutritiva',
+    unidad: '°C',
+  ),
+  VariableCatalogo(
+    codigo: 'temp_ambiental',
+    nombre: 'Temperatura ambiental',
+    unidad: '°C',
+  ),
   VariableCatalogo(codigo: 'humedad', nombre: 'Humedad relativa', unidad: '%'),
   VariableCatalogo(codigo: 'nivel_agua', nombre: 'Nivel de agua', unidad: 'cm'),
 ];
@@ -77,7 +90,11 @@ String unidadDeVariable(String codigo) {
 // Utilidades internas de lectura
 // ---------------------------------------------------------------------------
 
-String _texto(Map<String, dynamic> json, String campo, {String porDefecto = ''}) {
+String _texto(
+  Map<String, dynamic> json,
+  String campo, {
+  String porDefecto = '',
+}) {
   final Object? valor = json[campo];
   return valor == null ? porDefecto : valor.toString();
 }
@@ -93,12 +110,16 @@ double _numero(Map<String, dynamic> json, String campo) {
       return convertido;
     }
   }
-  throw ErrorDeContrato('El campo "$campo" debía ser numérico y llegó como "$valor".');
+  throw ErrorDeContrato(
+    'El campo "$campo" debía ser numérico y llegó como "$valor".',
+  );
 }
 
 DateTime _fecha(Map<String, dynamic> json, String campo) {
   final Object? valor = json[campo];
-  final DateTime? fecha = valor == null ? null : DateTime.tryParse(valor.toString());
+  final DateTime? fecha = valor == null
+      ? null
+      : DateTime.tryParse(valor.toString());
   if (fecha == null) {
     throw ErrorDeContrato('El campo "$campo" no contiene una fecha válida.');
   }
@@ -191,7 +212,11 @@ class RangoReferencia {
       variable: _texto(json, 'variable'),
       minimo: _numero(json, 'minimo'),
       maximo: _numero(json, 'maximo'),
-      unidad: _texto(json, 'unidad', porDefecto: unidadDeVariable(_texto(json, 'variable'))),
+      unidad: _texto(
+        json,
+        'unidad',
+        porDefecto: unidadDeVariable(_texto(json, 'variable')),
+      ),
     );
   }
 }
@@ -236,6 +261,7 @@ class Lectura {
     required this.origen,
     required this.timestamp,
     this.estadoRango,
+    this.observacion,
   });
 
   final String id;
@@ -356,9 +382,64 @@ class AlertaServidor {
       rangoMaximo: _numero(json, 'rango_maximo'),
       estado: _texto(json, 'estado', porDefecto: 'activa'),
       timestamp: _fecha(json, 'timestamp'),
-      unidad: json['unidad']?.toString() ?? unidadDeVariable(_texto(json, 'variable')),
+      unidad:
+          json['unidad']?.toString() ??
+          unidadDeVariable(_texto(json, 'variable')),
       desviacion: json['desviacion']?.toString(),
       observacion: json['observacion']?.toString(),
+    );
+  }
+}
+
+/// Perfil de la cuenta que tiene la sesión iniciada.
+///
+/// El identificador es el **uid** de Firebase Authentication; el rol lo resuelve
+/// el servicio al autorizar cada petición, de modo que la aplicación lo presenta
+/// pero nunca lo decide.
+class PerfilUsuario {
+  const PerfilUsuario({
+    required this.id,
+    this.email = '',
+    this.nombre = '',
+    this.rol = '',
+    this.activo = true,
+    this.telefono,
+    this.cargo,
+  });
+
+  final String id;
+  final String email;
+  final String nombre;
+  final String rol;
+  final bool activo;
+  final String? telefono;
+  final String? cargo;
+
+  bool get esAdministrador => rol == 'admin';
+
+  /// Texto presentable del rol.
+  String get etiquetaRol {
+    switch (rol) {
+      case 'admin':
+        return 'Administrador';
+      case 'usuario':
+        return 'Operador';
+      default:
+        return rol.isEmpty ? 'Sin rol' : rol;
+    }
+  }
+
+  factory PerfilUsuario.fromJson(Map<String, dynamic> json) {
+    return PerfilUsuario(
+      id: _texto(json, 'id'),
+      email: json['email']?.toString() ?? '',
+      nombre: json['nombre']?.toString() ?? '',
+      rol: json['rol']?.toString() ?? '',
+      // Un perfil sin el campo `activo` se considera habilitado: solo la
+      // desactivación explícita bloquea el acceso, igual que en el servicio.
+      activo: json['activo'] != false,
+      telefono: json['telefono']?.toString(),
+      cargo: json['cargo']?.toString(),
     );
   }
 }

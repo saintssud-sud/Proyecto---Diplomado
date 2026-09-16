@@ -33,6 +33,16 @@ class ApiCliente {
   final String _baseUrl;
   final Duration _espera;
 
+  /// Tiempo máximo para obtener el token de identidad.
+  ///
+  /// El token de Firebase expira cada hora y el SDK lo renueva contra los
+  /// servidores del proveedor de identidad. Esa renovación no tenía límite: si
+  /// la petición no completaba —por ejemplo, cuando un bloqueador de
+  /// rastreadores la intercepta— la pantalla quedaba en «cargando» de forma
+  /// indefinida, sin mensaje y sin acción posible. Acotarla convierte esa espera
+  /// infinita en un fallo informado, con su acción de reintento.
+  static const Duration _esperaToken = Duration(seconds: 15);
+
   /// Dirección base que está utilizando el cliente.
   String get baseUrl => _baseUrl;
 
@@ -164,7 +174,14 @@ class ApiCliente {
     if (autenticada) {
       final String? token;
       try {
-        token = await _obtenerToken();
+        token = await _obtenerToken().timeout(_esperaToken);
+      } on TimeoutException catch (error) {
+        // El proveedor de identidad no respondió dentro del plazo admitido: se
+        // informa como fallo de conexión para que la pantalla ofrezca reintentar.
+        throw ErrorConexion(
+          'No se pudo renovar la sesión con el proveedor de identidad.',
+          causa: error,
+        );
       } catch (error) {
         // Si el proveedor de identidad no está disponible, el acceso se niega
         // con un mensaje claro en lugar de propagar un error inesperado.

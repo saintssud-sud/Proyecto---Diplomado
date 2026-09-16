@@ -1,61 +1,88 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../controllers/preferences_controller.dart';
-import '../../models/alerta.dart';
+import '../../controllers/alertas_controller.dart';
+import '../../models/api/modelos_api.dart';
+import '../../utils/formato_fecha.dart';
+import '../../widgets/vista_con_estados.dart';
 import 'alerta_detalle_screen.dart';
 
 /// Pantalla 4 — Alertas con pestañas Activas / Historial.
-class AlertasScreen extends StatelessWidget {
+///
+/// Las alertas se consultan al servicio: las genera el servidor cuando una
+/// lectura sale de su rango de referencia. La pantalla no las inventa ni las
+/// deduce de los datos locales, de modo que siempre coinciden con el aviso del
+/// panel principal.
+class AlertasScreen extends StatefulWidget {
   const AlertasScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final preferences = context.watch<PreferencesController>();
-    final activas = preferences.alertas
-        .where((a) => a.estado == 'Activa')
-        .toList();
-    final historial = preferences.alertas
-        .where((a) => a.estado == 'Resuelta')
-        .toList();
+  State<AlertasScreen> createState() => _AlertasScreenState();
+}
 
-    return DefaultTabController(
-      length: 2,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
-            child: Text(
-              'Alertas',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-          ),
-          const TabBar(
-            tabs: <Widget>[
-              Tab(text: 'Activas'),
-              Tab(text: 'Historial'),
+class _AlertasScreenState extends State<AlertasScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<AlertasController>().cargar();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final AlertasController controller = context.watch<AlertasController>();
+
+    return VistaConEstados<List<AlertaServidor>>(
+      estado: controller.estado,
+      datos: <AlertaServidor>[...controller.activas, ...controller.atendidas],
+      errorDeConexion: controller.errorDeConexion,
+      mensajeError: controller.mensajeError,
+      mensajeVacio: 'Todavía no hay alertas. El servicio genera una alerta cada '
+          'vez que una lectura sale del rango de su perfil de cultivo.',
+      alReintentar: () => controller.cargar(),
+      alMostrarDatos: (BuildContext contexto, List<AlertaServidor> _) {
+        return DefaultTabController(
+          length: 2,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: Text(
+                  'Alertas',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const TabBar(
+                tabs: <Widget>[
+                  Tab(text: 'Activas'),
+                  Tab(text: 'Historial'),
+                ],
+                labelColor: Color(0xFF2E7D32),
+                unselectedLabelColor: Colors.grey,
+                indicatorColor: Color(0xFF2E7D32),
+              ),
+              Expanded(
+                child: TabBarView(
+                  children: <Widget>[
+                    _ListaAlertas(
+                      alertas: controller.activas,
+                      vacio: 'No hay alertas activas',
+                    ),
+                    _ListaAlertas(
+                      alertas: controller.atendidas,
+                      vacio: 'No hay alertas atendidas todavía',
+                    ),
+                  ],
+                ),
+              ),
             ],
-            labelColor: Color(0xFF2E7D32),
-            unselectedLabelColor: Colors.grey,
-            indicatorColor: Color(0xFF2E7D32),
           ),
-          Expanded(
-            child: TabBarView(
-              children: <Widget>[
-                _ListaAlertas(
-                  alertas: activas,
-                  vacio: 'No hay alertas activas',
-                ),
-                _ListaAlertas(
-                  alertas: historial,
-                  vacio: 'No hay alertas en el historial',
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -63,7 +90,7 @@ class AlertasScreen extends StatelessWidget {
 class _ListaAlertas extends StatelessWidget {
   const _ListaAlertas({required this.alertas, required this.vacio});
 
-  final List<Alerta> alertas;
+  final List<AlertaServidor> alertas;
   final String vacio;
 
   @override
@@ -85,7 +112,7 @@ class _ListaAlertas extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       children: alertas
           .map(
-            (alerta) => _AlertaCard(
+            (AlertaServidor alerta) => _AlertaCard(
               alerta: alerta,
               onTap: () {
                 Navigator.push<void>(
@@ -103,19 +130,25 @@ class _ListaAlertas extends StatelessWidget {
   }
 }
 
+/// Tarjeta de una alerta: variable, valor registrado, rango y fecha.
 class _AlertaCard extends StatelessWidget {
   const _AlertaCard({required this.alerta, required this.onTap});
 
-  final Alerta alerta;
+  final AlertaServidor alerta;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final critica = alerta.critica;
-    final color = critica ? Colors.red : const Color(0xFF2E7D32);
-    final icono = critica
-        ? Icons.warning_amber_rounded
-        : Icons.check_circle_outline;
+    final bool activa = alerta.estaActiva;
+    final Color color =
+        activa ? const Color(0xFFC62828) : const Color(0xFF2E7D32);
+    final IconData icono =
+        activa ? Icons.warning_amber_rounded : Icons.check_circle_outline;
+    final String valorTexto =
+        '${formatearValor(alerta.valor)} ${alerta.unidad}'.trim();
+    final String rangoTexto =
+        'Rango del perfil: ${formatearValor(alerta.rangoMinimo)} – '
+        '${formatearValor(alerta.rangoMaximo)} ${alerta.unidad}'.trim();
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -139,7 +172,7 @@ class _AlertaCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      alerta.titulo,
+                      _titulo(alerta),
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
@@ -147,19 +180,20 @@ class _AlertaCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      alerta.nivelActual,
+                      'Valor registrado: $valorTexto',
                       style: const TextStyle(
                         color: Colors.black87,
                         fontSize: 13,
                       ),
                     ),
                     Text(
-                      alerta.rangoPermitido,
+                      rangoTexto,
                       style: const TextStyle(color: Colors.grey, fontSize: 13),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      alerta.fecha,
+                      '${formatearFechaHora(alerta.timestamp)} · '
+                      '${activa ? 'Activa' : 'Atendida'}',
                       style: const TextStyle(color: Colors.grey, fontSize: 12),
                     ),
                   ],
@@ -171,5 +205,17 @@ class _AlertaCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _titulo(AlertaServidor alerta) {
+    final String variable = alerta.nombreVariable;
+    switch (alerta.desviacion) {
+      case 'alto':
+        return '$variable por encima del rango';
+      case 'bajo':
+        return '$variable por debajo del rango';
+      default:
+        return '$variable fuera del rango';
+    }
   }
 }

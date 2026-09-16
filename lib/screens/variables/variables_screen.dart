@@ -1,183 +1,171 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../controllers/preferences_controller.dart';
-import '../../models/variable_rango.dart';
-import 'variable_detalle_screen.dart';
+import '../../controllers/panel_controller.dart';
+import '../../models/api/modelos_api.dart';
+import '../../utils/formato_fecha.dart';
+import '../../widgets/vista_con_estados.dart';
 
-/// Pantalla 2 — Lista de variables con su estado (Normal / Fuera de rango).
+/// Pantalla 2 — Estado de las variables del módulo.
+///
+/// Consume el servicio a través de [PanelController], el mismo que alimenta el
+/// panel principal: la lista se construye con el **catálogo completo** de
+/// variables (siete) y con la **última lectura** y el **rango de referencia**
+/// que entrega el servidor, de modo que esta pantalla y el panel nunca puedan
+/// mostrar datos distintos.
 class VariablesScreen extends StatelessWidget {
   const VariablesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final preferences = context.watch<PreferencesController>();
+    final PanelController panel = context.watch<PanelController>();
 
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: <Widget>[
-        const Text(
-          'Variables',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 12),
-        _VariableCard(
-          icon: Icons.thermostat_outlined,
-          color: const Color(0xFFE65100),
-          label: 'Temperatura',
-          valor: preferences.temperature,
-          unidad: '°C',
-          rango: _rangoDe(preferences, 'Temperatura'),
-          onTap: () => _abrirDetalle(context, 'Temperatura'),
-        ),
-        _VariableCard(
-          icon: Icons.water_drop_outlined,
-          color: const Color(0xFF1565C0),
-          label: 'Humedad',
-          valor: preferences.humidity,
-          unidad: '%',
-          rango: _rangoDe(preferences, 'Humedad'),
-          onTap: () => _abrirDetalle(context, 'Humedad'),
-        ),
-        _VariableCard(
-          icon: Icons.science_outlined,
-          color: const Color(0xFFC62828),
-          label: 'pH',
-          valor: preferences.ph,
-          unidad: '',
-          rango: _rangoDe(preferences, 'pH'),
-          onTap: () => _abrirDetalle(context, 'pH'),
-        ),
-        _VariableCard(
-          icon: Icons.eco_outlined,
-          color: const Color(0xFF2E7D32),
-          label: 'TDS',
-          valor: preferences.tds,
-          unidad: 'ppm',
-          rango: _rangoDe(preferences, 'TDS'),
-          onTap: () => _abrirDetalle(context, 'TDS'),
-        ),
-        _VariableCard(
-          icon: Icons.water_drop_outlined,
-          color: const Color(0xFF1565C0),
-          label: 'Nivel de agua',
-          valor: preferences.waterLevel,
-          unidad: '%',
-          rango: _rangoDe(preferences, 'Nivel de agua'),
-          onTap: () => _abrirDetalle(context, 'Nivel de agua'),
-        ),
-      ],
+    return VistaConEstados<List<EstadoDeVariable>>(
+      estado: panel.estado,
+      datos: panel.variables,
+      errorDeConexion: panel.errorDeConexion,
+      mensajeError: panel.mensajeError,
+      mensajeVacio: 'El módulo todavía no tiene lecturas registradas. '
+          'Registre una medición desde el panel principal.',
+      alReintentar: () => panel.cargar(),
+      alMostrarDatos: (BuildContext contexto, List<EstadoDeVariable> variables) {
+        return ListView(
+          padding: const EdgeInsets.all(16),
+          children: <Widget>[
+            const Text(
+              'Variables',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              _subtitulo(panel),
+              style: const TextStyle(color: Colors.grey, fontSize: 13),
+            ),
+            const SizedBox(height: 12),
+            for (final EstadoDeVariable variable in variables)
+              _VariableCard(variable: variable),
+          ],
+        );
+      },
     );
   }
 
-  VariableRango? _rangoDe(PreferencesController preferences, String nombre) {
-    for (final r in preferences.rangos) {
-      if (r.variable == nombre) return r;
+  String _subtitulo(PanelController panel) {
+    final ModuloCultivo? modulo = panel.modulo;
+    if (modulo == null) {
+      return 'Sin módulo seleccionado';
     }
-    return null;
-  }
-
-  void _abrirDetalle(BuildContext context, String nombre) {
-    Navigator.push<void>(
-      context,
-      MaterialPageRoute<void>(
-        builder: (routeContext) => VariableDetalleScreen(nombre: nombre),
-      ),
-    );
+    return '${modulo.nombre} · ${modulo.tipoCultivo} · datos del servicio';
   }
 }
 
+/// Tarjeta de una variable: valor, nombre, rango de referencia y estado.
+///
+/// El estado no lo calcula la interfaz: viene del servidor, que evaluó el valor
+/// contra el rango vigente del perfil de cultivo.
 class _VariableCard extends StatelessWidget {
-  const _VariableCard({
-    required this.icon,
-    required this.color,
-    required this.label,
-    required this.valor,
-    required this.unidad,
-    required this.rango,
-    required this.onTap,
-  });
+  const _VariableCard({required this.variable});
 
-  final IconData icon;
-  final Color color;
-  final String label;
-  final double valor;
-  final String unidad;
-  final VariableRango? rango;
-  final VoidCallback onTap;
+  final EstadoDeVariable variable;
 
-  String get _estado {
-    if (rango == null) return 'Normal';
-    if (valor < rango!.minimo || valor > rango!.maximo) return 'Fuera de rango';
-    return 'Normal';
-  }
+  static const Map<String, IconData> _iconos = <String, IconData>{
+    'ph': Icons.science_outlined,
+    'tds': Icons.eco_outlined,
+    'ec': Icons.bolt_outlined,
+    'temp_solucion': Icons.thermostat_outlined,
+    'temp_ambiental': Icons.thermostat,
+    'humedad': Icons.water_drop_outlined,
+    'nivel_agua': Icons.opacity,
+  };
 
-  Color get _estadoColor =>
-      _estado == 'Normal' ? const Color(0xFF2E7D32) : Colors.red;
+  static const Map<String, Color> _colores = <String, Color>{
+    'ph': Color(0xFFC62828),
+    'tds': Color(0xFF2E7D32),
+    'ec': Color(0xFF00838F),
+    'temp_solucion': Color(0xFFE65100),
+    'temp_ambiental': Color(0xFFEF6C00),
+    'humedad': Color(0xFF1565C0),
+    'nivel_agua': Color(0xFF0277BD),
+  };
 
   @override
   Widget build(BuildContext context) {
-    final valorTexto = valor == valor.roundToDouble()
-        ? valor.toStringAsFixed(0)
-        : valor.toStringAsFixed(1);
+    final IconData icono = _iconos[variable.codigo] ?? Icons.tune;
+    final Color color = _colores[variable.codigo] ?? Colors.blueGrey;
+
+    final bool hayValor = variable.tieneValor;
+    final bool fueraDeRango = variable.fueraDeRango;
+    final Color colorEstado = !hayValor
+        ? Colors.grey
+        : (fueraDeRango ? const Color(0xFFC62828) : const Color(0xFF2E7D32));
+
+    final String valorTexto = hayValor ? formatearValor(variable.valor!) : '—';
+    final String unidad = hayValor ? variable.unidad : '';
+    final String rangoTexto = variable.tieneRango
+        ? 'Rango: ${formatearValor(variable.minimo!)} – '
+            '${formatearValor(variable.maximo!)} ${variable.unidad}'.trim()
+        : 'Sin rango configurado';
+    final String fechaTexto =
+        hayValor && variable.fecha != null ? formatearFechaHora(variable.fecha!) : '';
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 1,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.green.withValues(alpha: 0.25)),
+        side: BorderSide(
+          color: fueraDeRango
+              ? const Color(0xFFC62828).withValues(alpha: 0.4)
+              : Colors.green.withValues(alpha: 0.25),
+        ),
       ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Row(
-            children: <Widget>[
-              Icon(icon, color: color, size: 28),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      '$valorTexto $unidad'.trim(),
-                      style: TextStyle(
-                        color: color,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w800,
-                      ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          children: <Widget>[
+            Icon(icono, color: color, size: 28),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    '$valorTexto $unidad'.trim(),
+                    style: TextStyle(
+                      color: color,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      label,
-                      style: const TextStyle(color: Colors.grey, fontSize: 13),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: _estadoColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  _estado,
-                  style: TextStyle(
-                    color: _estadoColor,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
                   ),
+                  const SizedBox(height: 2),
+                  Text(
+                    variable.nombre,
+                    style: const TextStyle(color: Colors.grey, fontSize: 13),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    fechaTexto.isEmpty ? rangoTexto : '$rangoTexto · $fechaTexto',
+                    style: const TextStyle(color: Colors.grey, fontSize: 11),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: colorEstado.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                variable.etiquetaEstado,
+                style: TextStyle(
+                  color: colorEstado,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-              const Icon(Icons.chevron_right, color: Colors.grey),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -5,15 +5,22 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app.dart';
 import 'config/app_config.dart';
+import 'controllers/alertas_controller.dart';
 import 'controllers/context_controller.dart';
+import 'controllers/cultivos_controller.dart';
 import 'controllers/historial_controller.dart';
+import 'controllers/modulos_controller.dart';
 import 'controllers/panel_controller.dart';
+import 'controllers/perfil_controller.dart';
 import 'controllers/preferences_controller.dart';
+import 'controllers/rangos_controller.dart';
 import 'controllers/usuario_controller.dart';
 import 'repositories/api/alertas_api_repository.dart';
 import 'repositories/api/lecturas_api_repository.dart';
 import 'repositories/api/modulos_api_repository.dart';
+import 'repositories/api/perfiles_api_repository.dart';
 import 'repositories/api/rangos_api_repository.dart';
+import 'repositories/api/usuarios_api_repository.dart';
 import 'repositories/usuario_repository.dart';
 import 'services/api_cliente.dart';
 import 'services/auth_service.dart';
@@ -96,6 +103,53 @@ Future<void> main() async {
       create: (providerContext) => HistorialController(
         lecturas: LecturasApiRepository(providerContext.read<ApiCliente>()),
       ),
+    ),
+  );
+  providers.add(
+    ChangeNotifierProvider<AlertasController>(
+      create: (providerContext) => AlertasController(
+        alertas: AlertasApiRepository(providerContext.read<ApiCliente>()),
+      ),
+    ),
+  );
+  providers.add(
+    ChangeNotifierProvider<RangosController>(
+      create: (providerContext) {
+        final ApiCliente cliente = providerContext.read<ApiCliente>();
+        return RangosController(
+          rangos: RangosApiRepository(cliente),
+          perfiles: PerfilesApiRepository(cliente),
+        );
+      },
+    ),
+  );
+  providers.add(
+    ChangeNotifierProvider<ModulosController>(
+      create: (providerContext) {
+        final ApiCliente cliente = providerContext.read<ApiCliente>();
+        return ModulosController(
+          modulos: ModulosApiRepository(cliente),
+          perfiles: PerfilesApiRepository(cliente),
+        );
+      },
+    ),
+  );
+  providers.add(
+    ChangeNotifierProvider<PerfilController>(
+      create: (providerContext) => PerfilController(
+        usuarios: UsuariosApiRepository(providerContext.read<ApiCliente>()),
+      ),
+    ),
+  );
+  providers.add(
+    ChangeNotifierProvider<CultivosController>(
+      create: (providerContext) {
+        final ApiCliente cliente = providerContext.read<ApiCliente>();
+        return CultivosController(
+          perfiles: PerfilesApiRepository(cliente),
+          rangos: RangosApiRepository(cliente),
+        );
+      },
     ),
   );
 
