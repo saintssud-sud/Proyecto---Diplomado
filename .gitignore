@@ -51,4 +51,4 @@ android/key.properties
 *.key
 serviceAccountKey.json
 firebase-adminsdk*.json
-
+serviceAccountKey.json

@@ -1,0 +1,45 @@
+# Despliegue del servicio de SIGVACH en Render (capa gratuita)
+#
+# Infraestructura como código: el servicio se crea al conectar el repositorio, sin
+# configurar nada a mano en el panel. Los valores secretos NO se declaran aquí:
+# se completan en el panel del proveedor (sync: false) y nunca llegan al
+# repositorio, conforme al requisito mínimo 7.
+#
+# Comprobaciones que la plataforma realizará:
+#   · Construcción:  pip install -r requirements.txt
+#   · Arranque:      uvicorn escuchando en 0.0.0.0 y en el puerto que asigna la
+#                    plataforma ($PORT); en local ese puerto es 8011 y se indica
+#                    con el lanzador SIGVACH.bat.
+#   · Salud:         GET /api/v1/salud responde 200 y confirma la base de datos.
+
+services:
+  - type: web
+    name: sigvach-api
+    runtime: python
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: >-
+      uvicorn app.main:app --host 0.0.0.0 --port $PORT
+      --proxy-headers --forwarded-allow-ips="*"
+    healthCheckPath: /api/v1/salud
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.13.5"
+      - key: ENTORNO
+        value: produccion
+      - key: FIREBASE_PROJECT_ID
+        value: sigvach26-bd
+      # Orígenes permitidos para CORS: la dirección pública de la aplicación web
+      # (por ejemplo https://sigvach26-bd.web.app). Se completa en el panel.
+      - key: ALLOWED_ORIGINS
+        sync: false
+      # Clave del módulo de adquisición (ESP32). Se completa en el panel.
+      - key: DEVICE_API_KEY
+        sync: false
+      # Clave de la cuenta de servicio de Firebase, en una sola línea JSON.
+      # Se pega en el panel como valor secreto y nunca se versiona.
+      - key: FIREBASE_SERVICE_ACCOUNT_JSON
+        sync: false
