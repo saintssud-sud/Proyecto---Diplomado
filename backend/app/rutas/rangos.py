@@ -10,7 +10,7 @@ from ..dependencias import obtener_repositorio
 from ..errores import CODIGO_CONFLICTO, CODIGO_NO_ENCONTRADO, ErrorApi
 from ..esquemas import CATALOGO_VARIABLES, RangoActualizacion, RangoEntrada, RangoSalida, _normalizar_variable
 from ..repositorios.base import RepositorioDatos
-from ..seguridad import UsuarioAutenticado, requiere_administracion, requiere_operacion
+from ..seguridad import UsuarioAutenticado, requiere_administracion, requiere_consulta
 
 enrutador = APIRouter(prefix="/rangos", tags=["Rangos de referencia"])
 
@@ -67,7 +67,7 @@ def crear_rango(
 def listar_rangos(
     perfil_id: str | None = Query(default=None, max_length=64),
     variable: str | None = Query(default=None, max_length=32),
-    _: UsuarioAutenticado = Depends(requiere_operacion),
+    _: UsuarioAutenticado = Depends(requiere_consulta),
     repositorio: RepositorioDatos = Depends(obtener_repositorio),
 ) -> list[dict]:
     """Devuelve los rangos, opcionalmente filtrados por perfil y variable."""
@@ -81,7 +81,7 @@ def listar_rangos(
 @enrutador.get("/{rango_id}", response_model=RangoSalida, summary="Consultar un rango de referencia")
 def obtener_rango(
     rango_id: str,
-    _: UsuarioAutenticado = Depends(requiere_operacion),
+    _: UsuarioAutenticado = Depends(requiere_consulta),
     repositorio: RepositorioDatos = Depends(obtener_repositorio),
 ) -> dict:
     """Devuelve un rango concreto."""

@@ -1,15 +1,17 @@
 # Dependencias del backend de SIGVACH (servicio de la API)
 #
 # Instalación:      pip install -r requirements.txt
-# Ejecución local:  uvicorn app.main:app --reload --port 8000
-# Documentación:    http://localhost:8000/docs
+# Ejecución local:  uvicorn app.main:app --reload --port 8011
+#                   (o el lanzador SIGVACH.bat, que usa el puerto 8011)
+# En el despliegue: uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers
+# Documentación:    http://localhost:8011/docs
 #
 # El módulo de adquisición no declara dependencias aquí: vive en el firmware
 # del dispositivo, no en este servicio.
 
 # --- Verificadas con las pruebas y con el arranque real del servicio --------
-# (59 casos automatizados y arranque del servidor con el comando de despliegue,
-#  verificados el 14/09/2026)
+# (83 casos automatizados y arranque del servidor con el comando de despliegue,
+#  verificados el 15/09/2026)
 fastapi==0.141.1
 pydantic==2.13.5
 pydantic-settings==2.15.0

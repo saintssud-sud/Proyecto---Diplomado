@@ -11,7 +11,7 @@ from fastapi import APIRouter, Depends, Query, Response
 
 from ..dependencias import obtener_repositorio
 from ..repositorios.base import RepositorioDatos
-from ..seguridad import UsuarioAutenticado, requiere_operacion
+from ..seguridad import UsuarioAutenticado, requiere_consulta
 from ..servicios import evaluacion
 
 enrutador = APIRouter(prefix="/exportaciones", tags=["Exportaciones"])
@@ -29,7 +29,7 @@ def exportar_lecturas(
     desde: datetime | None = Query(default=None),
     hasta: datetime | None = Query(default=None),
     limite: int = Query(default=1000, ge=1, le=5000),
-    _: UsuarioAutenticado = Depends(requiere_operacion),
+    _: UsuarioAutenticado = Depends(requiere_consulta),
     repositorio: RepositorioDatos = Depends(obtener_repositorio),
 ) -> Response:
     """Devuelve el historial consultado como archivo descargable."""

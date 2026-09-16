@@ -2,7 +2,16 @@
 
 from fastapi import APIRouter
 
-from . import alertas, exportaciones, lecturas, modulos, perfiles, rangos, salud
+from . import (
+    alertas,
+    exportaciones,
+    lecturas,
+    modulos,
+    perfiles,
+    rangos,
+    salud,
+    usuarios,
+)
 
 enrutador_api = APIRouter()
 
@@ -13,5 +22,6 @@ enrutador_api.include_router(perfiles.enrutador)
 enrutador_api.include_router(rangos.enrutador)
 enrutador_api.include_router(alertas.enrutador)
 enrutador_api.include_router(exportaciones.enrutador)
+enrutador_api.include_router(usuarios.enrutador)
 
 __all__ = ["enrutador_api"]

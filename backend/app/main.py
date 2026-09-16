@@ -14,11 +14,53 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from . import __version__
-from .config import obtener_configuracion
+from .config import Configuracion, obtener_configuracion
 from .errores import registrar_manejadores_de_error
 from .dependencias import obtener_repositorio
 from .rutas import enrutador_api
 from .semilla import sembrar_demostracion
+
+
+def asegurar_sdk_firebase(configuracion: Configuracion) -> None:
+    """Inicializa el SDK de Firebase una sola vez por proceso.
+
+    El SDK lo necesitan **dos** componentes: el repositorio de Firestore y la
+    verificación del token de identidad de Firebase Authentication. Por eso se
+    inicializa aquí, al arrancar, y no de forma perezosa dentro del repositorio:
+    de lo contrario la primera petición autenticada llega antes de que exista el
+    SDK y el servicio responde 401 con un mensaje que oculta la causa real.
+
+    Sin credenciales configuradas, la demostración sigue funcionando: se deja
+    constancia en el registro y el servicio continúa con el repositorio en memoria.
+    """
+    import json
+    import logging
+
+    import firebase_admin
+    from firebase_admin import credentials
+
+    if firebase_admin._apps:
+        return
+
+    try:
+        if configuracion.credenciales_servicio:
+            datos = json.loads(configuracion.credenciales_servicio)
+            credencial = credentials.Certificate(datos)
+        else:
+            # Alternativa: GOOGLE_APPLICATION_CREDENTIALS apuntando al archivo.
+            credencial = credentials.ApplicationDefault()
+        opciones = (
+            {"projectId": configuracion.proyecto_firebase}
+            if configuracion.proyecto_firebase
+            else None
+        )
+        firebase_admin.initialize_app(credencial, opciones)
+    except Exception as error:  # noqa: BLE001 - la demostración debe seguir en pie
+        logging.getLogger("sigvach").warning(
+            "No se pudo inicializar el SDK de Firebase al arrancar: %s: %s",
+            type(error).__name__,
+            error,
+        )
 
 DESCRIPCION = """
 API del sistema SI.G.VA.C.H. (Sistema de Gestión de Variables para Cultivos Hidropónicos).
@@ -35,13 +77,21 @@ Identidades admitidas:
 
 @asynccontextmanager
 async def ciclo_de_vida(_: FastAPI) -> AsyncIterator[None]:
-    """Prepara los datos de demostración cuando no hay base de datos real.
+    """Prepara el SDK de Firebase y, si corresponde, los datos de demostración.
+
+    El SDK se inicializa **siempre** al arrancar, antes de atender la primera
+    petición: la verificación del token de identidad de Firebase Authentication
+    lo necesita, y hasta ahora solo se inicializaba de forma perezosa al tocar
+    Firestore, lo que hacía que la primera petición autenticada fallara con 401.
 
     Con `USAR_REPOSITORIO_EN_MEMORIA=true` el servicio arranca sin credenciales,
     de modo que el sistema pueda recorrerse completo en la demostración o en una
-    revisión del tribunal sin depender de Firebase ni de los sensores.
+    revisión del tribunal sin depender de Firebase ni de los sensores. En ese
+    caso, si hay credenciales configuradas, también se inicializa el SDK y el
+    inicio de sesión de los usuarios sigue funcionando.
     """
     configuracion = obtener_configuracion()
+    asegurar_sdk_firebase(configuracion)
     if configuracion.usar_repositorio_en_memoria:
         sembrar_demostracion(obtener_repositorio(configuracion))
     yield

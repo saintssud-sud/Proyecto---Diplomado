@@ -212,6 +212,20 @@ class AlertaActualizacion(_BaseEntrada):
     observacion: str | None = Field(default=None, max_length=200)
 
 
+class UsuarioPerfilActualizacion(_BaseEntrada):
+    """Datos personales que el propio usuario puede modificar.
+
+    Solo admite los datos de contacto y el cargo. El **rol** y el estado de
+    activación quedan fuera del esquema a propósito: no se rechazan con un
+    mensaje, simplemente no existen como campos de entrada, de modo que un
+    cliente no pueda elevar sus propios privilegios ni reactivarse.
+    """
+
+    nombre: str | None = Field(default=None, min_length=2, max_length=80)
+    telefono: str | None = Field(default=None, max_length=30)
+    cargo: str | None = Field(default=None, max_length=60)
+
+
 class PerfilEntrada(_BaseEntrada):
     """Perfil de cultivo con sus rangos de referencia."""
 
@@ -299,3 +313,20 @@ class ResumenVariable(_BaseSalida):
     promedio: float
     maximo: float
     minimo: float
+
+
+class UsuarioPerfilSalida(_BaseSalida):
+    """Perfil del usuario que realiza la petición.
+
+    El identificador es el **uid** de Firebase Authentication: es el mismo valor
+    con el que el servicio resuelve la autorización, de modo que la aplicación no
+    necesita guardar por su cuenta la correspondencia entre la sesión y el perfil.
+    """
+
+    id: str
+    email: str = ""
+    nombre: str = ""
+    rol: str = ""
+    activo: bool = True
+    telefono: str | None = None
+    cargo: str | None = None

@@ -123,6 +123,30 @@ def requiere_administracion(
     return usuario
 
 
+def requiere_consulta(
+    usuario: UsuarioAutenticado = Depends(usuario_actual),
+    configuracion: Configuracion = Depends(obtener_configuracion),
+) -> UsuarioAutenticado:
+    """Exige un rol habilitado para consultar la información del cultivo.
+
+    Es el nivel de autorización más bajo: lo satisfacen los roles de operación y
+    el rol de solo consulta (invitado). Se aplica a las operaciones de lectura,
+    mientras que las que registran o modifican datos siguen exigiendo el nivel de
+    operación, y las de configuración, el de administración.
+    """
+    if usuario.rol not in configuracion.roles_consulta:
+        raise ErrorApi(
+            403,
+            CODIGO_SIN_PERMISO,
+            "La operación requiere un rol habilitado para consultar el cultivo.",
+            {
+                "rol_requerido": sorted(configuracion.roles_consulta),
+                "rol_actual": usuario.rol,
+            },
+        )
+    return usuario
+
+
 def requiere_operacion(
     usuario: UsuarioAutenticado = Depends(usuario_actual),
     configuracion: Configuracion = Depends(obtener_configuracion),

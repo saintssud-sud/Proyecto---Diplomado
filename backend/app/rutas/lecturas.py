@@ -14,7 +14,13 @@ from ..esquemas import (
     ResumenVariable,
 )
 from ..repositorios.base import RepositorioDatos
-from ..seguridad import UsuarioAutenticado, dispositivo_autorizado, requiere_administracion, requiere_operacion
+from ..seguridad import (
+    UsuarioAutenticado,
+    dispositivo_autorizado,
+    requiere_administracion,
+    requiere_consulta,
+    requiere_operacion,
+)
 from ..servicios import evaluacion, lecturas
 
 enrutador = APIRouter(prefix="/lecturas", tags=["Lecturas"])
@@ -77,7 +83,7 @@ def consultar_lecturas(
     desde: datetime | None = Query(default=None),
     hasta: datetime | None = Query(default=None),
     limite: int = Query(default=200, ge=1, le=1000),
-    _: UsuarioAutenticado = Depends(requiere_operacion),
+    _: UsuarioAutenticado = Depends(requiere_consulta),
     repositorio: RepositorioDatos = Depends(obtener_repositorio),
 ) -> list[dict]:
     """Devuelve las lecturas que satisfacen los tres filtros aplicados."""
@@ -100,7 +106,7 @@ def resumir_lecturas(
     variable: str | None = Query(default=None, max_length=32),
     desde: datetime | None = Query(default=None),
     hasta: datetime | None = Query(default=None),
-    _: UsuarioAutenticado = Depends(requiere_operacion),
+    _: UsuarioAutenticado = Depends(requiere_consulta),
     repositorio: RepositorioDatos = Depends(obtener_repositorio),
 ) -> list[dict]:
     """Resume la serie consultada; es el cálculo que sostiene el gráfico de tendencia."""
@@ -138,7 +144,7 @@ def resumir_lecturas(
 )
 def obtener_lectura(
     lectura_id: str,
-    _: UsuarioAutenticado = Depends(requiere_operacion),
+    _: UsuarioAutenticado = Depends(requiere_consulta),
     repositorio: RepositorioDatos = Depends(obtener_repositorio),
 ) -> dict:
     """Devuelve una lectura concreta."""

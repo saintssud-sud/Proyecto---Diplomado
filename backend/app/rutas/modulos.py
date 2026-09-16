@@ -6,7 +6,7 @@ from ..dependencias import obtener_repositorio
 from ..errores import CODIGO_CONFLICTO, CODIGO_NO_ENCONTRADO, ErrorApi
 from ..esquemas import ModuloActualizacion, ModuloEntrada, ModuloSalida
 from ..repositorios.base import RepositorioDatos
-from ..seguridad import UsuarioAutenticado, requiere_administracion, requiere_operacion
+from ..seguridad import UsuarioAutenticado, requiere_administracion, requiere_consulta
 
 enrutador = APIRouter(prefix="/modulos", tags=["Módulos de cultivo"])
 
@@ -44,7 +44,7 @@ def crear_modulo(
 )
 def listar_modulos(
     activo: bool | None = Query(default=None, description="Filtra por módulos activos o inactivos"),
-    _: UsuarioAutenticado = Depends(requiere_operacion),
+    _: UsuarioAutenticado = Depends(requiere_consulta),
     repositorio: RepositorioDatos = Depends(obtener_repositorio),
 ) -> list[dict]:
     """Devuelve los módulos registrados."""
@@ -58,7 +58,7 @@ def listar_modulos(
 )
 def obtener_modulo(
     modulo_id: str,
-    _: UsuarioAutenticado = Depends(requiere_operacion),
+    _: UsuarioAutenticado = Depends(requiere_consulta),
     repositorio: RepositorioDatos = Depends(obtener_repositorio),
 ) -> dict:
     """Devuelve un módulo concreto."""

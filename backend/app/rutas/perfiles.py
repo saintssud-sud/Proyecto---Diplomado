@@ -11,7 +11,7 @@ from ..dependencias import obtener_repositorio
 from ..errores import CODIGO_CONFLICTO, CODIGO_NO_ENCONTRADO, ErrorApi
 from ..esquemas import PerfilEntrada, PerfilSalida
 from ..repositorios.base import RepositorioDatos
-from ..seguridad import UsuarioAutenticado, requiere_administracion, requiere_operacion
+from ..seguridad import UsuarioAutenticado, requiere_administracion, requiere_consulta
 
 enrutador = APIRouter(prefix="/perfiles", tags=["Perfiles de cultivo"])
 
@@ -44,7 +44,7 @@ def crear_perfil(
 
 @enrutador.get("", response_model=list[PerfilSalida], summary="Listar los perfiles de cultivo")
 def listar_perfiles(
-    _: UsuarioAutenticado = Depends(requiere_operacion),
+    _: UsuarioAutenticado = Depends(requiere_consulta),
     repositorio: RepositorioDatos = Depends(obtener_repositorio),
 ) -> list[dict]:
     """Devuelve los perfiles registrados."""
@@ -54,7 +54,7 @@ def listar_perfiles(
 @enrutador.get("/{perfil_id}", response_model=PerfilSalida, summary="Consultar un perfil de cultivo")
 def obtener_perfil(
     perfil_id: str,
-    _: UsuarioAutenticado = Depends(requiere_operacion),
+    _: UsuarioAutenticado = Depends(requiere_consulta),
     repositorio: RepositorioDatos = Depends(obtener_repositorio),
 ) -> dict:
     """Devuelve un perfil concreto."""

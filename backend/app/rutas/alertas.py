@@ -8,7 +8,12 @@ from ..dependencias import obtener_repositorio
 from ..errores import CODIGO_NO_ENCONTRADO, ErrorApi
 from ..esquemas import AlertaActualizacion, AlertaSalida
 from ..repositorios.base import RepositorioDatos
-from ..seguridad import UsuarioAutenticado, requiere_administracion, requiere_operacion
+from ..seguridad import (
+    UsuarioAutenticado,
+    requiere_administracion,
+    requiere_consulta,
+    requiere_operacion,
+)
 
 enrutador = APIRouter(prefix="/alertas", tags=["Alertas"])
 
@@ -29,7 +34,7 @@ def listar_alertas(
     estado: str | None = Query(default=None, pattern="^(activa|atendida)$"),
     modulo_id: str | None = Query(default=None, max_length=64),
     limite: int = Query(default=100, ge=1, le=500),
-    _: UsuarioAutenticado = Depends(requiere_operacion),
+    _: UsuarioAutenticado = Depends(requiere_consulta),
     repositorio: RepositorioDatos = Depends(obtener_repositorio),
 ) -> list[dict]:
     """Devuelve las alertas activas, el historial o las de un módulo concreto."""
@@ -39,7 +44,7 @@ def listar_alertas(
 @enrutador.get("/{alerta_id}", response_model=AlertaSalida, summary="Consultar una alerta")
 def obtener_alerta(
     alerta_id: str,
-    _: UsuarioAutenticado = Depends(requiere_operacion),
+    _: UsuarioAutenticado = Depends(requiere_consulta),
     repositorio: RepositorioDatos = Depends(obtener_repositorio),
 ) -> dict:
     """Devuelve una alerta concreta, con la referencia a la lectura que la originó."""

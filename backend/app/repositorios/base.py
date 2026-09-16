@@ -81,8 +81,13 @@ class RepositorioDatos(Protocol):
 
     # --- Usuarios -----------------------------------------------------------
     # El perfil del usuario (con su rol) lo crea la aplicación al registrarse;
-    # el backend lo lee para resolver la autorización de cada petición.
+    # el backend lo lee para resolver la autorización de cada petición y permite
+    # que el propio usuario mantenga sus datos de contacto.
     def obtener_perfil_usuario(self, uid: str) -> dict[str, Any] | None: ...
+
+    def actualizar_perfil_usuario(
+        self, uid: str, cambios: dict[str, Any]
+    ) -> dict[str, Any] | None: ...
 
     # --- Diagnóstico --------------------------------------------------------
     def verificar_conexion(self) -> bool: ...

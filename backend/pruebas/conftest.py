@@ -24,6 +24,7 @@ CLAVE_DISPOSITIVO = "clave-de-prueba-del-dispositivo"
 UID_ADMINISTRADOR = "u-admin"
 UID_OPERADOR = "u-operador"
 UID_INACTIVO = "u-inactivo"
+UID_INVITADO = "u-invitado"
 
 
 @dataclass
@@ -39,7 +40,7 @@ class Entorno:
 
 @pytest.fixture
 def entorno() -> Entorno:
-    """Repositorio en memoria con un perfil, un módulo, un rango y tres usuarios."""
+    """Repositorio en memoria con un perfil, un módulo, un rango y cuatro usuarios."""
     repositorio = RepositorioMemoria()
 
     perfil = repositorio.crear_perfil({"nombre": "Lechuga", "predefinido": True})
@@ -73,6 +74,10 @@ def entorno() -> Entorno:
     repositorio.registrar_perfil_usuario(
         UID_INACTIVO,
         {"email": "inactivo@sigvach.com", "rol": "usuario", "activo": False, "nombre": "Inactivo"},
+    )
+    repositorio.registrar_perfil_usuario(
+        UID_INVITADO,
+        {"email": "invitado@sigvach.com", "rol": "invitado", "activo": True, "nombre": "Invitado"},
     )
 
     configuracion = Configuracion(
@@ -134,6 +139,7 @@ def cliente_con_token(entorno: Entorno, monkeypatch) -> TestClient:
             "token-admin": (UID_ADMINISTRADOR, "admin@sigvach.com"),
             "token-operador": (UID_OPERADOR, "operador@sigvach.com"),
             "token-inactivo": (UID_INACTIVO, "inactivo@sigvach.com"),
+            "token-invitado": (UID_INVITADO, "invitado@sigvach.com"),
             "token-sin-perfil": ("u-desconocido", "nadie@sigvach.com"),
         }
         if token not in identidades:

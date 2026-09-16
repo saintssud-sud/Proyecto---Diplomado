@@ -31,6 +31,11 @@ def _normalizar_fecha(valor: Any) -> datetime | None:
     return None
 
 
+def _clave_antiguedad(documento: dict[str, Any]) -> tuple[str, str]:
+    """Clave de orden por antigüedad: la fecha de creación y, como desempate, el id."""
+    return (str(documento.get("creado_en") or ""), str(documento.get("id") or ""))
+
+
 class RepositorioFirestore:
     """Implementación del repositorio sobre Cloud Firestore."""
 
@@ -131,11 +136,19 @@ class RepositorioFirestore:
         return self._documento(self._coleccion(COLECCION_MODULOS).document(modulo_id).get())
 
     def listar_modulos(self, activo: bool | None = None) -> list[dict[str, Any]]:
+        """Lista los módulos ordenados por fecha de creación.
+
+        El orden se resuelve aquí, en memoria, y no con un ordenamiento de
+        Firestore: el criterio debe ser la antigüedad —la aplicación presenta el
+        primer módulo como módulo vigente y el alfabético anteponía un módulo
+        creado después si su nombre se escribía con otra grafía— y así no depende
+        de un índice compuesto ni del juego de caracteres.
+        """
         consulta = self._coleccion(COLECCION_MODULOS)
         if activo is not None:
             consulta = consulta.where("activo", "==", activo)
-        consulta = consulta.order_by("nombre")
-        return [self._documento(instantanea) for instantanea in consulta.stream()]  # type: ignore[misc]
+        documentos = [self._documento(instantanea) for instantanea in consulta.stream()]  # type: ignore[misc]
+        return sorted(documentos, key=_clave_antiguedad)
 
     def actualizar_modulo(self, modulo_id: str, cambios: dict[str, Any]) -> dict[str, Any] | None:
         referencia = self._coleccion(COLECCION_MODULOS).document(modulo_id)
@@ -258,6 +271,21 @@ class RepositorioFirestore:
     def obtener_perfil_usuario(self, uid: str) -> dict[str, Any] | None:
         """Lee el perfil del usuario (con su rol) creado por la aplicación."""
         return self._documento(self._coleccion(COLECCION_USUARIOS).document(uid).get())
+
+    def actualizar_perfil_usuario(
+        self, uid: str, cambios: dict[str, Any]
+    ) -> dict[str, Any] | None:
+        """Modifica los datos del perfil; devuelve None si no existe.
+
+        El identificador del documento es el uid que emite Firebase
+        Authentication, de modo que el perfil y la sesión no puedan desalinearse.
+        """
+        referencia = self._coleccion(COLECCION_USUARIOS).document(uid)
+        instantanea = referencia.get()
+        if not instantanea.exists:
+            return None
+        referencia.update(cambios)
+        return self.obtener_perfil_usuario(uid)
 
     # --- Diagnóstico --------------------------------------------------------
     def verificar_conexion(self) -> bool:

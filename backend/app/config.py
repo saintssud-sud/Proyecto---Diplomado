@@ -7,16 +7,24 @@ del proyecto.
 """
 
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Rutas absolutas: el `.env` se busca junto al paquete (`backend/.env`) y en la
+# raíz del proyecto, en ese orden, de modo que el servicio arranque igual sin
+# importar la carpeta desde la que se ejecute. La raíz tiene precedencia.
+# En el despliegue no hay `.env`: las variables llegan del entorno del servicio.
+_RAIZ_BACKEND = Path(__file__).resolve().parent.parent
+_RAIZ_PROYECTO = _RAIZ_BACKEND.parent
 
 
 class Configuracion(BaseSettings):
     """Configuración del servicio, resuelta desde variables de entorno."""
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(_RAIZ_BACKEND / ".env", _RAIZ_PROYECTO / ".env"),
         env_file_encoding="utf-8",
         extra="ignore",
         populate_by_name=True,
@@ -63,6 +71,10 @@ class Configuracion(BaseSettings):
         default="usuario",
         validation_alias=AliasChoices("ROL_OPERADOR", "OPERATOR_ROLE"),
     )
+    rol_invitado: str = Field(
+        default="invitado",
+        validation_alias=AliasChoices("ROL_INVITADO", "GUEST_ROLE"),
+    )
     minutos_tolerancia_reloj: int = Field(
         default=5,
         validation_alias=AliasChoices(
@@ -94,6 +106,18 @@ class Configuracion(BaseSettings):
     def roles_operacion(self) -> set[str]:
         """Roles que pueden registrar y consultar datos del cultivo."""
         return {self.rol_administrador, self.rol_operador}
+
+    @property
+    def roles_consulta(self) -> set[str]:
+        """Roles que pueden consultar la información del cultivo.
+
+        El rol de invitado se suma a los de operación: consulta el panel, el
+        historial y las alertas, pero no registra mediciones ni modifica la
+        configuración. La distinción se resuelve aquí, en la configuración, para
+        que añadir o quitar un rol de solo consulta no obligue a tocar el código
+        de autorización.
+        """
+        return self.roles_operacion | {self.rol_invitado}
 
 
 @lru_cache

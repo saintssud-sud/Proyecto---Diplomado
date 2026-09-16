@@ -18,6 +18,11 @@ def _ahora() -> datetime:
     return datetime.now(timezone.utc)
 
 
+def _clave_antiguedad(documento: dict[str, Any]) -> tuple[str, str]:
+    """Clave de orden por antigüedad: la fecha de creación y, como desempate, el id."""
+    return (str(documento.get("creado_en") or ""), str(documento.get("id") or ""))
+
+
 class RepositorioMemoria:
     """Implementación del repositorio sobre diccionarios en memoria."""
 
@@ -98,10 +103,17 @@ class RepositorioMemoria:
         return dict(documento) if documento else None
 
     def listar_modulos(self, activo: bool | None = None) -> list[dict[str, Any]]:
+        """Lista los módulos ordenados por fecha de creación.
+
+        El orden es por antigüedad y no alfabético: la aplicación presenta el
+        primer módulo de la lista como módulo vigente, y el orden alfabético hacía
+        que un módulo creado después —y escrito con otra grafía, por ejemplo sin
+        tilde— se antepusiera al módulo original del cultivo.
+        """
         modulos = self._listar("modulos")
         if activo is not None:
             modulos = [modulo for modulo in modulos if modulo.get("activo", True) is activo]
-        modulos.sort(key=lambda item: item.get("nombre", ""))
+        modulos.sort(key=_clave_antiguedad)
         return modulos
 
     def actualizar_modulo(self, modulo_id: str, cambios: dict[str, Any]) -> dict[str, Any] | None:
@@ -192,6 +204,17 @@ class RepositorioMemoria:
     def obtener_perfil_usuario(self, uid: str) -> dict[str, Any] | None:
         documento = self._datos["usuarios"].get(uid)
         return dict(documento) if documento else None
+
+    def actualizar_perfil_usuario(
+        self, uid: str, cambios: dict[str, Any]
+    ) -> dict[str, Any] | None:
+        """Modifica los datos del perfil; devuelve None si no existe."""
+        with self._cerrojo:
+            documento = self._datos["usuarios"].get(uid)
+            if documento is None:
+                return None
+            documento.update(cambios)
+            return dict(documento)
 
     # --- Diagnóstico --------------------------------------------------------
     def verificar_conexion(self) -> bool:
