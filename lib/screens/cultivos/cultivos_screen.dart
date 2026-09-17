@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../controllers/estado_de_vista.dart';
 import '../../controllers/modulos_controller.dart';
+import '../../controllers/panel_controller.dart';
 import '../../models/api/modelos_api.dart';
 import '../../widgets/vista_con_estados.dart';
 
@@ -63,6 +64,7 @@ class _CultivosScreenState extends State<CultivosScreen> {
       mensajero.showSnackBar(
         const SnackBar(content: Text('Módulo registrado en el servicio.')),
       );
+      await _avisarAlPanel();
     } catch (error) {
       mensajero.showSnackBar(
         SnackBar(content: Text(FalloDeVista.desde(error).mensaje)),
@@ -97,10 +99,29 @@ class _CultivosScreenState extends State<CultivosScreen> {
       mensajero.showSnackBar(
         const SnackBar(content: Text('Módulo modificado en el servicio.')),
       );
+      await _avisarAlPanel();
     } catch (error) {
       mensajero.showSnackBar(
         SnackBar(content: Text(FalloDeVista.desde(error).mensaje)),
       );
+    }
+  }
+
+  /// Avisa al panel de inicio de que la lista de módulos cambió.
+  ///
+  /// Cada controlador mantiene su propia lista: el de módulos, la de esta
+  /// pantalla, y el del panel, la que alimenta su selector. Sin este aviso, un
+  /// módulo recién registrado **no aparecía en el panel** hasta reiniciar la
+  /// aplicación, que era exactamente lo que se observaba al crear un módulo.
+  Future<void> _avisarAlPanel() async {
+    if (!mounted) {
+      return;
+    }
+    try {
+      await context.read<PanelController>().cargar();
+    } catch (_) {
+      // Si el panel no puede recargarse, la pantalla de módulos ya hizo su
+      // trabajo y muestra el resultado: no se interrumpe al usuario por esto.
     }
   }
 
@@ -145,6 +166,7 @@ class _CultivosScreenState extends State<CultivosScreen> {
       mensajero.showSnackBar(
         const SnackBar(content: Text('Módulo eliminado del servicio.')),
       );
+      await _avisarAlPanel();
     } catch (error) {
       mensajero.showSnackBar(
         SnackBar(content: Text(FalloDeVista.desde(error).mensaje)),
