@@ -58,6 +58,33 @@ class _CultivosCatalogoScreenState extends State<CultivosCatalogoScreen> {
     }
   }
 
+  /// Abre el diálogo con los rangos vigentes para completarlos o corregirlos.
+  Future<void> _editarRangos(CultivoConRangos cultivo) async {
+    final CultivosController controller = context.read<CultivosController>();
+
+    final _DatosCultivo? datos = await showDialog<_DatosCultivo>(
+      context: context,
+      builder: (dialogContext) => _DialogoNuevoCultivo(cultivo: cultivo),
+    );
+    if (datos == null || !mounted) {
+      return;
+    }
+
+    final ScaffoldMessengerState mensajero = ScaffoldMessenger.of(context);
+    try {
+      await controller.guardarRangos(cultivo, datos.rangos);
+      mensajero.showSnackBar(
+        SnackBar(
+          content: Text('Rangos de "${cultivo.nombre}" guardados en el servicio.'),
+        ),
+      );
+    } catch (error) {
+      mensajero.showSnackBar(
+        SnackBar(content: Text(FalloDeVista.desde(error).mensaje)),
+      );
+    }
+  }
+
   Future<void> _eliminar(CultivoConRangos cultivo) async {
     final CultivosController controller = context.read<CultivosController>();
 
@@ -141,6 +168,7 @@ class _CultivosCatalogoScreenState extends State<CultivosCatalogoScreen> {
               for (final CultivoConRangos cultivo in cultivos)
                 _CultivoCard(
                   cultivo: cultivo,
+                  onEditarRangos: () => _editarRangos(cultivo),
                   onEliminar: () => _eliminar(cultivo),
                 ),
               const SizedBox(height: 16),
@@ -166,9 +194,14 @@ class _CultivosCatalogoScreenState extends State<CultivosCatalogoScreen> {
 }
 
 class _CultivoCard extends StatelessWidget {
-  const _CultivoCard({required this.cultivo, required this.onEliminar});
+  const _CultivoCard({
+    required this.cultivo,
+    required this.onEditarRangos,
+    required this.onEliminar,
+  });
 
   final CultivoConRangos cultivo;
+  final VoidCallback onEditarRangos;
   final VoidCallback onEliminar;
 
   @override
@@ -243,6 +276,16 @@ class _CultivoCard extends StatelessWidget {
               ),
             ),
             IconButton(
+              tooltip: cultivo.rangos.isEmpty
+                  ? 'Definir los rangos de este cultivo'
+                  : 'Editar los rangos de este cultivo',
+              onPressed: onEditarRangos,
+              icon: Icon(
+                cultivo.rangos.isEmpty ? Icons.addchart_outlined : Icons.tune,
+                color: const Color(0xFF2E7D32),
+              ),
+            ),
+            IconButton(
               tooltip: 'Eliminar cultivo',
               onPressed: onEliminar,
               icon: const Icon(Icons.delete_outline, color: Color(0xFFC62828)),
@@ -268,15 +311,24 @@ class _DatosCultivo {
 }
 
 class _DialogoNuevoCultivo extends StatefulWidget {
-  const _DialogoNuevoCultivo();
+  const _DialogoNuevoCultivo({this.cultivo});
+
+  /// Cultivo cuyos rangos se van a corregir.
+  ///
+  /// Sin este dato el diálogo registra un cultivo nuevo; con él, parte de los
+  /// rangos vigentes para completarlos o corregirlos, que es la operación que
+  /// faltaba cuando un cultivo quedaba sin rangos.
+  final CultivoConRangos? cultivo;
 
   @override
   State<_DialogoNuevoCultivo> createState() => _DialogoNuevoCultivoState();
 }
 
 class _DialogoNuevoCultivoState extends State<_DialogoNuevoCultivo> {
-  final TextEditingController _nombre = TextEditingController();
-  final TextEditingController _descripcion = TextEditingController();
+  late final TextEditingController _nombre =
+      TextEditingController(text: widget.cultivo?.nombre ?? '');
+  late final TextEditingController _descripcion =
+      TextEditingController(text: widget.cultivo?.descripcion ?? '');
 
   /// Un par de campos por variable del catálogo: mínimo y máximo.
   final Map<String, TextEditingController> _minimos = <String, TextEditingController>{
@@ -288,6 +340,24 @@ class _DialogoNuevoCultivoState extends State<_DialogoNuevoCultivo> {
       variable.codigo: TextEditingController(),
   };
   String? _error;
+
+  /// Indica si el diálogo está corrigiendo los rangos de un cultivo existente.
+  bool get _esEdicion => widget.cultivo != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final CultivoConRangos? cultivo = widget.cultivo;
+    if (cultivo == null) {
+      return;
+    }
+    // Los campos parten de los límites vigentes: se corrige sobre lo que hay, y
+    // las variables sin rango quedan vacías para que el usuario las complete.
+    for (final RangoReferencia rango in cultivo.rangos) {
+      _minimos[rango.variable]?.text = formatearValor(rango.minimo);
+      _maximos[rango.variable]?.text = formatearValor(rango.maximo);
+    }
+  }
 
   @override
   void dispose() {

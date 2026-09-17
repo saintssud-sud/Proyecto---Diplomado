@@ -137,6 +137,48 @@ class CultivosController extends ChangeNotifier {
     await cargar();
   }
 
+  /// Define o corrige los rangos de un cultivo ya registrado.
+  ///
+  /// Un cultivo creado sin rangos no se podía completar después: la pantalla
+  /// solo permitía registrarlo entero con sus rangos o eliminarlo, y la pantalla
+  /// de rangos únicamente edita los que ya existen. Como las lecturas de un
+  /// cultivo sin rangos no se evalúan ni generan alertas, la única salida era
+  /// borrarlo y volverlo a crear. Aquí se actualiza el rango que ya existe y se
+  /// crea el que falta, de modo que completar un cultivo no obligue a perderlo.
+  Future<void> guardarRangos(
+    CultivoConRangos cultivo,
+    List<RangoNuevo> rangos,
+  ) async {
+    for (final RangoNuevo rango in rangos) {
+      final RangoReferencia? existente = _rangoDe(cultivo, rango.variable);
+      if (existente == null) {
+        await _rangos.crear(
+          perfilId: cultivo.id,
+          variable: rango.variable,
+          minimo: rango.minimo,
+          maximo: rango.maximo,
+        );
+      } else {
+        await _rangos.actualizar(
+          existente.id,
+          minimo: rango.minimo,
+          maximo: rango.maximo,
+        );
+      }
+    }
+    await cargar();
+  }
+
+  /// Rango del cultivo para la variable indicada, si ya está definido.
+  RangoReferencia? _rangoDe(CultivoConRangos cultivo, String variable) {
+    for (final RangoReferencia rango in cultivo.rangos) {
+      if (rango.variable == variable) {
+        return rango;
+      }
+    }
+    return null;
+  }
+
   /// Elimina un cultivo junto con sus rangos.
   ///
   /// El servicio rechaza eliminar un cultivo que todavía tiene rangos definidos,
