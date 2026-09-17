@@ -170,3 +170,35 @@ y el archivo del tablero.
 | `docs/12_VERIFICACION_SEGURIDAD.md` | Verificación de las reglas de seguridad |
 | `docs/13_EVIDENCIAS_DE_LA_ENTREGA.md` | Este documento |
 | `docs/BITACORA_MARTES_2026-09-15.md` | Bitácora de trabajo, con los hallazgos y sus correcciones |
+
+---
+
+## Archivo instalable de Android (APK)
+
+| Dato | Valor |
+|---|---|
+| Archivo | `build/app/outputs/flutter-apk/app-release.apk` |
+| Tamaño | 53,8 MB |
+| Compilación | `flutter build apk --release --dart-define=API_BASE_URL=https://sigvach-api.onrender.com` |
+| Firma | Con la clave de depuración (ver la nota de revisión del apartado 2.7 de la monografía) |
+| Requisito de sistema | Android 8.0 (API 26) o superior, conforme al RNF-04 |
+
+El archivo se compila apuntando al **servicio publicado**, de modo que la aplicación
+instalada funciona desde cualquier red con acceso a internet y no requiere que el
+equipo del autor esté encendido.
+
+**Cómo se instala**
+
+1. Copiar el archivo al teléfono (cable, almacenamiento o mensajería).
+2. Abrirlo desde el teléfono y aceptar la instalación de aplicaciones de origen desconocido.
+3. Iniciar sesión con una cuenta del sistema y comprobar que el panel muestra las
+   variables del módulo con sus valores y estados.
+
+**Observaciones de la compilación**
+
+- La compilación descarta los recursos no utilizados: el paquete de iconos se
+  redujo un 99,4 % (de 1.645.184 a 10.184 bytes).
+- Los complementos `firebase_auth` y `firebase_core` aplican hoy el complemento
+  Gradle de Kotlin de forma directa; una versión próxima de Flutter pedirá migrarlos
+  al complemento integrado. Se deja constancia como tarea de mantenimiento y no
+  afecta al funcionamiento actual.
