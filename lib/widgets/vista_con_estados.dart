@@ -38,6 +38,7 @@ class VistaConEstados<T> extends StatelessWidget {
     this.alReintentar,
     this.mensajeCargando = 'Cargando información…',
     this.tituloVacio = 'Todavía no hay información',
+    this.contenidoVacio,
   });
 
   /// Estado actual de la vista.
@@ -67,6 +68,13 @@ class VistaConEstados<T> extends StatelessWidget {
   final String mensajeCargando;
   final String tituloVacio;
 
+  /// Contenido propio para el estado vacío.
+  ///
+  /// Se usa cuando «no hay datos» no basta como respuesta: el panel, por
+  /// ejemplo, ofrece en ese caso cambiar de módulo de cultivo, porque el módulo
+  /// vigente puede estar sin lecturas mientras otro sí las tiene.
+  final Widget Function(BuildContext contexto)? contenidoVacio;
+
   @override
   Widget build(BuildContext context) {
     switch (estado) {
@@ -91,6 +99,12 @@ class VistaConEstados<T> extends StatelessWidget {
         return alMostrarDatos(context, contenido);
 
       case EstadoVista.vacio:
+        // Una pantalla puede necesitar algo más que el mensaje cuando no hay
+        // datos: por ejemplo, el panel ofrece elegir otro módulo de cultivo, que
+        // es la salida natural si el módulo vigente todavía no tiene lecturas.
+        if (contenidoVacio != null) {
+          return contenidoVacio!(context);
+        }
         return _Centrado(
           icono: Icons.inbox_outlined,
           titulo: tituloVacio,

@@ -291,6 +291,34 @@ class _PanelViewState extends State<_PanelView> {
         mensajeError: panel.mensajeError,
         mensajeVacio: _mensajeVacio(panel),
         alReintentar: () => panel.cargar(),
+        // En el estado vacío se ofrece el mismo encabezado que en el estado con
+        // datos, para que el usuario pueda **cambiar de módulo** cuando el módulo
+        // vigente todavía no tiene lecturas: de lo contrario quedaba sin salida,
+        // viendo un aviso que no le permitía llegar al módulo que sí tiene datos.
+        contenidoVacio: (BuildContext contexto) => ListView(
+          padding: const EdgeInsets.all(16),
+          children: <Widget>[
+            _StatusBanner(hayAlertas: panel.alertasActivas > 0),
+            const SizedBox(height: 12),
+            _EncabezadoModulo(panel: panel),
+            const SizedBox(height: 28),
+            const Icon(Icons.inbox_outlined, size: 46, color: Colors.grey),
+            const SizedBox(height: 10),
+            Text(
+              _mensajeVacio(panel),
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.grey),
+            ),
+            const SizedBox(height: 16),
+            Center(
+              child: OutlinedButton.icon(
+                onPressed: () => panel.cargar(),
+                icon: const Icon(Icons.refresh, size: 18),
+                label: const Text('Actualizar'),
+              ),
+            ),
+          ],
+        ),
         alMostrarDatos: (BuildContext contexto, List<EstadoDeVariable> variables) {
           return ListView(
             padding: const EdgeInsets.all(16),
