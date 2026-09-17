@@ -381,7 +381,9 @@ class _DialogoNuevoCultivoState extends State<_DialogoNuevoCultivo> {
   }
 
   void _guardar() {
-    if (_nombre.text.trim().length < 2) {
+    // Al corregir los rangos de un cultivo existente, el nombre ya está definido
+    // y no se modifica: solo se validan y se envían los límites.
+    if (!_esEdicion && _nombre.text.trim().length < 2) {
       setState(() => _error = 'Escriba el nombre del cultivo (dos letras como mínimo).');
       return;
     }
@@ -423,7 +425,9 @@ class _DialogoNuevoCultivoState extends State<_DialogoNuevoCultivo> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Añadir cultivo'),
+      title: Text(
+        _esEdicion ? 'Rangos de ${widget.cultivo!.nombre}' : 'Añadir cultivo',
+      ),
       content: SizedBox(
         width: 420,
         child: SingleChildScrollView(
@@ -431,25 +435,37 @@ class _DialogoNuevoCultivoState extends State<_DialogoNuevoCultivo> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const Text(
-                'Indique el nombre del cultivo y, si lo conoce, el rango de '
-                'referencia de cada variable. Los rangos que deje vacíos no se '
-                'enviarán; el servidor valida que estén dentro de los límites '
-                'físicos de cada variable.',
-                style: TextStyle(color: Colors.black54, fontSize: 12),
+              Text(
+                _esEdicion
+                    ? 'Corrija o complete el rango de referencia de cada variable: '
+                        'se muestran los límites vigentes y las variables sin rango '
+                        'quedan vacías. Los rangos que deje vacíos no se envían. '
+                        'El servidor valida que estén dentro de los límites físicos '
+                        'de cada variable.'
+                    : 'Indique el nombre del cultivo y, si lo conoce, el rango de '
+                        'referencia de cada variable. Los rangos que deje vacíos no se '
+                        'enviarán; el servidor valida que estén dentro de los límites '
+                        'físicos de cada variable.',
+                style: const TextStyle(color: Colors.black54, fontSize: 12),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: _nombre,
-                decoration: const InputDecoration(
+                // Al corregir rangos, el nombre del cultivo no se modifica: el
+                // campo se muestra para saber de qué cultivo se trata, pero no se
+                // edita, para que la pantalla no ofrezca un cambio que no guarda.
+                readOnly: _esEdicion,
+                decoration: InputDecoration(
                   labelText: 'Nombre del cultivo',
                   hintText: 'Ej. Acelga',
-                  border: OutlineInputBorder(),
+                  helperText: _esEdicion ? 'El nombre del cultivo no se modifica aquí' : null,
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 10),
               TextField(
                 controller: _descripcion,
+                readOnly: _esEdicion,
                 decoration: const InputDecoration(
                   labelText: 'Descripción (opcional)',
                   hintText: 'Ej. Hoja verde, ciclo corto',
