@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../controllers/panel_controller.dart';
 import '../../models/api/modelos_api.dart';
 import '../../utils/formato_fecha.dart';
+import '../../widgets/tarjeta_de_modulo.dart';
 import '../../widgets/vista_con_estados.dart';
 
 /// Pantalla 2 — Estado de las variables del módulo.
@@ -28,19 +29,37 @@ class VariablesScreen extends StatelessWidget {
       mensajeVacio: 'El módulo todavía no tiene lecturas registradas. '
           'Registre una medición desde el panel principal.',
       alReintentar: () => panel.cargar(),
+      // El estado vacío también muestra el módulo: si la pantalla informa que no
+      // hay lecturas, debe decir de qué módulo habla y con qué rangos se van a
+      // evaluar cuando lleguen.
+      contenidoVacio: (BuildContext contexto) => ListView(
+        padding: const EdgeInsets.all(16),
+        children: <Widget>[
+          _encabezado(panel),
+          const SizedBox(height: 28),
+          const Icon(Icons.inbox_outlined, size: 46, color: Colors.grey),
+          const SizedBox(height: 10),
+          const Text(
+            'El módulo todavía no tiene lecturas registradas.\n'
+            'Registre la primera medición desde el panel principal.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.grey),
+          ),
+          const SizedBox(height: 16),
+          Center(
+            child: OutlinedButton.icon(
+              onPressed: () => panel.cargar(),
+              icon: const Icon(Icons.refresh, size: 18),
+              label: const Text('Actualizar'),
+            ),
+          ),
+        ],
+      ),
       alMostrarDatos: (BuildContext contexto, List<EstadoDeVariable> variables) {
         return ListView(
           padding: const EdgeInsets.all(16),
           children: <Widget>[
-            const Text(
-              'Variables',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              _subtitulo(panel),
-              style: const TextStyle(color: Colors.grey, fontSize: 13),
-            ),
+            _encabezado(panel),
             const SizedBox(height: 12),
             for (final EstadoDeVariable variable in variables)
               _VariableCard(variable: variable),
@@ -50,12 +69,34 @@ class VariablesScreen extends StatelessWidget {
     );
   }
 
-  String _subtitulo(PanelController panel) {
+  /// Encabezado de la pantalla: título y detalle del módulo vigente.
+  ///
+  /// Se usa el mismo componente de tarjeta que el panel principal y la pantalla
+  /// de módulos, de modo que el módulo se vea igual en los tres lugares y el
+  /// usuario reconozca de un vistazo sobre qué cultivo está mirando los datos.
+  Widget _encabezado(PanelController panel) {
     final ModuloCultivo? modulo = panel.modulo;
-    if (modulo == null) {
-      return 'Sin módulo seleccionado';
-    }
-    return '${modulo.nombre} · ${modulo.tipoCultivo} · datos del servicio';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        const Text(
+          'Variables',
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          modulo == null
+              ? 'Sin módulo seleccionado'
+              : 'Datos del servicio · evaluados contra los rangos del cultivo',
+          style: const TextStyle(color: Colors.grey, fontSize: 13),
+        ),
+        if (modulo != null) ...<Widget>[
+          const SizedBox(height: 12),
+          TarjetaDeModulo(modulo: modulo, margin: EdgeInsets.zero),
+        ],
+      ],
+    );
   }
 }
 
