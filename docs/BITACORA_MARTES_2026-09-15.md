@@ -427,4 +427,20 @@ El servicio quedó desplegado en **Render**, en su capa gratuita, con la definic
 
 ---
 
-*Bitácora de trabajo del Módulo 4. Elaborada al cierre de las sesiones del lunes 14, del martes 15 y del miércoles 16 de septiembre de 2026.*
+## 24. Jueves 17: publicación de la aplicación web y cierre de la seguridad
+
+**Publicación de la aplicación web.** Se compiló la aplicación apuntando al servicio publicado y se publicó en Firebase Hosting, con el agregado de una opción al panel de control que realiza los dos pasos —compilar y publicar— sin escribir comandos. La aplicación quedó accesible en `https://sigvach26-bd.web.app` y consume el servicio de la nube, de modo que el sistema completo funciona sin depender del equipo del autor. Los orígenes permitidos quedaron verificados sin intervención adicional: si la aplicación publicada lee datos del servicio, el navegador no está bloqueando las peticiones.
+
+**Hallazgo: el servicio buscaba la base de datos en otro proyecto.** La comprobación de salud del servicio desplegado informaba `degradado` con la base como no disponible, mientras que el servicio local conectaba sin inconvenientes con las **mismas** credenciales. El registro del servicio permitió identificar la causa con precisión: la consulta se dirigía al proyecto `production` en lugar de `sigvach26-bd`, y Google respondía `403 Cloud Firestore API has not been used in project production`. Corregida la variable de configuración del proyecto, la comprobación de salud pasó a informar `ok` con la base conectada.
+
+> Este caso dejó dos enseñanzas que se incorporaron al sistema. La primera es de **diagnóstico**: el repositorio de Firestore atrapaba cualquier fallo y devolvía «no disponible» sin dejar constancia de la causa, de modo que una credencial ausente, un proyecto equivocado y un problema de permisos producían el mismo síntoma. Ahora la excepción se registra con su tipo y su mensaje, y al arrancar se informa el proyecto y la cuenta de servicio con los que quedó vinculado el SDK. La segunda es de **método**: comparar el comportamiento local con el desplegado permitió descartar en un paso las credenciales —que funcionaban— y concentrar la búsqueda en la configuración del entorno.
+
+**Hallazgo de interfaz: el estado vacío no ofrecía salida.** Al probar la aplicación publicada, el panel mostró el estado vacío del módulo recién creado —que todavía no tiene lecturas— y en ese estado no presentaba el selector de módulo ni la acción de registrar una medición: el usuario quedaba viendo un aviso sin forma de llegar al módulo que sí tiene datos. Se corrigió el componente de estados para que admita un contenido propio del estado vacío, y el panel ahora ofrece allí el encabezado con el selector de módulo y la acción de actualizar.
+
+**Reglas de seguridad publicadas.** Antes de publicarlas se verificó que ningún componente del cliente acceda a las colecciones del dominio: la aplicación solo lee y escribe la colección `usuarios` —el perfil propio y, para el administrador, el resto— y todo el dominio pasa por el servicio. Se comprobó además que el correo del administrador declarado en las reglas coincide con el que asigna la aplicación (`admin@sigvach.com`) y que las colecciones heredadas del proyecto del aula (`registros` y `firestore_demo`) corresponden a código sin uso, de modo que cerrarlas no afecta ninguna pantalla.
+
+**Estado del despliegue.** Servicio en la nube (`Live`), documentación de la API publicada, aplicación web publicada, reglas de seguridad publicadas y comprobación de salud en `ok` con la base conectada. Queda pendiente generar el archivo instalable de Android y reunir las evidencias de los ocho requisitos mínimos.
+
+---
+
+*Bitácora de trabajo del Módulo 4. Elaborada al cierre de las sesiones del lunes 14, del martes 15, del miércoles 16 y del jueves 17 de septiembre de 2026.*
