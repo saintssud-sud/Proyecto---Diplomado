@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../controllers/alertas_controller.dart';
+import '../../controllers/panel_controller.dart';
 import '../../models/api/modelos_api.dart';
 import '../../utils/formato_fecha.dart';
+import '../../widgets/tarjeta_de_modulo.dart';
 import '../../widgets/vista_con_estados.dart';
 import 'alerta_detalle_screen.dart';
 
@@ -21,12 +23,19 @@ class AlertasScreen extends StatefulWidget {
 }
 
 class _AlertasScreenState extends State<AlertasScreen> {
+  /// Módulo con el que se hizo la última consulta.
+  String? _moduloConsultado;
+
   @override
   void initState() {
     super.initState();
+    // El módulo de referencia se fija aquí —y no dentro del callback— para que la
+    // primera construcción no lo compare contra un valor todavía nulo y lance una
+    // segunda consulta idéntica.
+    _moduloConsultado = context.read<PanelController>().modulo?.id;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        context.read<AlertasController>().cargar();
+        context.read<AlertasController>().cargar(moduloId: _moduloConsultado);
       }
     });
   }
@@ -34,6 +43,18 @@ class _AlertasScreenState extends State<AlertasScreen> {
   @override
   Widget build(BuildContext context) {
     final AlertasController controller = context.watch<AlertasController>();
+    final ModuloCultivo? modulo = context.watch<PanelController>().modulo;
+
+    // Las alertas se consultan para el módulo vigente, igual que el panel: si el
+    // usuario cambia de módulo, se vuelven a consultar.
+    if (modulo?.id != _moduloConsultado) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && modulo?.id != _moduloConsultado) {
+          _moduloConsultado = modulo?.id;
+          context.read<AlertasController>().cargar(moduloId: modulo?.id);
+        }
+      });
+    }
 
     return VistaConEstados<List<AlertaServidor>>(
       estado: controller.estado,
@@ -42,7 +63,7 @@ class _AlertasScreenState extends State<AlertasScreen> {
       mensajeError: controller.mensajeError,
       mensajeVacio: 'Todavía no hay alertas. El servicio genera una alerta cada '
           'vez que una lectura sale del rango de su perfil de cultivo.',
-      alReintentar: () => controller.cargar(),
+      alReintentar: () => controller.cargar(moduloId: _moduloConsultado),
       alMostrarDatos: (BuildContext contexto, List<AlertaServidor> _) {
         return DefaultTabController(
           length: 2,
@@ -56,6 +77,11 @@ class _AlertasScreenState extends State<AlertasScreen> {
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
               ),
+              if (modulo != null)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                  child: TarjetaDeModulo(modulo: modulo, margin: EdgeInsets.zero),
+                ),
               const TabBar(
                 tabs: <Widget>[
                   Tab(text: 'Activas'),

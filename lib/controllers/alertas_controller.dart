@@ -40,7 +40,12 @@ class AlertasController extends ChangeNotifier {
   /// Se piden las dos listas en la misma operación lógica: si el servicio no
   /// responde, la pantalla lo informa como un fallo y no como un historial
   /// vacío, que el usuario leería como «no hay nada que atender».
-  Future<void> cargar() async {
+  /// Consulta las alertas del módulo indicado.
+  ///
+  /// El filtro por módulo es el mismo que usa el panel principal: sin él, la
+  /// pantalla mostraba alertas de todos los módulos juntas, aunque el resto de
+  /// la aplicación trabaje sobre el módulo vigente.
+  Future<void> cargar({String? moduloId}) async {
     _estado = EstadoVista.cargando;
     _mensajeError = null;
     _errorDeConexion = false;
@@ -48,9 +53,9 @@ class AlertasController extends ChangeNotifier {
 
     try {
       final List<AlertaServidor> activas =
-          await _alertas.listar(estado: 'activa');
+          await _alertas.listar(estado: 'activa', moduloId: moduloId);
       final List<AlertaServidor> atendidas =
-          await _alertas.listar(estado: 'atendida');
+          await _alertas.listar(estado: 'atendida', moduloId: moduloId);
       _activas = List<AlertaServidor>.unmodifiable(activas);
       _atendidas = List<AlertaServidor>.unmodifiable(atendidas);
       _estado = total == 0 ? EstadoVista.vacio : EstadoVista.conDatos;

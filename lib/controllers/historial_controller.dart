@@ -11,9 +11,21 @@ import 'estado_de_vista.dart';
 /// que es el mismo que entiende el servicio; el nombre presentable se resuelve
 /// con `nombreDeVariable` en el momento de mostrarlo.
 class FiltroHistorial {
-  const FiltroHistorial({required this.variable, this.desde, this.hasta});
+  const FiltroHistorial({
+    required this.variable,
+    this.moduloId,
+    this.desde,
+    this.hasta,
+  });
 
   final String variable;
+
+  /// Módulo del que se consulta el historial.
+  ///
+  /// La aplicación trabaja sobre el **módulo vigente**: sin este filtro, el
+  /// historial mezclaba las lecturas de módulos con cultivos y rangos distintos,
+  /// y el resumen del periodo no correspondía a ningún módulo en particular.
+  final String? moduloId;
   final DateTime? desde;
   final DateTime? hasta;
 }
@@ -90,11 +102,13 @@ class HistorialController extends ChangeNotifier {
     try {
       final List<ResumenVariable> resumenes = await _lecturas.resumen(
         variable: _filtro.variable,
+        moduloId: _filtro.moduloId,
         desde: _filtro.desde,
         hasta: _filtro.hasta,
       );
       final List<Lectura> lecturas = await _lecturas.listar(
         variable: _filtro.variable,
+        moduloId: _filtro.moduloId,
         desde: _filtro.desde,
         hasta: _filtro.hasta,
         limite: _limiteSerie,
@@ -125,6 +139,7 @@ class HistorialController extends ChangeNotifier {
   Future<void> seleccionarPeriodo({DateTime? desde, DateTime? hasta}) => cargar(
         filtro: FiltroHistorial(
           variable: _filtro.variable,
+          moduloId: _filtro.moduloId,
           desde: desde,
           hasta: hasta,
         ),

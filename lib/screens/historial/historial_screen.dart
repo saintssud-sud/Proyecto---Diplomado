@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../controllers/historial_controller.dart';
+import '../../controllers/panel_controller.dart';
 import '../../models/api/modelos_api.dart';
+import '../../widgets/tarjeta_de_modulo.dart';
 import '../../widgets/vista_con_estados.dart';
 import 'grafica_historica_screen.dart';
 import 'lista_mediciones_screen.dart';
@@ -25,6 +27,12 @@ class _HistorialScreenState extends State<HistorialScreen> {
   DateTime? _desde;
   DateTime? _hasta;
   String? _aviso;
+
+  /// Módulo con el que se hizo la última consulta.
+  ///
+  /// El historial se consulta para el módulo vigente del panel: si el usuario
+  /// cambia de módulo, la consulta anterior deja de corresponder y se rehace.
+  String? _moduloConsultado;
 
   /// Indica si el rango elegido es incoherente.
   ///
@@ -68,9 +76,13 @@ class _HistorialScreenState extends State<HistorialScreen> {
     }
   }
 
-  /// Arma el filtro con lo elegido en pantalla.
-  FiltroHistorial get _filtro =>
-      FiltroHistorial(variable: _variable, desde: _desde, hasta: _hasta);
+  /// Arma el filtro con lo elegido en pantalla y el módulo vigente.
+  FiltroHistorial _filtroPara(String? moduloId) => FiltroHistorial(
+        variable: _variable,
+        moduloId: moduloId,
+        desde: _desde,
+        hasta: _hasta,
+      );
 
   /// Consulta el historial con los filtros vigentes.
   Future<void> _consultar() async {
@@ -82,7 +94,11 @@ class _HistorialScreenState extends State<HistorialScreen> {
       return;
     }
     setState(() => _aviso = null);
-    await context.read<HistorialController>().cargar(filtro: _filtro);
+    final String? moduloId = context.read<PanelController>().modulo?.id;
+    _moduloConsultado = moduloId;
+    await context.read<HistorialController>().cargar(
+          filtro: _filtroPara(moduloId),
+        );
   }
 
   /// Aplica el filtro y abre la pantalla indicada.
@@ -99,7 +115,9 @@ class _HistorialScreenState extends State<HistorialScreen> {
       return;
     }
     setState(() => _aviso = null);
-    context.read<HistorialController>().cargar(filtro: _filtro);
+    final String? moduloId = context.read<PanelController>().modulo?.id;
+    _moduloConsultado = moduloId;
+    context.read<HistorialController>().cargar(filtro: _filtroPara(moduloId));
     Navigator.push<void>(
       context,
       MaterialPageRoute<void>(builder: (BuildContext routeContext) => destino),
@@ -117,6 +135,18 @@ class _HistorialScreenState extends State<HistorialScreen> {
   @override
   Widget build(BuildContext context) {
     final HistorialController historial = context.watch<HistorialController>();
+    final ModuloCultivo? modulo = context.watch<PanelController>().modulo;
+
+    // Si el módulo vigente cambió, la consulta anterior corresponde a otro
+    // módulo: se rehace con el nuevo, para que la lista y el resumen coincidan
+    // con el módulo que la tarjeta muestra.
+    if (historial.seConsulto && modulo?.id != _moduloConsultado) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && modulo?.id != _moduloConsultado) {
+          _consultar();
+        }
+      });
+    }
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -125,6 +155,10 @@ class _HistorialScreenState extends State<HistorialScreen> {
           'Historial',
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
+        if (modulo != null) ...<Widget>[
+          const SizedBox(height: 12),
+          TarjetaDeModulo(modulo: modulo, margin: EdgeInsets.zero),
+        ],
         const SizedBox(height: 8),
         const Text(
           'Consultar historia',
