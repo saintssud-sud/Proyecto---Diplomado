@@ -9,6 +9,7 @@ import '../services/api_errores.dart';
 import '../services/auth_service.dart';
 import '../utils/formato_fecha.dart';
 import '../widgets/max_width_box.dart';
+import '../widgets/tarjeta_de_modulo.dart';
 import '../widgets/vista_con_estados.dart';
 import 'ajustes/ajustes_screen.dart';
 import 'ajustes/cultivos_screen.dart';
@@ -413,28 +414,16 @@ class _EncabezadoModulo extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final String detalle = <String>[
-      modulo.tipoCultivo,
-      if ((modulo.ubicacion ?? '').isNotEmpty) modulo.ubicacion!,
-    ].join(' · ');
-
-    if (panel.modulosDisponibles.length <= 1) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            modulo.nombre,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          Text(detalle, style: const TextStyle(color: Colors.grey, fontSize: 13)),
-        ],
-      );
-    }
-
-    return Row(
+    // Se muestra el detalle del módulo vigente —cultivo, perfil de referencia y
+    // ubicación— con el mismo componente que la pantalla de módulos: el panel
+    // debe decir con qué rangos se están evaluando las lecturas que presenta, y
+    // antes solo daba una línea resumida. Con más de un módulo, el selector se
+    // ubica arriba y el detalle queda debajo, para no perderlo al cambiar.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Expanded(
-          child: DropdownButtonFormField<String>(
+        if (panel.modulosDisponibles.length > 1) ...<Widget>[
+          DropdownButtonFormField<String>(
             initialValue: modulo.id,
             decoration: const InputDecoration(
               labelText: 'Módulo de cultivo',
@@ -454,7 +443,9 @@ class _EncabezadoModulo extends StatelessWidget {
               }
             },
           ),
-        ),
+          const SizedBox(height: 12),
+        ],
+        TarjetaDeModulo(modulo: modulo, margin: EdgeInsets.zero),
       ],
     );
   }

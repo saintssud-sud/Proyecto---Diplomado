@@ -11,6 +11,17 @@ from ..seguridad import UsuarioAutenticado, requiere_administracion, requiere_co
 enrutador = APIRouter(prefix="/modulos", tags=["Módulos de cultivo"])
 
 
+def _con_nombre_de_perfil(repositorio: RepositorioDatos, modulo: dict) -> dict:
+    """Agrega al módulo el nombre de su perfil de referencia.
+
+    Lo resuelve el servicio y no cada pantalla porque es él quien conoce la
+    relación entre el módulo y el perfil: así la pantalla de módulos y el panel
+    de inicio muestran el mismo dato sin cruzar listas por su cuenta.
+    """
+    perfil = repositorio.obtener_perfil(str(modulo.get("perfil_id", "")))
+    return {**modulo, "perfil_nombre": (perfil or {}).get("nombre", "")}
+
+
 def _modulo_o_error(repositorio: RepositorioDatos, modulo_id: str) -> dict:
     modulo = repositorio.obtener_modulo(modulo_id)
     if modulo is None:
@@ -19,7 +30,7 @@ def _modulo_o_error(repositorio: RepositorioDatos, modulo_id: str) -> dict:
             CODIGO_NO_ENCONTRADO,
             f"El módulo de cultivo '{modulo_id}' no existe.",
         )
-    return modulo
+    return _con_nombre_de_perfil(repositorio, modulo)
 
 
 @enrutador.post(
@@ -34,7 +45,8 @@ def crear_modulo(
     repositorio: RepositorioDatos = Depends(obtener_repositorio),
 ) -> dict:
     """Crea un módulo asociado a un tipo de cultivo y a un perfil de referencia."""
-    return repositorio.crear_modulo(entrada.model_dump())
+    creado = repositorio.crear_modulo(entrada.model_dump())
+    return _con_nombre_de_perfil(repositorio, creado)
 
 
 @enrutador.get(
@@ -48,7 +60,10 @@ def listar_modulos(
     repositorio: RepositorioDatos = Depends(obtener_repositorio),
 ) -> list[dict]:
     """Devuelve los módulos registrados."""
-    return repositorio.listar_modulos(activo=activo)
+    return [
+        _con_nombre_de_perfil(repositorio, modulo)
+        for modulo in repositorio.listar_modulos(activo=activo)
+    ]
 
 
 @enrutador.get(
@@ -85,7 +100,9 @@ def actualizar_modulo(
             "datos_invalidos",
             "La petición no contiene ningún campo para modificar.",
         )
-    return repositorio.actualizar_modulo(modulo_id, cambios)
+    return _con_nombre_de_perfil(
+        repositorio, repositorio.actualizar_modulo(modulo_id, cambios)
+    )
 
 
 @enrutador.delete(

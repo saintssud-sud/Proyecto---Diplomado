@@ -269,6 +269,14 @@ class ModuloSalida(_BaseSalida):
     nombre: str
     tipo_cultivo: str
     perfil_id: str
+    # Nombre del perfil de referencia, resuelto por el servicio.
+    #
+    # Se incluye para que las pantallas puedan mostrar con qué rangos se evalúan
+    # las lecturas del módulo sin tener que cruzar la lista de perfiles: la
+    # pantalla de módulos ya lo hacía en el cliente, y el panel de inicio no
+    # disponía de esa lista, de modo que no podía nombrar el perfil. El servicio
+    # es quien conoce la relación, así que la resuelve él.
+    perfil_nombre: str = ""
     ubicacion: str | None = None
     activo: bool = True
 

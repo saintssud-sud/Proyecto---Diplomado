@@ -5,6 +5,7 @@ import '../../controllers/estado_de_vista.dart';
 import '../../controllers/modulos_controller.dart';
 import '../../controllers/panel_controller.dart';
 import '../../models/api/modelos_api.dart';
+import '../../widgets/tarjeta_de_modulo.dart';
 import '../../widgets/vista_con_estados.dart';
 
 /// Pantalla 3 — Módulos o zonas de cultivo.
@@ -218,7 +219,6 @@ class _CultivosScreenState extends State<CultivosScreen> {
               for (final ModuloCultivo modulo in modulos)
                 _ModuloCard(
                   modulo: modulo,
-                  perfil: controller.nombrePerfil(modulo.perfilId),
                   onAlternarActivacion: () =>
                       controller.cambiarActivacion(modulo),
                   onEditar: () => _editar(modulo),
@@ -249,164 +249,69 @@ class _CultivosScreenState extends State<CultivosScreen> {
 class _ModuloCard extends StatelessWidget {
   const _ModuloCard({
     required this.modulo,
-    required this.perfil,
     required this.onAlternarActivacion,
     required this.onEditar,
     required this.onEliminar,
   });
 
   final ModuloCultivo modulo;
-  final String perfil;
   final VoidCallback onAlternarActivacion;
   final VoidCallback onEditar;
   final VoidCallback onEliminar;
 
   @override
   Widget build(BuildContext context) {
-    final bool activo = modulo.activo;
-    final Color color =
-        activo ? const Color(0xFF2E7D32) : const Color(0xFF757575);
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(Icons.eco_outlined, color: color),
+    // El detalle del módulo lo dibuja el componente compartido, el mismo que usa
+    // el panel de inicio; aquí se agrega lo propio de esta pantalla: el menú de
+    // acciones. Así el módulo se ve igual en los dos lugares.
+    return TarjetaDeModulo(
+      modulo: modulo,
+      acciones: PopupMenuButton<String>(
+        tooltip: 'Acciones del módulo',
+        icon: const Icon(Icons.more_vert, color: Colors.grey),
+        onSelected: (String accion) {
+          if (accion == 'editar') {
+            onEditar();
+          } else if (accion == 'activacion') {
+            onAlternarActivacion();
+          } else if (accion == 'eliminar') {
+            onEliminar();
+          }
+        },
+        itemBuilder: (BuildContext contexto) => <PopupMenuEntry<String>>[
+          const PopupMenuItem<String>(
+            value: 'editar',
+            child: ListTile(
+              dense: true,
+              leading: Icon(Icons.edit_outlined),
+              title: Text('Editar módulo'),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text(
-                          modulo.nombre,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: color.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          activo ? 'Activo' : 'Inactivo',
-                          style: TextStyle(
-                            color: color,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    modulo.tipoCultivo,
-                    style: const TextStyle(color: Colors.grey, fontSize: 13),
-                  ),
-                  const SizedBox(height: 6),
-                  _InfoChip(icon: Icons.science_outlined, text: perfil),
-                  if (modulo.ubicacion != null && modulo.ubicacion!.isNotEmpty)
-                    _InfoChip(
-                      icon: Icons.place_outlined,
-                      text: modulo.ubicacion!,
-                    ),
-                ],
+          ),
+          PopupMenuItem<String>(
+            value: 'activacion',
+            child: ListTile(
+              dense: true,
+              leading: Icon(
+                modulo.activo
+                    ? Icons.pause_circle_outline
+                    : Icons.play_circle_outline,
+              ),
+              title: Text(
+                modulo.activo ? 'Desactivar módulo' : 'Activar módulo',
               ),
             ),
-            PopupMenuButton<String>(
-              tooltip: 'Acciones del módulo',
-              icon: const Icon(Icons.more_vert, color: Colors.grey),
-              onSelected: (String accion) {
-                if (accion == 'editar') {
-                  onEditar();
-                } else if (accion == 'activacion') {
-                  onAlternarActivacion();
-                } else if (accion == 'eliminar') {
-                  onEliminar();
-                }
-              },
-              itemBuilder: (BuildContext contexto) => <PopupMenuEntry<String>>[
-                const PopupMenuItem<String>(
-                  value: 'editar',
-                  child: ListTile(
-                    dense: true,
-                    leading: Icon(Icons.edit_outlined),
-                    title: Text('Editar módulo'),
-                  ),
-                ),
-                PopupMenuItem<String>(
-                  value: 'activacion',
-                  child: ListTile(
-                    dense: true,
-                    leading: Icon(
-                      activo
-                          ? Icons.pause_circle_outline
-                          : Icons.play_circle_outline,
-                    ),
-                    title: Text(activo ? 'Desactivar módulo' : 'Activar módulo'),
-                  ),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'eliminar',
-                  child: ListTile(
-                    dense: true,
-                    leading: Icon(Icons.delete_outline, color: Color(0xFFC62828)),
-                    title: Text(
-                      'Eliminar módulo',
-                      style: TextStyle(color: Color(0xFFC62828)),
-                    ),
-                  ),
-                ),
-              ],
+          ),
+          const PopupMenuItem<String>(
+            value: 'eliminar',
+            child: ListTile(
+              dense: true,
+              leading: Icon(Icons.delete_outline, color: Color(0xFFC62828)),
+              title: Text(
+                'Eliminar módulo',
+                style: TextStyle(color: Color(0xFFC62828)),
+              ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _InfoChip extends StatelessWidget {
-  const _InfoChip({required this.icon, required this.text});
-
-  final IconData icon;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 4),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Icon(icon, size: 15, color: Colors.grey),
-          const SizedBox(width: 4),
-          Text(text, style: const TextStyle(fontSize: 12, color: Colors.black87)),
+          ),
         ],
       ),
     );

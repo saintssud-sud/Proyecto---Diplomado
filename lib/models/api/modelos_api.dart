@@ -137,6 +137,7 @@ class ModuloCultivo {
     required this.nombre,
     required this.tipoCultivo,
     required this.perfilId,
+    this.perfilNombre = '',
     this.ubicacion,
     this.activo = true,
   });
@@ -145,8 +146,18 @@ class ModuloCultivo {
   final String nombre;
   final String tipoCultivo;
   final String perfilId;
+
+  /// Nombre del perfil de referencia, resuelto por el servicio.
+  ///
+  /// Llega vacío si el perfil ya no existe: en ese caso se muestra el módulo sin
+  /// nombrar el perfil, en lugar de dejar la pantalla sin información.
+  final String perfilNombre;
   final String? ubicacion;
   final bool activo;
+
+  /// Perfil que se muestra: el nombre que envía el servicio y, si no llegó, el
+  /// identificador, para no dejar el dato en blanco.
+  String get perfilVisible => perfilNombre.isNotEmpty ? perfilNombre : perfilId;
 
   factory ModuloCultivo.fromJson(Map<String, dynamic> json) {
     return ModuloCultivo(
@@ -154,6 +165,7 @@ class ModuloCultivo {
       nombre: _texto(json, 'nombre'),
       tipoCultivo: _texto(json, 'tipo_cultivo'),
       perfilId: _texto(json, 'perfil_id'),
+      perfilNombre: _texto(json, 'perfil_nombre'),
       ubicacion: json['ubicacion']?.toString(),
       activo: json['activo'] as bool? ?? true,
     );
