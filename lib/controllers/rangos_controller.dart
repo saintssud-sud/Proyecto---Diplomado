@@ -26,6 +26,7 @@ class RangosController extends ChangeNotifier {
   String? _mensajeError;
   bool _errorDeConexion = false;
   List<RangoReferencia> _rangosCargados = const <RangoReferencia>[];
+  List<PerfilCultivo> _perfilesCargados = const <PerfilCultivo>[];
   Map<String, String> _nombresDePerfil = const <String, String>{};
 
   EstadoVista get estado => _estado;
@@ -33,8 +34,25 @@ class RangosController extends ChangeNotifier {
   bool get errorDeConexion => _errorDeConexion;
   List<RangoReferencia> get rangos => _rangosCargados;
 
+  /// Cultivos registrados, para poder elegir cuáles se están consultando.
+  List<PerfilCultivo> get perfiles => _perfilesCargados;
+
   /// Nombre presentable del perfil; si no se pudo resolver, devuelve el id.
   String nombrePerfil(String perfilId) => _nombresDePerfil[perfilId] ?? perfilId;
+
+  /// Rangos del cultivo indicado.
+  ///
+  /// Devuelve todos si no se indica ninguno, para conservar la vista general que
+  /// había antes de incorporar el selector.
+  List<RangoReferencia> rangosDe(String? perfilId) {
+    if (perfilId == null) {
+      return _rangosCargados;
+    }
+    return <RangoReferencia>[
+      for (final RangoReferencia rango in _rangosCargados)
+        if (rango.perfilId == perfilId) rango,
+    ];
+  }
 
   /// Consulta los rangos y los perfiles (para mostrar el nombre del perfil).
   Future<void> cargar() async {
@@ -47,6 +65,7 @@ class RangosController extends ChangeNotifier {
       final List<PerfilCultivo> perfiles = await _perfiles.listar();
       final List<RangoReferencia> rangos = await _rangos.listar();
 
+      _perfilesCargados = List<PerfilCultivo>.unmodifiable(perfiles);
       _nombresDePerfil = <String, String>{
         for (final PerfilCultivo perfil in perfiles) perfil.id: perfil.nombre,
       };

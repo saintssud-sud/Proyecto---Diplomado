@@ -20,6 +20,12 @@ class RangosVariablesScreen extends StatefulWidget {
 }
 
 class _RangosVariablesScreenState extends State<RangosVariablesScreen> {
+  /// Cultivo cuyos rangos se están viendo.
+  ///
+  /// Nulo significa «todos los cultivos», que era la única vista posible antes de
+  /// incorporar el selector y sigue siendo la vista inicial.
+  String? _perfilSeleccionado;
+
   @override
   void initState() {
     super.initState();
@@ -74,6 +80,8 @@ class _RangosVariablesScreenState extends State<RangosVariablesScreen> {
         mensajeVacio: 'El cultivo todavía no tiene rangos de referencia definidos.',
         alReintentar: () => controller.cargar(),
         alMostrarDatos: (BuildContext contexto, List<RangoReferencia> rangos) {
+          final List<RangoReferencia> visibles =
+              controller.rangosDe(_perfilSeleccionado);
           return ListView(
             padding: const EdgeInsets.all(16),
             children: <Widget>[
@@ -84,16 +92,48 @@ class _RangosVariablesScreenState extends State<RangosVariablesScreen> {
               const SizedBox(height: 4),
               const Text(
                 'Son los valores con los que el servicio evalúa cada lectura. '
-                'Toque un rango para modificarlo.',
+                'Cada cultivo tiene los suyos: elija el cultivo para verlos y '
+                'toque un rango para modificarlo.',
                 style: TextStyle(color: Colors.grey, fontSize: 13),
               ),
               const SizedBox(height: 12),
-              for (final RangoReferencia rango in rangos)
-                _RangoTile(
-                  rango: rango,
-                  perfil: controller.nombrePerfil(rango.perfilId),
-                  onTap: () => _editar(rango),
+              // Selector de cultivo: los rangos pertenecen a un cultivo, de modo
+              // que verlos todos juntos no permitía saber cuáles faltaban. Un
+              // cultivo recién creado no tiene rangos, y eso hay que poder verlo.
+              DropdownButtonFormField<String?>(
+                initialValue: _perfilSeleccionado,
+                decoration: const InputDecoration(
+                  labelText: 'Cultivo',
+                  border: OutlineInputBorder(),
                 ),
+                items: <DropdownMenuItem<String?>>[
+                  const DropdownMenuItem<String?>(
+                    value: null,
+                    child: Text('Todos los cultivos'),
+                  ),
+                  for (final PerfilCultivo perfil in controller.perfiles)
+                    DropdownMenuItem<String?>(
+                      value: perfil.id,
+                      child: Text(perfil.nombre),
+                    ),
+                ],
+                onChanged: (String? seleccionado) {
+                  setState(() => _perfilSeleccionado = seleccionado);
+                },
+              ),
+              const SizedBox(height: 14),
+              if (visibles.isEmpty)
+                _SinRangos(
+                  cultivo: controller.nombrePerfil(_perfilSeleccionado ?? ''),
+                )
+              else
+                for (final RangoReferencia rango in visibles)
+                  _RangoTile(
+                    rango: rango,
+                    perfil: controller.nombrePerfil(rango.perfilId),
+                    mostrarPerfil: _perfilSeleccionado == null,
+                    onTap: () => _editar(rango),
+                  ),
             ],
           );
         },
@@ -107,11 +147,18 @@ class _RangoTile extends StatelessWidget {
     required this.rango,
     required this.perfil,
     required this.onTap,
+    this.mostrarPerfil = true,
   });
 
   final RangoReferencia rango;
   final String perfil;
   final VoidCallback onTap;
+
+  /// Si se indica el cultivo en el detalle del rango.
+  ///
+  /// Se omite cuando la lista ya está filtrada por cultivo: repetirlo en cada
+  /// renglón no aportaría nada.
+  final bool mostrarPerfil;
 
   @override
   Widget build(BuildContext context) {
@@ -127,12 +174,62 @@ class _RangoTile extends StatelessWidget {
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
         subtitle: Text(
-          '${formatearValor(rango.minimo)} – ${formatearValor(rango.maximo)} '
-          '$unidad · $perfil'
-              .trim(),
+          mostrarPerfil
+              ? '${formatearValor(rango.minimo)} – ${formatearValor(rango.maximo)} '
+                  '$unidad · $perfil'
+              : '${formatearValor(rango.minimo)} – ${formatearValor(rango.maximo)} '
+                  '$unidad',
         ),
         trailing: const Icon(Icons.edit_outlined, color: Colors.grey),
         onTap: onTap,
+      ),
+    );
+  }
+}
+
+/// Aviso que se muestra cuando el cultivo elegido no tiene rangos.
+///
+/// Un cultivo recién creado no trae rangos: sin este aviso, la pantalla quedaba
+/// vacía y el usuario no sabía si faltaba cargar algo o si el sistema no admitía
+/// más de un cultivo.
+class _SinRangos extends StatelessWidget {
+  const _SinRangos({required this.cultivo});
+
+  final String cultivo;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0,
+      color: const Color(0xFFFFF8E1),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                const Icon(Icons.info_outline, color: Color(0xFFEF6C00)),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'El cultivo $cultivo todavía no tiene rangos de referencia',
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Se definen al crear o editar el cultivo, en Ajustes → Cultivos: '
+              'allí se indican el mínimo y el máximo de cada una de las siete '
+              'variables. Mientras un cultivo no tenga rangos, sus lecturas no se '
+              'evalúan y no generan alertas.',
+              style: TextStyle(fontSize: 13),
+            ),
+          ],
+        ),
       ),
     );
   }
