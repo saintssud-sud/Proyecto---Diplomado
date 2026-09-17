@@ -310,6 +310,18 @@ class _PanelViewState extends State<_PanelView> {
               style: const TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 16),
+            // La acción de registrar es la que da sentido al estado vacío: un
+            // módulo recién creado no tiene lecturas, y sin este botón no había
+            // forma de cargarle la primera medición desde la aplicación, de modo
+            // que el módulo quedaba vacío para siempre y parecía inútil.
+            Center(
+              child: FilledButton.icon(
+                onPressed: _registrarMedicion,
+                icon: const Icon(Icons.add_circle_outline, size: 18),
+                label: const Text('Registrar la primera medición'),
+              ),
+            ),
+            const SizedBox(height: 8),
             Center(
               child: OutlinedButton.icon(
                 onPressed: () => panel.cargar(),
