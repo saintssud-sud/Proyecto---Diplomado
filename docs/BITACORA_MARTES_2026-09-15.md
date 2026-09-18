@@ -453,6 +453,8 @@ El servicio quedó desplegado en **Render**, en su capa gratuita, con la definic
 
 **Verificación de tipos antes de publicar.** Durante la jornada la compilación web falló por un error de tipos —una función usada sin su importación, retirada antes por estar sin uso—, y ese episodio fijó una rutina: **analizar antes de publicar**. El analizador informa «No issues found» en pocos segundos y evita perder minutos en una compilación que no puede terminar. Queda también como constancia de que la verificación estructural del repositorio —que comprueba la forma del código— no sustituye a la verificación de tipos.
 
+**Validación de los datos del contexto.** Los tres puntos críticos del apartado 1.2 —registro manual y esporádico, ausencia de trazabilidad de la medición y detección tardía de los valores fuera de rango— y la tabla que los respalda se sometieron a quien realizó el seguimiento previo del cultivo, que es la fuente citada, y confirmó que describen lo que efectivamente se hacía. La constancia importa porque esos datos no provienen de una medición propia: se redactaron como hechos observables del proceso, sin cifras que no pudieran respaldarse, y se validaron con la fuente antes de sostenerlos en el documento. Con esta validación, el entregable queda sin datos del contexto pendientes de confirmar.
+
 **Estado del despliegue.** Servicio en la nube (`Live`), documentación de la API publicada, aplicación web publicada, reglas de seguridad publicadas y comprobación de salud en `ok` con la base conectada. Queda pendiente generar el archivo instalable de Android y reunir las evidencias de los ocho requisitos mínimos.
 
 ---
