@@ -459,4 +459,33 @@ El servicio quedó desplegado en **Render**, en su capa gratuita, con la definic
 
 ---
 
-*Bitácora de trabajo del Módulo 4. Elaborada al cierre de las sesiones del lunes 14, del martes 15, del miércoles 16 y del jueves 17 de septiembre de 2026.*
+## 25. Aclaración conceptual: monolito, monolito modular y arquitectura en capas
+
+Esta sección no registra una tarea hecha sino una **duda resuelta durante la revisión del documento**, que conviene conservar porque el concepto se evalúa en la defensa y porque explica una decisión ya tomada.
+
+**El origen de la duda.** Al revisar el apartado de arquitectura surgió la pregunta de si «monolítico» y «monolito modular» son lo mismo. La confusión proviene de las listas de patrones que circulan: suelen enumerar «microservicios, monolítico, orientada a eventos y en capas» como si fueran alternativas del mismo tipo, cuando en realidad **pertenecen a dos ejes distintos** y por lo tanto pueden combinarse.
+
+**Los dos ejes que no deben confundirse.**
+
+| Eje | Pregunta que responde | Patrones |
+|---|---|---|
+| **Despliegue** (estructura) | ¿En cuántas unidades se despliega el sistema? | Microservicios · Monolítico · Orientada a eventos |
+| **Organización interna** (código) | ¿Cómo se ordena el código por dentro? | **En capas (N-Tier)** · **Modular** |
+
+**Monolítico y monolito modular.** «Monolítico» responde al **primer** eje: todo el sistema se construye y se despliega como **una única unidad** ✅. «Monolito modular» precisa el **segundo**: esa unidad única se organiza internamente en **módulos con responsabilidad separada** ✅. En consecuencia, **todo monolito modular es un monolito, pero no todo monolito es modular**: un monolito sin módulos definidos es lo que la industria llama una «bola de barro», donde cualquier cambio puede afectar partes no relacionadas. La palabra «modular», por tanto, no decora: distingue el sistema de ese caso.
+
+**Cómo se aplica a SI.G.VA.CH.**
+
+- **Despliegue:** monolito modular ✅ — una sola unidad desplegable: un programa, un proceso, una dirección pública y una sola conexión con la base de datos, de modo que el cliente no distingue la estructura interna del servicio.
+- **Organización interna:** arquitectura en capas ✅ — `rutas/` (presentación, el contrato de la API), `servicios/` y controladores (lógica de negocio y reglas del dominio), `repositorios/` (acceso a datos, con una implementación en memoria y otra sobre Cloud Firestore), `esquemas/` (validación de entradas) y `seguridad/` (autorización por rol).
+- **Alternativas evaluadas y descartadas:** microservicios y cómputo sin servidor, por el costo operativo que imponen frente al alcance del prototipo, con la recomendación de separar el servicio si el sistema crece.
+
+**La precisión que se incorporó al documento.** Conviene distinguir el **servicio** del **sistema**: el servicio es un monolito modular, mientras que el sistema en su conjunto es una **solución distribuida**, con el módulo de adquisición (ESP32), el servicio, los clientes —web y móvil— y la base de datos como componentes separados que se comunican por la red. Los «cuatro niveles» que menciona el apartado describen los componentes del sistema, no la estructura interna del servicio. Sin esta precisión, la pregunta «si es un monolito, ¿por qué habla de cuatro niveles?» queda abierta.
+
+**La analogía adoptada para explicarlo.** Un barrio de casas separadas se corresponde con los microservicios; **una casa con habitaciones y paredes interiores**, con el monolito modular —un solo edificio, pero con cada ambiente separado—; y una casa sin paredes interiores, con el monolito no modular. La comparación se conserva porque permite explicar la diferencia en una frase sin recurrir a terminología técnica.
+
+**Redacción adoptada.** *«Patrón arquitectónico adoptado: monolito modular, variante del patrón monolítico en la que una única unidad desplegable se organiza internamente en módulos con responsabilidad separada, con organización en capas —presentación, lógica de negocio y datos—.»*
+
+---
+
+*Bitácora de trabajo del Módulo 4. Elaborada al cierre de las sesiones del lunes 14, del martes 15, del miércoles 16, del jueves 17 y del viernes 18 de septiembre de 2026.*
