@@ -457,6 +457,8 @@ El servicio quedó desplegado en **Render**, en su capa gratuita, con la definic
 
 **Estado del despliegue.** Servicio en la nube (`Live`), documentación de la API publicada, aplicación web publicada, reglas de seguridad publicadas y comprobación de salud en `ok` con la base conectada. Queda pendiente generar el archivo instalable de Android y reunir las evidencias de los ocho requisitos mínimos.
 
+**Entrega del perfil de proyecto (E1).** El entregable se revisó por completo antes de enviarlo: se auditó el texto, las catorce tablas y las cinco figuras, se comprobó por huella digital que las figuras insertadas fueran las vigentes del proyecto y se verificó que no quedaran marcadores ni avisos de revisión en el cuerpo. El diagrama de casos de uso se rehízo en Enterprise Architect. La entrega se realizó en el **formato que exige la plataforma —PDF—** y con el nombre que indica la plantilla, `Santos_Perfil_Proyecto_v1`, **23 horas y 45 minutos antes del cierre**, con el estado «Enviado para calificar» confirmado. El documento editable y su PDF quedan versionados en `docs/` del repositorio, junto con los programas que generan las figuras y el que completa la plantilla, de modo que el entregable sea reproducible.
+
 ---
 
 ## 25. Aclaración conceptual: monolito, monolito modular y arquitectura en capas
