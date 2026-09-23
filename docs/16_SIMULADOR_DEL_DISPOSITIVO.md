@@ -117,7 +117,7 @@ en las observaciones de la tutoría.
 
 | Comprobación | Resultado |
 |---|---|
-| Conjunto de pruebas del servicio | **87 casos, todos aprobados** (3,27 s) |
+| Conjunto de pruebas del servicio | **90 casos, todos aprobados** |
 | Caso `test_lectura_fuera_de_rango_genera_una_alerta` | Una lectura del dispositivo fuera de rango genera **exactamente una** alerta, con la referencia a la lectura que la originó |
 | Caso `test_lectura_dentro_de_rango_no_genera_alerta` | Ninguna alerta cuando el valor está dentro del rango |
 

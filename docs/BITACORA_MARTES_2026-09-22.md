@@ -186,7 +186,8 @@ tutoría señaló como riesgo (observación B-4).
 **Verificación 3 — reglas del servicio.** El conjunto de pruebas automatizadas quedó en
 **87 casos aprobados** en 3,27 s, incluidos los dos que fijan la regla de la alerta: una
 lectura fuera de rango genera **exactamente una** alerta y una lectura dentro del rango
-no genera ninguna.
+no genera ninguna. *(Al cierre de la sesión, con las tres pruebas de trazabilidad del
+apartado 9, el conjunto queda en 90 casos.)*
 
 ### 8.1 Consumo de la base de datos
 
