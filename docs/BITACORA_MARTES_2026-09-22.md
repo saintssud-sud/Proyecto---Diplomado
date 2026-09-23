@@ -119,7 +119,7 @@ respaldos del entregable y de la monografía anteriores a esta corrección.
 | Grupo | Total | Atendidas | Pendientes |
 |---|---|---|---|
 | A. Redacción y consistencia | 12 | Verificación de antecedentes, fuentes con URL y fecha, datos reales en el Capítulo 1 | A-1, A-2, A-3, A-4, A-6, A-7, A-8, A-9, A-10, A-12 |
-| B. Cambios en el sistema | 5 | — | B-1 a B-5 (incluye el **simulador del dispositivo**, requisito del E2) |
+| B. Cambios en el sistema | 5 | Dispositivo simulado, reintento con memoria y consumo de la base (B-3, B-4 y B-5) | B-1 y B-2 |
 | C. Datos del autor | 4 | Mediciones por semana (21) y renovación de la solución | El número de detecciones tardías; el ámbito del módulo piloto |
 | D. Riesgos y limpieza | 5 | Clave del dispositivo rotada e historial revisado | Datos ficticios, hoja de verificación, figuras |
 
@@ -155,15 +155,69 @@ respaldos del entregable y de la monografía anteriores a esta corrección.
 
 ---
 
-## 8. Próximos pasos
+## 8. El dispositivo simulado (lo que faltaba para el E2)
+
+El entregable E2 pide la aplicación contra la API publicada con **dispositivo
+simulado**: sin ESP32 construido, el camino automático de las lecturas quedaba sin
+demostrar. Se escribió `scripts/simulador_dispositivo.py`, que **ocupa el lugar del
+dispositivo**: se autentica con la clave del módulo de adquisición (`X-Device-Key`) y
+publica lecturas por el mismo endpoint, con el mismo cuerpo y la misma validación que
+usará el firmware, de modo que el servicio no distingue una lectura simulada de una
+real. La clave se lee del `.env` y nunca se imprime.
+
+**Verificación 1 — envío normal y alerta.** Contra el servicio local en modo de
+demostración (sin escribir en la base real), un ciclo de las siete variables con el pH
+forzado a 4,3:
+
+| Comprobación | Resultado |
+|---|---|
+| Lecturas almacenadas por el servicio | **7 de 7** (201) |
+| Estado evaluado de las seis variables con rango | `dentro` |
+| Estado del pH forzado (rango 5,5 a 6,5) | **`bajo`** → genera la alerta |
+| Variable sin rango configurado (`nivel_agua`) | `sin_rango`, sin alerta inventada |
+
+**Verificación 2 — arranque en frío.** Se inició el simulador **antes** que el servicio
+y el servicio se levantó cuatro segundos después. El primer ciclo no pudo enviar y las
+lecturas **quedaron en la memoria del dispositivo**; en el ciclo siguiente se
+**recuperaron con su valor original** (pH 6,31 y EC 1,57) y el resumen cerró con cero
+lecturas sin enviar. Es el comportamiento que debe implementar el firmware y que la
+tutoría señaló como riesgo (observación B-4).
+
+**Verificación 3 — reglas del servicio.** El conjunto de pruebas automatizadas quedó en
+**87 casos aprobados** en 3,27 s, incluidos los dos que fijan la regla de la alerta: una
+lectura fuera de rango genera **exactamente una** alerta y una lectura dentro del rango
+no genera ninguna.
+
+### 8.1 Consumo de la base de datos
+
+Cada envío escribe **siete documentos** (uno por variable) más la alerta cuando
+corresponde. La capa gratuita de Cloud Firestore admite **20 000 escrituras y 50 000
+lecturas por día**, 1 GiB almacenado y 10 GiB de salida al mes
+([cuotas y límites](https://docs.cloud.google.com/firestore/quotas)).
+
+| Intervalo | Documentos por día | % de la cuota de escritura |
+|---|---|---|
+| 30 segundos | 20 160 | **101 % — la excede** |
+| 1 minuto | 10 080 | 50 % |
+| **5 minutos** | **2 016** | **10 %** |
+| 10 minutos | 1 008 | 5 % |
+
+**Decisión:** el intervalo de referencia del prototipo se fija en **cinco minutos**, que
+consume una décima parte de la cuota y deja margen para las alertas y las consultas del
+panel. El almacenamiento no es el factor limitante: unos 30 MB al mes.
+
+El detalle, el guion de la demostración y las pruebas quedaron en
+`docs/16_SIMULADOR_DEL_DISPOSITIVO.md`.
+
+---
+
+## 9. Próximos pasos
 
 | # | Tarea | Cuándo |
 |---|---|---|
-| 1 | **Simulador del dispositivo** que envía lecturas con la clave, para el flujo completo del E2 | Antes del sábado 26 |
-| 2 | Reintento y memoria en el dispositivo ante los 60 s de arranque en frío del servicio | Antes del sábado 26 |
-| 3 | Cálculo del consumo diario de Firestore y su documentación | Antes del sábado 26 |
-| 4 | Resto de las observaciones de redacción (A-1, A-2, A-3, A-6, A-7, A-8, A-9, A-10) | Durante la semana |
-| 5 | Guion de la demostración y plan de contingencia para la defensa | Antes del 13/10 |
+| 1 | Resto de las observaciones de redacción (A-1, A-2, A-3, A-6, A-7, A-8, A-9, A-10) | Durante la semana |
+| 2 | Crear módulos, perfiles y rangos reales en la base publicada y ensayar el guion del E2 | Antes del sábado 26 |
+| 3 | Guion de la demostración y plan de contingencia para la defensa | Antes del 13/10 |
 
 ---
 

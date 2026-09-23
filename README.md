@@ -78,6 +78,18 @@ El sistema cuenta además con un **servicio backend** (FastAPI sobre Python 3.13
 - Ejecución local en modo de demostración, sin credenciales: desde `backend/`, con `USAR_REPOSITORIO_EN_MEMORIA=true`, ejecutar `uvicorn app.main:app --reload`
 - Contrato navegable del servicio (OpenAPI): `http://localhost:8011/docs` en local, y el publicado en https://sigvach-api.onrender.com/docs
 - Pruebas automatizadas del backend: `python -m pytest` desde `backend/` (**87 casos**, sin credenciales ni conexión)
+- **Simulador del módulo de adquisición** (envía lecturas como lo hará el ESP32, con la clave de dispositivo):
+
+```bash
+python scripts/simulador_dispositivo.py --modulo <ID> --ciclos 1                     # un envío de las siete variables
+python scripts/simulador_dispositivo.py --modulo <ID> --ciclos 1 --fuera-de-rango ph # fuerza una alerta
+python scripts/simulador_dispositivo.py --url https://sigvach-api.onrender.com --modulo <ID> --intervalo 300
+python scripts/simulador_dispositivo.py --listar-modulos                            # qué módulos hay registrados
+```
+
+El simulador guarda en memoria las lecturas que no puede enviar y las reintenta, de modo que
+una medición no se pierde si el servicio está arrancando en frío. Detalles y consumo de la base
+de datos en [`docs/16_SIMULADOR_DEL_DISPOSITIVO.md`](docs/16_SIMULADOR_DEL_DISPOSITIVO.md).
 - Apuntar la aplicación al backend, sin editar el código:
 
 ```bash
@@ -226,7 +238,7 @@ flutter build apk --release
 
 ## 11. Limitaciones conocidas
 
-- El **módulo de adquisición físico** (ESP32) no está conectado de forma permanente: las lecturas se registran desde el dispositivo cuando se lo conecta, o de forma manual con instrumentos portátiles. El servicio admite ambos orígenes y los distingue.
+- El **módulo de adquisición físico** (ESP32) no está construido —su modelo está por definir—, de modo que las lecturas automáticas se generan con el **simulador del dispositivo** (`scripts/simulador_dispositivo.py`), que entra por el mismo endpoint y con la misma clave que usará el firmware. Las lecturas manuales se registran con instrumentos portátiles. El servicio distingue ambos orígenes.
 - La **capa gratuita** de la plataforma de alojamiento suspende el servicio por inactividad: la primera petición posterior puede demorar hasta **cincuenta segundos o más**, demora que el requisito no funcional RNF-05 admite de forma explícita.
 - El archivo instalable se firma con la **clave de depuración**; una firma propia queda pendiente para su distribución fuera del ámbito académico.
 - La aplicación está pensada para **Android y web**; el escritorio no forma parte del alcance.
