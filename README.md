@@ -8,35 +8,46 @@
 
 ## 1. Nombre y descripción del proyecto
 
-**SIGVACH** es una aplicación móvil desarrollada con **Flutter** que permite monitorear y gestionar las principales variables de un cultivo hidropónico: **temperatura, humedad, pH, TDS (conductividad) y nivel de agua**.
+**SIGVACH** es una aplicación desarrollada con **Flutter** —para Android y web— que permite monitorear y gestionar las **siete variables** de un cultivo hidropónico: **pH, sólidos disueltos totales, conductividad eléctrica, temperatura de la solución, temperatura ambiental, humedad relativa y nivel de agua**. Las mediciones se evalúan contra los **rangos de referencia del cultivo** que se siembra en cada módulo, y el sistema genera una alerta cuando un valor sale de rango.
 
 Se compone de dos piezas: la **aplicación Flutter** y el **servicio backend** que expone la API y concentra la validación, la autorización y las reglas de negocio (apartado 5).
 
-Forma parte de una **práctica de aula acumulativa** en la que se integran conceptos como asincronía, consumo de API REST, GPS, mapas, persistencia local y autenticación con **Firebase** (Authentication + Cloud Firestore).
+Se desarrolla como **trabajo final del Módulo 4** del Diplomado en Desarrollo Web y Aplicaciones Móviles (UAJMS), e integra autenticación con **Firebase** (Authentication + Cloud Firestore), consumo de un servicio propio con **API REST**, y su publicación en la nube.
 
-> Este proyecto **no es otro proyecto distinto**: es el mismo sistema que crece sesión a sesión (Sesión 1 → Sesión 2 → Proyecto Final 360).
+**El sistema está publicado y en funcionamiento:**
+
+| Componente | Dirección |
+|---|---|
+| Aplicación web | https://sigvach26-bd.web.app |
+| Servicio (API) | https://sigvach-api.onrender.com |
+| Documentación interactiva de la API | https://sigvach-api.onrender.com/docs |
+
+El **archivo instalable de Android** se compila apuntando al servicio publicado, de modo que la aplicación funciona desde cualquier red, sin depender del equipo del autor. El repositorio conserva además el histórico del proyecto de aula del que proviene: el mismo sistema, que fue creciendo sesión a sesión.
 
 ## 2. Problema u objetivo
 
 **Problema:** en un cultivo hidropónico, mantener las variables dentro de sus rangos óptimos es crítico para la salud de las plantas, pero hacerlo de forma manual es lento y propenso a errores, y es difícil detectar a tiempo cuándo una variable sale de rango.
 
-**Objetivo:** ofrecer una aplicación que centralice el registro, el monitoreo y las alertas de las variables de los cultivos, además de servir como proyecto de aprendizaje para aplicar Flutter, asincronía, API REST, GPS, mapas y Firebase.
+**Objetivo:** centralizar el registro, el monitoreo y las alertas de las variables de un módulo de cultivo hidropónico piloto, de modo que la información medida conserve su valor: que permita observar la evolución de cada variable, compararla contra el rango de referencia del cultivo y avisar cuando un valor sale de rango.
 
 ## 3. Funcionalidades implementadas
 
 | Módulo | Funcionalidad |
 |---|---|
+| Módulo | Funcionalidad |
+|---|---|
 | Presentación | Splash con logo, nombre del sistema y animación de aparición. |
-| Autenticación | Registro e inicio de sesión con **Firebase Authentication** (correo + contraseña); el perfil del usuario (nombres, apellidos, teléfono, cargo, rol) se guarda en **Cloud Firestore**. |
-| Dashboard (Inicio) | Métricas de temperatura, humedad, pH, TDS y nivel de agua; banner de estado y última actualización. |
-| Variables | Lista con estado Normal/Fuera de rango; detalle y edición del rango óptimo (mín/máx/unidad). |
-| Cultivos | Listar, agregar, ver detalle, ver variables por cultivo y eliminar cultivos. |
-| Alertas | Pestañas Activas/Historial; alertas automáticas cuando una variable sale de su rango óptimo; marcar como resuelta. |
-| Historial | Rango de fechas, gráfica histórica (CustomPaint) con promedio/máx/mín y lista de mediciones. |
+| Autenticación | Registro e inicio de sesión con **Firebase Authentication** (correo + contraseña); el perfil del usuario (nombres, apellidos, teléfono, cargo, rol) se guarda en **Cloud Firestore** y se consulta a través del servicio. |
+| Inicio (panel) | Las **siete variables** del módulo vigente, con su último valor, su rango de referencia y su estado; aviso de alertas activas, selector de módulo y registro de mediciones manuales. |
+| Variables | Detalle de las siete variables del módulo, contra los rangos del cultivo que se siembra en él. |
+| Módulo | Alta, edición, activación y baja de los módulos de cultivo; cada uno se asocia a un cultivo y a una ubicación. |
+| Cultivos | Catálogo de especies con sus **rangos de referencia** (lechuga, acelga, apio u otra hortaliza): alta, edición de rangos y baja. |
+| Alertas | Pestañas Activas/Historial **del módulo vigente**; las genera el **servicio** cuando una lectura sale del rango del cultivo; se marcan como atendidas. |
+| Historial | Consulta al servicio por variable y período, con promedio, máximo y mínimo calculados por el servicio, gráfica y listado. |
 | Contexto | GPS + clima (API Open-Meteo) y registro de un snapshot de contexto. |
 | Usuarios (admin) | Panel de gestión de usuarios: listar, editar datos, cambiar rol, activar/desactivar y eliminar. Visible solo para el rol `admin`. |
-| Ajustes | Perfil (nombre/cargo), tema claro/oscuro, opciones y rangos de variables. |
-| Persistencia | Datos locales con SharedPreferences (dashboard, cultivos, alertas, mediciones, perfil, rangos). |
+| Ajustes | Perfil, tema claro/oscuro y acceso al catálogo de cultivos y a los rangos de referencia. |
+| Servicio propio | Todo el dominio —módulos, cultivos, rangos, lecturas y alertas— se gestiona a través de la **API REST** del servicio, que valida, autoriza por rol y es el único componente que accede a la base de datos. |
 
 ## 4. Tecnologías utilizadas
 
@@ -47,7 +58,7 @@ Forma parte de una **práctica de aula acumulativa** en la que se integran conce
 | Firebase Authentication | Registro e inicio de sesión (correo/contraseña). |
 | Cloud Firestore | Base de datos NoSQL (perfiles de usuario en `usuarios/{uid}`). |
 | FastAPI sobre Python 3.13 | Backend del sistema: expone el contrato de la API, valida los datos, autoriza por rol y aplica las reglas de negocio. |
-| SharedPreferences | Persistencia local en el dispositivo. |
+| SharedPreferences | Preferencias de la aplicación (tema, opciones). Los datos del dominio **no** se guardan en el dispositivo: viven en la nube y se consultan por la API. |
 | HTTP + Open-Meteo | Consumo de API REST para el clima. |
 | flutter_launcher_icons | Generación de iconos de la app. |
 
@@ -65,8 +76,8 @@ El sistema cuenta además con un **servicio backend** (FastAPI sobre Python 3.13
 
 - Código y documentación del servicio: [`backend/README.md`](backend/README.md)
 - Ejecución local en modo de demostración, sin credenciales: desde `backend/`, con `USAR_REPOSITORIO_EN_MEMORIA=true`, ejecutar `uvicorn app.main:app --reload`
-- Contrato navegable del servicio (OpenAPI): `http://localhost:8000/docs`
-- Pruebas automatizadas del backend: `python -m pytest` desde `backend/` (54 casos, sin credenciales ni conexión)
+- Contrato navegable del servicio (OpenAPI): `http://localhost:8011/docs` en local, y el publicado en https://sigvach-api.onrender.com/docs
+- Pruebas automatizadas del backend: `python -m pytest` desde `backend/` (**87 casos**, sin credenciales ni conexión)
 - Apuntar la aplicación al backend, sin editar el código:
 
 ```bash
@@ -94,19 +105,45 @@ Si no se define `API_BASE_URL`, la aplicación usa una dirección local adecuada
 
 ### Windows
 
-1. Extrae el proyecto en una ruta corta, por ejemplo: `C:\flutter_aula\PROYECTO_FINAL_360_SESION2_FINAL`
-2. Ejecuta `scripts\00_PREPARAR_WINDOWS.bat`
-3. Luego `scripts\02_MENU_WINDOWS.bat`
-4. Elige Android o Chrome.
+1. Clona o descarga el repositorio en una ruta corta, por ejemplo `C:\SIGVACH`.
+2. Instala las dependencias, desde la raíz del proyecto:
 
-> Windows Desktop **no** es requisito para esta clase.
+```powershell
+flutter pub get
+```
+
+3. Ejecuta la aplicación. Hay dos formas:
+
+```powershell
+# Menú del proyecto (permite elegir dispositivo o Chrome)
+scripts\01_MENU_WINDOWS.bat
+
+# O directamente
+flutter run                  # dispositivo Android conectado
+flutter run -d chrome        # navegador
+```
+
+4. Para comprobar el entorno y ejecutar las verificaciones, existe un diagnóstico:
+
+```powershell
+scripts\99_DIAGNOSTICO_WINDOWS.bat
+```
+
+> ⚠️ La aplicación necesita **Firebase configurado** (`lib/firebase_options.dart` y
+> `android/app/google-services.json`), que no se publican en el repositorio: se
+> generan con `flutterfire configure` (sección 6).
 
 ### Linux (MX)
 
-1. Extrae el proyecto dentro de tu HOME.
-2. `chmod +x scripts/*.sh`
-3. `./scripts/00_PREPARAR_LINUX.sh`
-4. `./scripts/01_MENU_LINUX.sh`
+1. Clona el proyecto dentro de tu carpeta personal.
+2. Instala las dependencias y ejecuta:
+
+```bash
+flutter pub get
+flutter run -d chrome
+```
+
+> La guía detallada para Linux está en [`docs/02_LINUX_MX_SIN_DOLOR.md`](docs/02_LINUX_MX_SIN_DOLOR.md).
 5. Si aparece error de Ninja: `./scripts/98_REPARAR_NINJA_LINUX.sh`
 
 ### Configuración de Firebase
@@ -182,18 +219,19 @@ flutter build apk --release
 ## 10. Versión entregada
 
 - **Versión:** `1.0.0+1` (definida en `pubspec.yaml`).
-- **Sesión / etapa:** Sesión 2 — Proyecto Final SIGVACH.
-- **Plataforma objetivo:** Android (y web para pruebas).
+- **Etapa:** trabajo final del Módulo 4 del Diplomado en Desarrollo Web y Aplicaciones Móviles (UAJMS).
+- **Plataforma objetivo:** Android (archivo instalable) y web publicada.
+- **Estado:** desplegado y en funcionamiento — aplicación web, servicio y base de datos en la nube.
 
 ## 11. Limitaciones conocidas
 
-- Los valores del dashboard se editan manualmente; **aún no** están conectados a sensores reales.
-- La gráfica del historial simula el filtro por periodo (3/6/12 meses) con `take()`.
-- La casilla "Recordarme" del login aún no guarda las credenciales en preferencias.
-- La gestión de datos del dominio a través de la API todavía no está integrada en la aplicación: el servicio de API está implementado y probado (54 casos) y la aplicación ya cuenta con su cliente de API y sus pruebas (16 casos), pero falta conectar las pantallas y los repositorios, de modo que los módulos de cultivos, lecturas, alertas y rangos siguen persistiendo en el dispositivo (`SharedPreferences`).
-- Está pensado para Android/web; Windows Desktop no es requisito de la clase.
+- El **módulo de adquisición físico** (ESP32) no está conectado de forma permanente: las lecturas se registran desde el dispositivo cuando se lo conecta, o de forma manual con instrumentos portátiles. El servicio admite ambos orígenes y los distingue.
+- La **capa gratuita** de la plataforma de alojamiento suspende el servicio por inactividad: la primera petición posterior puede demorar hasta **cincuenta segundos o más**, demora que el requisito no funcional RNF-05 admite de forma explícita.
+- El archivo instalable se firma con la **clave de depuración**; una firma propia queda pendiente para su distribución fuera del ámbito académico.
+- La aplicación está pensada para **Android y web**; el escritorio no forma parte del alcance.
 - La confirmación por correo del registro depende de la configuración de Firebase Authentication.
 - **Eliminar** un usuario desde el panel borra su perfil de Firestore, pero **no** su cuenta de Authentication (requeriría Cloud Functions).
+- Un **cultivo sin rangos definidos** no permite evaluar sus lecturas: mientras no se le definan, no se generan alertas. La pantalla de rangos lo advierte de forma explícita.
 
 ## 12. Autor del proyecto
 
