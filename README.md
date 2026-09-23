@@ -81,9 +81,10 @@ El sistema cuenta además con un **servicio backend** (FastAPI sobre Python 3.13
 - Apuntar la aplicación al backend, sin editar el código:
 
 ```bash
-flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000        # emulador de Android
-flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:8000
-flutter build web --dart-define=API_BASE_URL=https://TU-API.onrender.com
+flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8011        # emulador de Android
+flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:8011
+flutter build web --dart-define=API_BASE_URL=https://sigvach-api.onrender.com
+flutter build apk --release --dart-define=API_BASE_URL=https://sigvach-api.onrender.com
 ```
 
 Si no se define `API_BASE_URL`, la aplicación usa una dirección local adecuada al dispositivo
