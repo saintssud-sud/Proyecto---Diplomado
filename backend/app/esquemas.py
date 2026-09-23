@@ -328,11 +328,14 @@ class ResumenVariable(_BaseSalida):
 
 
 class UsuarioPerfilSalida(_BaseSalida):
-    """Perfil del usuario que realiza la petición.
+    """Perfil de una cuenta del sistema.
 
     El identificador es el **uid** de Firebase Authentication: es el mismo valor
     con el que el servicio resuelve la autorización, de modo que la aplicación no
     necesita guardar por su cuenta la correspondencia entre la sesión y el perfil.
+
+    Se usa tanto para el perfil propio —lo que devuelven `/usuarios/perfil`— como
+    para las cuentas que consulta la administración.
     """
 
     id: str
@@ -342,3 +345,20 @@ class UsuarioPerfilSalida(_BaseSalida):
     activo: bool = True
     telefono: str | None = None
     cargo: str | None = None
+
+
+class UsuarioAdministracionActualizacion(_BaseEntrada):
+    """Cambios que la administración puede aplicar al perfil de una cuenta.
+
+    Incluye el rol y el estado de activación, que **no** forman parte del esquema
+    del perfil propio. Son dos esquemas distintos y no uno con campos opcionales
+    para que el contrato impida por sí mismo la elevación de privilegios: quien
+    quiera modificar su rol tiene que pasar por la operación de administración,
+    que exige el rol correspondiente.
+    """
+
+    nombre: str | None = Field(default=None, min_length=2, max_length=60)
+    telefono: str | None = Field(default=None, max_length=30)
+    cargo: str | None = Field(default=None, max_length=60)
+    rol: str | None = Field(default=None, min_length=2, max_length=20)
+    activo: bool | None = None

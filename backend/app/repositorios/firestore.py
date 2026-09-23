@@ -273,6 +273,11 @@ class RepositorioFirestore:
         """Lee el perfil del usuario (con su rol) creado por la aplicación."""
         return self._documento(self._coleccion(COLECCION_USUARIOS).document(uid).get())
 
+    def listar_perfiles_usuario(self) -> list[dict[str, Any]]:
+        """Lista las cuentas ordenadas por correo, que es como las muestra el panel."""
+        consulta = self._coleccion(COLECCION_USUARIOS).order_by("email")
+        return [self._documento(instantanea) for instantanea in consulta.stream()]  # type: ignore[misc]
+
     def actualizar_perfil_usuario(
         self, uid: str, cambios: dict[str, Any]
     ) -> dict[str, Any] | None:
@@ -287,6 +292,19 @@ class RepositorioFirestore:
             return None
         referencia.update(cambios)
         return self.obtener_perfil_usuario(uid)
+
+    def eliminar_perfil_usuario(self, uid: str) -> bool:
+        """Elimina el perfil del usuario; devuelve False si no existe.
+
+        Se elimina el **perfil** de la base de datos, no la cuenta de Firebase
+        Authentication: dar de baja la credencial exige el SDK de administración
+        de Authentication y queda como limitación declarada del prototipo.
+        """
+        referencia = self._coleccion(COLECCION_USUARIOS).document(uid)
+        if not referencia.get().exists:
+            return False
+        referencia.delete()
+        return True
 
     # --- Diagnóstico --------------------------------------------------------
     def verificar_conexion(self) -> bool:

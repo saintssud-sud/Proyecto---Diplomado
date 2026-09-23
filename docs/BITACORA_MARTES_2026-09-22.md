@@ -119,7 +119,7 @@ respaldos del entregable y de la monografía anteriores a esta corrección.
 | Grupo | Total | Atendidas | Pendientes |
 |---|---|---|---|
 | A. Redacción y consistencia | 12 | Verificación de antecedentes, fuentes con URL y fecha, datos reales en el Capítulo 1, coherencia MoSCoW, métricas de los RNF, diccionario del entregable, versiones y plataforma de despliegue, contrato con las rutas de perfiles (A-1, A-2, A-3, A-5, A-6, A-7, A-8, A-9 y A-10) | A-4 (requiere el dato del autor), A-11 y A-12 |
-| B. Cambios en el sistema | 5 | Dispositivo simulado, reintento con memoria, consumo de la base (B-3, B-4 y B-5) y trazabilidad de quién registró la lectura (B-2) | B-1 (operaciones de administración de usuarios en el servicio) |
+| B. Cambios en el sistema | 5 | Las cinco: dispositivo simulado, reintento con memoria, consumo de la base (B-3, B-4 y B-5), trazabilidad de quién registró la lectura (B-2) y administración de cuentas en el servicio (B-1) | — |
 | C. Datos del autor | 4 | Mediciones por semana (21) y renovación de la solución | El número de detecciones tardías; el ámbito del módulo piloto |
 | D. Riesgos y limpieza | 5 | Clave del dispositivo rotada e historial revisado | Datos ficticios, hoja de verificación, figuras |
 
@@ -223,7 +223,7 @@ coherencia interna del documento. Cada una obligó a **decidir**, no solo a reda
 | **A-2** | «Correo» y «Excel/PDF» figuraban como «Could» en una tabla de capacidades fuera de alcance | Se declaran **capacidades diferidas** (trabajo futuro) y el título de la tabla distingue unas de otras: tres excluidas y dos diferidas |
 | **A-3** | RF-04 era «Could», pero RF-09 y el diccionario dependen de él | El catálogo de las siete variables se declara **dato inicial del sistema** —vive en la definición del servicio y se carga con los datos de demostración—, de modo que RF-04 pasa a «Should» y nada depende de un requisito diferido |
 | **A-6** | El apartado 2.4.1 justificaba el patrón con el RNF-07, que decía otra cosa | El RNF-07 se alinea con lo que efectivamente justifica: contrato versionado, formato único de error y módulos con responsabilidades separadas |
-| **A-7** | RNF-02, RNF-07 y RNF-08 tenían método de inspección, no métrica | Los tres pasan a tener **métrica verificable**: cero credenciales en el repositorio y su historial, 100 % de respuestas 401 y 403 donde corresponde, cinco colecciones cerradas al cliente anónimo, 28 operaciones en el contrato y 100 % de lecturas con origen, autor y marca de tiempo |
+| **A-7** | RNF-02, RNF-07 y RNF-08 tenían método de inspección, no métrica | Los tres pasan a tener **métrica verificable**: cero credenciales en el repositorio y su historial, 100 % de respuestas 401 y 403 donde corresponde, cinco colecciones cerradas al cliente anónimo, 32 operaciones en el contrato y 100 % de lecturas con origen, autor y marca de tiempo |
 | **A-8** | El entregable solo detallaba la colección `lecturas` | Se describen las demás colecciones del modelo documental con sus campos: `modulos_cultivo`, `perfiles_cultivo`, `rangos`, `alertas` y `usuarios` |
 | **A-9** | Faltaban las versiones del servicio y el despliegue decía «previsto» | Se consignan **FastAPI 0.141.1, uvicorn 0.52.4 y firebase-admin 7.5.0** sobre Python 3.13, y se nombra **Render en capa gratuita** y Firebase Hosting, que son las plataformas en uso |
 | **A-10** | El contrato del entregable no incluía las rutas de perfiles | Se agrega la fila de `/api/v1/perfiles` y se reproduce el contrato real de la versión 1 |
@@ -243,13 +243,48 @@ El detalle de cada cambio, con los archivos regenerados, está en el plan de acc
 
 ---
 
-## 10. Próximos pasos
+## 10. Las cuentas se administran desde el servicio (B-1)
+
+El requisito funcional RF-02 pedía gestionar las cuentas y sus roles, y el servicio
+solo exponía el perfil propio: el panel de usuarios escribía **directamente en la base
+de datos**. Se agregaron cuatro operaciones, todas con autorización de administrador:
+
+| Operación | Para qué |
+|---|---|
+| `GET /api/v1/usuarios` | Lista las cuentas con su rol y su estado |
+| `GET /api/v1/usuarios/{uid}` | Consulta una cuenta |
+| `PATCH /api/v1/usuarios/{uid}` | Modifica sus datos, cambia su rol, la activa o la desactiva |
+| `DELETE /api/v1/usuarios/{uid}` | Elimina el perfil de la cuenta |
+
+**Dos protecciones deliberadas.** No se acepta un rol que el servicio no reconozca
+—dejaría una cuenta con un rol que no resuelve ninguna atribución— y la administración
+**no puede quitarse a sí misma** el rol, desactivar su cuenta ni eliminarla: sin esa
+comprobación, un descuido dejaría el sistema sin nadie que pueda administrarlo. La
+separación entre el perfil propio y la administración de las cuentas se resolvió con
+**dos esquemas de entrada distintos**, de modo que sea el contrato —y no solo la
+interfaz— el que impida la elevación de privilegios.
+
+**Verificación.** Dieciséis pruebas nuevas cubren el listado, la consulta, el cambio de
+rol, la desactivación —incluida su consecuencia: la cuenta desactivada deja de operar,
+porque la autorización se resuelve contra el perfil almacenado en cada petición—, el
+rechazo del rol inexistente y las tres protecciones. El contrato pasa de **28 a 32
+operaciones** y el conjunto del servicio queda en **106 casos aprobados**.
+
+**Lo que queda de este punto.** El panel de usuarios puede migrar a estas operaciones
+—hoy sigue escribiendo en la base, que las reglas de seguridad permiten solo para la
+colección `usuarios`—; esa migración se deja para después del E2, cuando la migración
+no compita con la demostración del sábado. Hecha la migración, las reglas podrían
+cerrar también esa colección al cliente.
+
+---
+
+## 11. Próximos pasos
 
 | # | Tarea | Cuándo |
 |---|---|---|
 | 1 | Crear módulos, perfiles y rangos reales en la base publicada y ensayar el guion del E2 | Antes del sábado 26 |
-| 2 | Implementar en el servicio las operaciones de administración de usuarios (RF-02 y B-1) | Antes del sábado 26 |
-| 3 | Cerrar A-4 (ámbito del módulo piloto), A-11 y A-12 con el tutor | Durante la semana |
+| 2 | Cerrar A-4 (ámbito del módulo piloto), A-11 y A-12 con el tutor | Durante la semana |
+| 3 | Migrar el panel de usuarios a las operaciones del servicio y cerrar la colección en las reglas | Después del E2 |
 | 4 | Guion de la demostración y plan de contingencia para la defensa | Antes del 13/10 |
 
 ---

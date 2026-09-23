@@ -205,6 +205,12 @@ class RepositorioMemoria:
         documento = self._datos["usuarios"].get(uid)
         return dict(documento) if documento else None
 
+    def listar_perfiles_usuario(self) -> list[dict[str, Any]]:
+        """Lista las cuentas ordenadas por correo, que es como las muestra el panel."""
+        with self._cerrojo:
+            documentos = [dict(documento) for documento in self._datos["usuarios"].values()]
+        return sorted(documentos, key=lambda documento: str(documento.get("email") or ""))
+
     def actualizar_perfil_usuario(
         self, uid: str, cambios: dict[str, Any]
     ) -> dict[str, Any] | None:
@@ -215,6 +221,11 @@ class RepositorioMemoria:
                 return None
             documento.update(cambios)
             return dict(documento)
+
+    def eliminar_perfil_usuario(self, uid: str) -> bool:
+        """Elimina el perfil; devuelve False si no existe."""
+        with self._cerrojo:
+            return self._datos["usuarios"].pop(uid, None) is not None
 
     # --- Diagnóstico --------------------------------------------------------
     def verificar_conexion(self) -> bool:

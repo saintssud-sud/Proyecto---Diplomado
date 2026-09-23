@@ -122,7 +122,7 @@ presentación, lógica de negocio y datos.
 
 **API (Interfaz de Programación de Aplicaciones)** — El conjunto de operaciones que
 un servicio ofrece a otros programas.
-*En el proyecto:* tu API tiene **28 operaciones**, todas bajo `/api/v1`.
+*En el proyecto:* tu API tiene **32 operaciones**, todas bajo `/api/v1`.
 
 **REST** — Estilo de API que usa direcciones (URL) y verbos HTTP (GET, POST,
 PATCH, DELETE).
