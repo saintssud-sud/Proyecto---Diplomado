@@ -118,8 +118,8 @@ respaldos del entregable y de la monografía anteriores a esta corrección.
 
 | Grupo | Total | Atendidas | Pendientes |
 |---|---|---|---|
-| A. Redacción y consistencia | 12 | Verificación de antecedentes, fuentes con URL y fecha, datos reales en el Capítulo 1 | A-1, A-2, A-3, A-4, A-6, A-7, A-8, A-9, A-10, A-12 |
-| B. Cambios en el sistema | 5 | Dispositivo simulado, reintento con memoria y consumo de la base (B-3, B-4 y B-5) | B-1 y B-2 |
+| A. Redacción y consistencia | 12 | Verificación de antecedentes, fuentes con URL y fecha, datos reales en el Capítulo 1, coherencia MoSCoW, métricas de los RNF, diccionario del entregable, versiones y plataforma de despliegue, contrato con las rutas de perfiles (A-1, A-2, A-3, A-5, A-6, A-7, A-8, A-9 y A-10) | A-4 (requiere el dato del autor), A-11 y A-12 |
+| B. Cambios en el sistema | 5 | Dispositivo simulado, reintento con memoria, consumo de la base (B-3, B-4 y B-5) y trazabilidad de quién registró la lectura (B-2) | B-1 (operaciones de administración de usuarios en el servicio) |
 | C. Datos del autor | 4 | Mediciones por semana (21) y renovación de la solución | El número de detecciones tardías; el ámbito del módulo piloto |
 | D. Riesgos y limpieza | 5 | Clave del dispositivo rotada e historial revisado | Datos ficticios, hoja de verificación, figuras |
 
@@ -211,13 +211,45 @@ El detalle, el guion de la demostración y las pruebas quedaron en
 
 ---
 
-## 9. Próximos pasos
+## 9. Observaciones de redacción atendidas
+
+Además de la verificación de los antecedentes, se resolvieron las observaciones de
+coherencia interna del documento. Cada una obligó a **decidir**, no solo a redactar:
+
+| # | Observación de la tutoría | Decisión tomada |
+|---|---|---|
+| **A-1** | El contexto de ubicación y clima (Open-Meteo y geolocator) no responde a ningún requisito | Se declara **fuera del alcance evaluado**: se conserva como funcionalidad complementaria del proyecto acumulativo, sin requisito ni criterio de aceptación, y se retira de la categoría «Could» |
+| **A-2** | «Correo» y «Excel/PDF» figuraban como «Could» en una tabla de capacidades fuera de alcance | Se declaran **capacidades diferidas** (trabajo futuro) y el título de la tabla distingue unas de otras: tres excluidas y dos diferidas |
+| **A-3** | RF-04 era «Could», pero RF-09 y el diccionario dependen de él | El catálogo de las siete variables se declara **dato inicial del sistema** —vive en la definición del servicio y se carga con los datos de demostración—, de modo que RF-04 pasa a «Should» y nada depende de un requisito diferido |
+| **A-6** | El apartado 2.4.1 justificaba el patrón con el RNF-07, que decía otra cosa | El RNF-07 se alinea con lo que efectivamente justifica: contrato versionado, formato único de error y módulos con responsabilidades separadas |
+| **A-7** | RNF-02, RNF-07 y RNF-08 tenían método de inspección, no métrica | Los tres pasan a tener **métrica verificable**: cero credenciales en el repositorio y su historial, 100 % de respuestas 401 y 403 donde corresponde, cinco colecciones cerradas al cliente anónimo, 28 operaciones en el contrato y 100 % de lecturas con origen, autor y marca de tiempo |
+| **A-8** | El entregable solo detallaba la colección `lecturas` | Se describen las demás colecciones del modelo documental con sus campos: `modulos_cultivo`, `perfiles_cultivo`, `rangos`, `alertas` y `usuarios` |
+| **A-9** | Faltaban las versiones del servicio y el despliegue decía «previsto» | Se consignan **FastAPI 0.141.1, uvicorn 0.52.4 y firebase-admin 7.5.0** sobre Python 3.13, y se nombra **Render en capa gratuita** y Firebase Hosting, que son las plataformas en uso |
+| **A-10** | El contrato del entregable no incluía las rutas de perfiles | Se agrega la fila de `/api/v1/perfiles` y se reproduce el contrato real de la versión 1 |
+
+**Trazabilidad de quién registró la lectura (B-2).** El RNF-08 pedía conservar el
+dispositivo o el usuario que registró cada lectura, y el modelo solo guardaba el
+origen. Se incorporó el campo `registrado_por`, que **resuelve el servidor**: en el
+registro manual guarda el identificador del usuario de la sesión y en el envío del
+módulo de adquisición queda nulo, porque la lectura ya está identificada por su módulo
+y su origen automático. El contrato rechaza que el cliente declare ese campo, de modo
+que nadie puede atribuir una medición a otra persona. La decisión se acompaña de
+**tres pruebas nuevas**: el conjunto del servicio queda en **90 casos aprobados**.
+
+El detalle de cada cambio, con los archivos regenerados, está en el plan de acción
+(`Recomendaciones E1 - plan de accion.md`) y en el informe de verificación
+(`docs/15_VERIFICACION_DE_LOS_ANTECEDENTES.md`).
+
+---
+
+## 10. Próximos pasos
 
 | # | Tarea | Cuándo |
 |---|---|---|
-| 1 | Resto de las observaciones de redacción (A-1, A-2, A-3, A-6, A-7, A-8, A-9, A-10) | Durante la semana |
-| 2 | Crear módulos, perfiles y rangos reales en la base publicada y ensayar el guion del E2 | Antes del sábado 26 |
-| 3 | Guion de la demostración y plan de contingencia para la defensa | Antes del 13/10 |
+| 1 | Crear módulos, perfiles y rangos reales en la base publicada y ensayar el guion del E2 | Antes del sábado 26 |
+| 2 | Implementar en el servicio las operaciones de administración de usuarios (RF-02 y B-1) | Antes del sábado 26 |
+| 3 | Cerrar A-4 (ámbito del módulo piloto), A-11 y A-12 con el tutor | Durante la semana |
+| 4 | Guion de la demostración y plan de contingencia para la defensa | Antes del 13/10 |
 
 ---
 

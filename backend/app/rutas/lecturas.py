@@ -65,11 +65,18 @@ def registrar_desde_dispositivo(
 )
 def registrar_manualmente(
     entrada: LecturaManualEntrada,
-    _: UsuarioAutenticado = Depends(requiere_operacion),
+    usuario: UsuarioAutenticado = Depends(requiere_operacion),
     repositorio: RepositorioDatos = Depends(obtener_repositorio),
 ) -> dict:
-    """Registra una lectura manual: el origen lo fija el servidor, no el cliente."""
-    return lecturas.registrar(repositorio, entrada, origen="manual")
+    """Registra una lectura manual: el origen y el autor los fija el servidor.
+
+    El autor no se toma del cuerpo de la petición —el contrato rechaza cualquier
+    campo no previsto—, sino de la identidad ya verificada de la sesión, de modo
+    que nadie pueda atribuir una medición a otra persona.
+    """
+    return lecturas.registrar(
+        repositorio, entrada, origen="manual", registrado_por=usuario.uid
+    )
 
 
 @enrutador.get(

@@ -1,6 +1,6 @@
 """Pruebas del contrato de lecturas: recepción, evaluación, alertas y consulta."""
 
-from .conftest import CLAVE_DISPOSITIVO, cabecera_dispositivo
+from .conftest import CLAVE_DISPOSITIVO, UID_OPERADOR, cabecera_dispositivo
 
 
 def _lectura(entorno, valor: float, variable: str = "ph") -> dict:
@@ -125,6 +125,41 @@ def test_registro_manual_queda_con_origen_manual(cliente_operador, entorno):
     )
     assert respuesta.status_code == 201
     assert respuesta.json()["origen"] == "manual"
+
+
+# ---------------------------------------------------------------------------
+# Trazabilidad de quién registró la lectura (RNF-08)
+# ---------------------------------------------------------------------------
+
+
+def test_la_lectura_manual_conserva_al_usuario_que_la_registro(cliente_operador, entorno):
+    respuesta = cliente_operador.post(
+        "/api/v1/lecturas/manual",
+        json=_lectura(entorno, 6.3),
+    )
+    assert respuesta.status_code == 201
+    # El autor lo resuelve el servidor a partir de la sesión, no el cliente.
+    assert respuesta.json()["registrado_por"] == UID_OPERADOR
+
+
+def test_la_lectura_del_dispositivo_no_se_atribuye_a_un_usuario(cliente_publico, entorno):
+    respuesta = cliente_publico.post(
+        "/api/v1/lecturas", json=_lectura(entorno, 6.1), headers=cabecera_dispositivo()
+    )
+    assert respuesta.status_code == 201
+    # Queda identificada por su módulo y su origen automático, sin usuario.
+    assert respuesta.json()["registrado_por"] is None
+    assert respuesta.json()["origen"] == "automatico"
+
+
+def test_el_cliente_no_puede_declarar_quien_registro_la_lectura(cliente_publico, entorno):
+    cuerpo = _lectura(entorno, 6.1)
+    cuerpo["registrado_por"] = "u-otro"
+    respuesta = cliente_publico.post(
+        "/api/v1/lecturas", json=cuerpo, headers=cabecera_dispositivo()
+    )
+    # El contrato rechaza los campos no previstos: la atribución no se falsifica.
+    assert respuesta.status_code == 422
 
 
 def test_consulta_filtrada_por_variable(cliente_publico, cliente_operador, entorno):

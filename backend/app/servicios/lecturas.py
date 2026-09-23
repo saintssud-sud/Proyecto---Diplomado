@@ -38,11 +38,19 @@ def registrar(
     repositorio: RepositorioDatos,
     entrada: LecturaEntrada | LecturaManualEntrada,
     origen: str,
+    registrado_por: str | None = None,
 ) -> dict[str, Any]:
     """Registra una lectura y, si sale del rango vigente, genera su alerta.
 
     Devuelve el documento de la lectura almacenada, con el estado que se le
     asignó al evaluarla contra el rango del perfil del módulo.
+
+    `registrado_por` es la trazabilidad de quién registró la lectura y **la
+    resuelve siempre el servidor**: en el registro manual, el identificador del
+    usuario de la sesión; en el envío del módulo de adquisición no se atribuye a
+    una persona, porque la lectura queda identificada por su módulo y su origen
+    automático. El cliente no puede declarar este campo: el contrato rechaza los
+    campos no previstos.
     """
     modulo = _modulo_verificado(repositorio, entrada.modulo_id)
     definicion = CATALOGO_VARIABLES[entrada.variable]
@@ -65,6 +73,8 @@ def registrar(
         # La unidad no se toma del cliente: se hereda del catálogo.
         "unidad": definicion.unidad,
         "origen": origen,
+        # Trazabilidad de quién registró la lectura (nula en el envío automático).
+        "registrado_por": registrado_por,
         "observacion": entrada.observacion,
         "timestamp": entrada.timestamp or datetime.now(timezone.utc),
         "estado_rango": estado,

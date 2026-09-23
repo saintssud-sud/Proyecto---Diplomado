@@ -257,6 +257,10 @@ class LecturaSalida(_BaseSalida):
     valor: float
     unidad: str
     origen: str
+    # Identificador del usuario que registró la lectura; nulo cuando la envió el
+    # módulo de adquisición, porque entonces la lectura queda identificada por su
+    # módulo y su origen automático.
+    registrado_por: str | None = None
     timestamp: datetime
     estado_rango: str | None = None
     # La observación se registra con la medición manual y forma parte de su
