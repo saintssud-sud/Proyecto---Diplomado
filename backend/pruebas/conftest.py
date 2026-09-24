@@ -65,15 +65,15 @@ def entorno() -> Entorno:
     )
     repositorio.registrar_perfil_usuario(
         UID_ADMINISTRADOR,
-        {"email": "admin@sigvach.com", "rol": "admin", "activo": True, "nombre": "Administrador"},
+        {"email": "admin@sigvach.com", "rol": "administrador", "activo": True, "nombre": "Administrador"},
     )
     repositorio.registrar_perfil_usuario(
         UID_OPERADOR,
-        {"email": "operador@sigvach.com", "rol": "usuario", "activo": True, "nombre": "Operador"},
+        {"email": "operador@sigvach.com", "rol": "operador", "activo": True, "nombre": "Operador"},
     )
     repositorio.registrar_perfil_usuario(
         UID_INACTIVO,
-        {"email": "inactivo@sigvach.com", "rol": "usuario", "activo": False, "nombre": "Inactivo"},
+        {"email": "inactivo@sigvach.com", "rol": "operador", "activo": False, "nombre": "Inactivo"},
     )
     repositorio.registrar_perfil_usuario(
         UID_INVITADO,
@@ -114,14 +114,14 @@ def cliente_publico(entorno: Entorno) -> TestClient:
 @pytest.fixture
 def cliente_operador(entorno: Entorno) -> TestClient:
     """Cliente autenticado con el rol de operación."""
-    identidad = UsuarioAutenticado(uid=UID_OPERADOR, correo="operador@sigvach.com", rol="usuario")
+    identidad = UsuarioAutenticado(uid=UID_OPERADOR, correo="operador@sigvach.com", rol="operador")
     return TestClient(_aplicacion(entorno, identidad))
 
 
 @pytest.fixture
 def cliente_administrador(entorno: Entorno) -> TestClient:
     """Cliente autenticado con el rol de administración."""
-    identidad = UsuarioAutenticado(uid=UID_ADMINISTRADOR, correo="admin@sigvach.com", rol="admin")
+    identidad = UsuarioAutenticado(uid=UID_ADMINISTRADOR, correo="admin@sigvach.com", rol="administrador")
     return TestClient(_aplicacion(entorno, identidad))
 
 

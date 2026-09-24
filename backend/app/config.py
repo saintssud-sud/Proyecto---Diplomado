@@ -64,11 +64,11 @@ class Configuracion(BaseSettings):
     # Los nombres de los roles se leen de la configuración para que la decisión
     # sobre el alcance de roles no obligue a tocar el código de autorización.
     rol_administrador: str = Field(
-        default="admin",
+        default="administrador",
         validation_alias=AliasChoices("ROL_ADMINISTRADOR", "ADMIN_ROLE"),
     )
     rol_operador: str = Field(
-        default="usuario",
+        default="operador",
         validation_alias=AliasChoices("ROL_OPERADOR", "OPERATOR_ROLE"),
     )
     rol_invitado: str = Field(

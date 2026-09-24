@@ -21,7 +21,7 @@ def test_el_operador_consulta_su_perfil(cliente_con_token):
     cuerpo = respuesta.json()
     assert cuerpo["id"] == UID_OPERADOR
     assert cuerpo["email"] == "operador@sigvach.com"
-    assert cuerpo["rol"] == "usuario"
+    assert cuerpo["rol"] == "operador"
     assert cuerpo["activo"] is True
 
 
@@ -107,14 +107,14 @@ def test_no_se_puede_cambiar_el_rol_desde_el_perfil_propio(cliente_con_token, en
     """El rol no es un campo del esquema: la petición ni siquiera se acepta."""
     respuesta = cliente_con_token.patch(
         "/api/v1/usuarios/perfil",
-        json={"nombre": "Operador Dos", "rol": "admin"},
+        json={"nombre": "Operador Dos", "rol": "administrador"},
         headers=cabecera("operador"),
     )
 
     assert respuesta.status_code == 422
     guardado = entorno.repositorio.obtener_perfil_usuario(UID_OPERADOR)
     assert guardado is not None
-    assert guardado["rol"] == "usuario"
+    assert guardado["rol"] == "operador"
 
 
 def test_no_se_puede_cambiar_el_estado_de_activacion_propio(cliente_con_token, entorno):
@@ -165,7 +165,7 @@ def test_el_administrador_consulta_una_cuenta(cliente_administrador):
 
     assert respuesta.status_code == 200
     assert respuesta.json()["id"] == UID_OPERADOR
-    assert respuesta.json()["rol"] == "usuario"
+    assert respuesta.json()["rol"] == "operador"
 
 
 def test_una_cuenta_inexistente_se_responde_404(cliente_administrador):
@@ -174,12 +174,12 @@ def test_una_cuenta_inexistente_se_responde_404(cliente_administrador):
 
 def test_el_administrador_cambia_el_rol_de_una_cuenta(cliente_administrador, entorno):
     respuesta = cliente_administrador.patch(
-        "/api/v1/usuarios/%s" % UID_OPERADOR, json={"rol": "admin"}
+        "/api/v1/usuarios/%s" % UID_OPERADOR, json={"rol": "administrador"}
     )
 
     assert respuesta.status_code == 200
-    assert respuesta.json()["rol"] == "admin"
-    assert entorno.repositorio.obtener_perfil_usuario(UID_OPERADOR)["rol"] == "admin"
+    assert respuesta.json()["rol"] == "administrador"
+    assert entorno.repositorio.obtener_perfil_usuario(UID_OPERADOR)["rol"] == "administrador"
 
 
 def test_el_administrador_desactiva_una_cuenta(cliente_administrador, entorno):
@@ -207,11 +207,11 @@ def test_la_cuenta_desactivada_deja_de_poder_operar(cliente_administrador, clien
 
 def test_el_operador_no_puede_cambiar_roles(cliente_operador, entorno):
     respuesta = cliente_operador.patch(
-        "/api/v1/usuarios/%s" % UID_ADMINISTRADOR, json={"rol": "usuario"}
+        "/api/v1/usuarios/%s" % UID_ADMINISTRADOR, json={"rol": "operador"}
     )
 
     assert respuesta.status_code == 403
-    assert entorno.repositorio.obtener_perfil_usuario(UID_ADMINISTRADOR)["rol"] == "admin"
+    assert entorno.repositorio.obtener_perfil_usuario(UID_ADMINISTRADOR)["rol"] == "administrador"
 
 
 def test_un_rol_desconocido_se_rechaza(cliente_administrador, entorno):
@@ -221,16 +221,16 @@ def test_un_rol_desconocido_se_rechaza(cliente_administrador, entorno):
 
     assert respuesta.status_code == 422
     assert "roles_admitidos" in respuesta.json()["detalle"]
-    assert entorno.repositorio.obtener_perfil_usuario(UID_OPERADOR)["rol"] == "usuario"
+    assert entorno.repositorio.obtener_perfil_usuario(UID_OPERADOR)["rol"] == "operador"
 
 
 def test_la_administracion_no_puede_quitarse_su_propio_rol(cliente_administrador, entorno):
     respuesta = cliente_administrador.patch(
-        "/api/v1/usuarios/%s" % UID_ADMINISTRADOR, json={"rol": "usuario"}
+        "/api/v1/usuarios/%s" % UID_ADMINISTRADOR, json={"rol": "operador"}
     )
 
     assert respuesta.status_code == 409
-    assert entorno.repositorio.obtener_perfil_usuario(UID_ADMINISTRADOR)["rol"] == "admin"
+    assert entorno.repositorio.obtener_perfil_usuario(UID_ADMINISTRADOR)["rol"] == "administrador"
 
 
 def test_la_administracion_no_puede_desactivar_su_cuenta(cliente_administrador):
@@ -251,7 +251,7 @@ def test_la_administracion_actualiza_los_datos_de_una_cuenta(cliente_administrad
     assert respuesta.json()["nombre"] == "Operador Uno"
     guardado = entorno.repositorio.obtener_perfil_usuario(UID_OPERADOR)
     assert guardado["cargo"] == "Encargado"
-    assert guardado["rol"] == "usuario"
+    assert guardado["rol"] == "operador"
 
 
 def test_una_actualizacion_sin_datos_se_rechaza(cliente_administrador):

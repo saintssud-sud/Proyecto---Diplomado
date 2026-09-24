@@ -64,7 +64,7 @@ def test_el_operador_no_puede_crear_modulos(cliente_con_token, entorno):
     )
     assert respuesta.status_code == 403
     assert respuesta.json()["codigo"] == "sin_permiso"
-    assert respuesta.json()["detalle"]["rol_actual"] == "usuario"
+    assert respuesta.json()["detalle"]["rol_actual"] == "operador"
 
 
 def test_el_operador_no_puede_modificar_rangos(cliente_con_token, entorno):
