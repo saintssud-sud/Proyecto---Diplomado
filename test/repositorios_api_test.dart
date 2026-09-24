@@ -490,7 +490,9 @@ void main() {
     });
 
     test('traduce los códigos de variable a nombres presentables', () {
-      expect(nombreDeVariable('temp_solucion'), 'Temperatura de la solución');
+      // El nombre debe coincidir con el del catálogo del servicio
+      // (`backend/app/esquemas.py`), que es el que viaja en las respuestas.
+      expect(nombreDeVariable('temp_solucion'), 'Temperatura de la solución nutritiva');
       expect(unidadDeVariable('humedad'), '%');
       expect(nombreDeVariable('desconocida'), 'desconocida');
     });

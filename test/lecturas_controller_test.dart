@@ -92,10 +92,15 @@ void main() {
 
       expect(controlador.estado, EstadoVista.error);
       expect(controlador.errorDeConexion, isTrue);
+      // El traductor agrega el detalle técnico entre paréntesis a propósito,
+      // para poder diagnosticar desde la propia pantalla (véase `FalloDeVista`).
       expect(
         controlador.mensajeError,
-        'No se pudo comunicar con el servidor. Revise la conexión e intente nuevamente.',
+        startsWith(
+          'No se pudo comunicar con el servidor. Revise la conexión e intente nuevamente.',
+        ),
       );
+      expect(controlador.mensajeError, contains('(detalle:'));
     });
 
     test('un rechazo del servidor queda como error del servidor, no de conexión', () async {
