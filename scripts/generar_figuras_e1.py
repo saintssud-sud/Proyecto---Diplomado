@@ -237,6 +237,17 @@ def figura_modelo_de_datos():
             dibujo.text((x + 16, y + 56 + i * 26), campo, font=fuente(15), fill=TEXTO)
         posiciones[titulo] = (x, y, caja_ancho, caja_alto)
 
+    def hay_choque(centro_x, centro_y, ancho_rotulo, alto_rotulo=30):
+        """Indica si una etiqueta en esa posición se montaría sobre una caja."""
+        x0, x1 = centro_x - ancho_rotulo / 2, centro_x + ancho_rotulo / 2
+        y0, y1 = centro_y - alto_rotulo / 2, centro_y + alto_rotulo / 2
+        if x0 < 8 or x1 > ancho - 8 or y0 < 8 or y1 > alto - 8:
+            return True
+        for caja_x, caja_y, caja_ancho, caja_alto in posiciones.values():
+            if x1 > caja_x and x0 < caja_x + caja_ancho and y1 > caja_y and y0 < caja_y + caja_alto:
+                return True
+        return False
+
     def conectar(origen, destino, etiqueta_texto, color=GRIS, discontinua=False,
                  desde_lado="abajo", hasta_lado="arriba"):
         x1, y1, w1, h1 = posiciones[origen]
@@ -245,23 +256,39 @@ def figura_modelo_de_datos():
         origen_y = y1 + h1 if desde_lado == "abajo" else y1 + h1 / 2
         destino_x = x2 + w2 / 2 if hasta_lado == "arriba" else x2
         destino_y = y2 if hasta_lado == "arriba" else y2 + h2 / 2
-        flecha(dibujo, origen_x, origen_y, destino_x, destino_y, color, 4, 20, discontinua)
+        flecha(dibujo, origen_x, origen_y, destino_x, destino_y, color, 5, 26, discontinua)
+        etiqueta_relacion(etiqueta_texto, origen_x, origen_y, destino_x, destino_y, color)
 
-        # El rótulo se coloca encima del trazo solo cuando la flecha es lo bastante
-        # larga para que quede trazo a los dos lados. En las flechas cortas —las
-        # que unen cajas vecinas— el rótulo tapa casi toda la línea y la deja
-        # partida en dos trozos sueltos, con un hueco antes de la punta; en ese
-        # caso va al costado, sin tocar el trazo.
-        medio_x = (origen_x + destino_x) / 2
-        medio_y = (origen_y + destino_y) / 2
-        largo = ((destino_x - origen_x) ** 2 + (destino_y - origen_y) ** 2) ** 0.5
-        ancho_rotulo = ancho_texto(dibujo, etiqueta_texto, 15, True) + 18
-        if largo < 200:
-            if abs(destino_x - origen_x) >= abs(destino_y - origen_y):
-                medio_y -= 34
-            else:
-                medio_x += ancho_rotulo / 2 + 16
-        etiqueta(dibujo, etiqueta_texto, medio_x, medio_y, 15, color, BLANCO, True)
+    def etiqueta_relacion(texto, origen_x, origen_y, destino_x, destino_y, color):
+        """Coloca el rótulo siempre al costado del trazo, nunca encima.
+
+        El rótulo se aparta en perpendicular al sentido de la flecha —de modo que
+        queda por encima de las flechas horizontales y a la derecha de las
+        verticales— y, si en ese lado se montaría sobre una caja, se prueba el
+        lado contrario. Así el trazo se ve entero, sin cortes, que es lo que se
+        busca al mirar el diagrama de un vistazo.
+        """
+        delta_x, delta_y = destino_x - origen_x, destino_y - origen_y
+        largo = (delta_x ** 2 + delta_y ** 2) ** 0.5
+        ancho_rotulo = ancho_texto(dibujo, texto, 16, True) + 18
+        medio_x, medio_y = (origen_x + destino_x) / 2, (origen_y + destino_y) / 2
+
+        elegido = None
+        for signo in (1, -1):
+            perpendicular_x = signo * delta_y / largo
+            perpendicular_y = -signo * delta_x / largo
+            separacion = (
+                abs(perpendicular_x) * ancho_rotulo / 2 + abs(perpendicular_y) * 15 + 12
+            )
+            centro_x = medio_x + perpendicular_x * separacion
+            centro_y = medio_y + perpendicular_y * separacion
+            if not hay_choque(centro_x, centro_y, ancho_rotulo):
+                elegido = (centro_x, centro_y)
+                break
+        if elegido is None:
+            # Los dos lados están ocupados: se aparta más y se acepta el primero.
+            elegido = (medio_x, medio_y - 44)
+        etiqueta(dibujo, texto, elegido[0], elegido[1], 16, color, BLANCO, True)
 
     # Relaciones del dominio.
     conectar("perfiles_cultivo", "rangos", "1 : N", AZUL, False, "derecha", "izquierda")
@@ -275,10 +302,7 @@ def figura_modelo_de_datos():
     # referencia `registrado_por`.
     conectar("usuarios", "lecturas", "1 : N  (registro manual)", MORADO, True, "abajo", "izquierda")
     # El rango evalúa la lectura y el usuario autoriza el acceso. Esta relación no
-    # une dos cajas vecinas sino que cruza el diagrama en diagonal, así que su
-    # rótulo se coloca donde el trazo cruza la franja libre que queda entre las
-    # cajas de módulos y de lecturas: en el punto medio caería sobre el borde de
-    # la caja de módulos.
+    # une dos cajas vecinas sino que cruza el diagrama en diagonal.
     x1, y1, w1, h1 = posiciones["rangos"]
     x2, y2, w2, h2 = posiciones["lecturas"]
     inicio_x, inicio_y = x1 + 40, y1 + h1
@@ -286,10 +310,8 @@ def figura_modelo_de_datos():
     # derecha: si bajara hasta el centro, el trazo entraría en el vértice
     # inferior derecho de la caja de módulos, que es la caja que queda en medio.
     fin_x, fin_y = x2 + w2 - 20, y2
-    flecha(dibujo, inicio_x, inicio_y, fin_x, fin_y, AZUL, 4, 20, True)
-    franja = 575
-    avance = (franja - inicio_y) / (fin_y - inicio_y)
-    etiqueta(dibujo, "evalúa la lectura", inicio_x + (fin_x - inicio_x) * avance, franja, 15, AZUL, BLANCO, True)
+    flecha(dibujo, inicio_x, inicio_y, fin_x, fin_y, AZUL, 5, 26, True)
+    etiqueta_relacion("evalúa la lectura", inicio_x, inicio_y, fin_x, fin_y, AZUL)
 
     texto_centrado(
         dibujo,
