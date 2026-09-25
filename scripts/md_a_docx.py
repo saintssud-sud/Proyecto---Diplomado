@@ -310,12 +310,39 @@ def _campo_indice(doc, instruccion: str, texto_guia: str) -> None:
     parrafo.paragraph_format.space_after = Pt(10)
 
 
+def _escudo(doc) -> None:
+    """Coloca el logotipo del proyecto donde la plantilla reserva el escudo.
+
+    La plantilla deja ese lugar al escudo de la universidad; en este documento lo
+    ocupa el logotipo del proyecto. Si el archivo del logotipo no está, se escribe
+    el marcador de texto —y no un hueco— para que quien arme el documento lo
+    advierta antes de entregarlo: un marcador de plantilla sin sustituir es un
+    resto, y el marcador visible lo delata.
+
+    El archivo que devuelve `_normalizar_logo` puede ser temporal —una copia
+    reconvertida a PNG real— y se retira en cuanto la imagen queda incrustada.
+    """
+    parrafo = doc.add_paragraph()
+    parrafo.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    parrafo.paragraph_format.space_after = Pt(18)
+
+    logo = _normalizar_logo()
+    if not logo:
+        run = parrafo.add_run("[Escudo de la Universidad]")
+        _configurar_fuente(run, tamano=12)
+        return
+
+    parrafo.add_run().add_picture(logo, width=Cm(3.2))
+    if logo != LOGO and os.path.exists(logo):
+        os.remove(logo)
+
+
 def _portada(doc) -> None:
     """Portada y contratapa, con la estructura y los tamaños de la plantilla."""
     for _ in range(2):
         _linea_centrada(doc, UNIVERSIDAD, 16, negrita=True)
         _linea_centrada(doc, SECRETARIA, 16, negrita=True, espacio_despues=18)
-        _linea_centrada(doc, "[Escudo de la Universidad]", 12, espacio_despues=18)
+        _escudo(doc)
         _linea_centrada(doc, "TRABAJO FINAL DE DIPLOMADO", 14, negrita=True, espacio_despues=24)
         _linea_centrada(doc, TITULO_OFICIAL, 14, negrita=True, espacio_despues=24)
         _linea_centrada(doc, AUTOR_OFICIAL, 14, negrita=True, espacio_despues=24)
