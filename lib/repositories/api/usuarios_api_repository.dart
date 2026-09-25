@@ -45,4 +45,61 @@ class UsuariosApiRepository {
     );
     return PerfilUsuario.fromJson(datos);
   }
+
+  // --- Administración de cuentas -------------------------------------------
+  //
+  // Estas tres operaciones exigen el rol de administración: el servicio
+  // responde 403 a cualquier otra cuenta, y esa comprobación se hace en el
+  // servidor, no en la pantalla. Ocultar el botón no es autorización.
+  //
+  // Antes, el panel de usuarios leía la colección `usuarios` directamente desde
+  // la aplicación. Esa vía dejó de funcionar cuando las reglas de seguridad de
+  // Firestore cerraron el acceso directo, y además eludía dos protecciones que
+  // el servicio sí aplica: que el rol pertenezca al catálogo y que la
+  // administración no pueda quitarse a sí misma el rol ni desactivarse.
+
+  /// Lista todas las cuentas registradas, con su rol y su estado.
+  Future<List<PerfilUsuario>> listarCuentas() async {
+    final List<Map<String, dynamic>> datos =
+        await _cliente.obtenerLista(ApiConfig.ruta(_recurso));
+    return datos.map(PerfilUsuario.fromJson).toList(growable: false);
+  }
+
+  /// Modifica los datos personales, el rol o el estado de una cuenta.
+  ///
+  /// Solo se envían los campos indicados. El servicio rechaza con 422 un rol
+  /// que no exista en el sistema, y con 409 el intento de la propia
+  /// administración de cambiarse el rol o desactivarse.
+  Future<PerfilUsuario> modificarCuenta(
+    String id, {
+    String? nombre,
+    String? telefono,
+    String? cargo,
+    String? rol,
+    bool? activo,
+  }) async {
+    final Map<String, dynamic> cambios = <String, dynamic>{
+      if (nombre != null) 'nombre': nombre,
+      if (telefono != null) 'telefono': telefono,
+      if (cargo != null) 'cargo': cargo,
+      if (rol != null) 'rol': rol,
+      if (activo != null) 'activo': activo,
+    };
+    if (cambios.isEmpty) {
+      throw ArgumentError('No se indicó ningún dato para modificar.');
+    }
+    final Map<String, dynamic> datos = await _cliente.actualizar(
+      ApiConfig.ruta('$_recurso/$id'),
+      cambios,
+    );
+    return PerfilUsuario.fromJson(datos);
+  }
+
+  /// Elimina el perfil de una cuenta.
+  ///
+  /// La credencial de Firebase Authentication permanece: eliminarla exige
+  /// privilegios de administración del proveedor, que no están en el alcance.
+  Future<void> eliminarCuenta(String id) async {
+    await _cliente.eliminar(ApiConfig.ruta('$_recurso/$id'));
+  }
 }

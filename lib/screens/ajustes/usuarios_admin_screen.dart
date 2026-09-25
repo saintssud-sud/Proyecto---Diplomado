@@ -1,20 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../controllers/usuario_controller.dart';
+import '../../controllers/perfil_controller.dart';
+import '../../models/api/modelos_api.dart';
 import '../../models/roles.dart';
-import '../../models/usuario_perfil.dart';
-import '../../repositories/usuario_repository.dart';
+import '../../repositories/api/usuarios_api_repository.dart';
+import '../../services/api_cliente.dart';
 import '../../widgets/max_width_box.dart';
 
 /// Pantalla de administración de usuarios (solo para el rol de administración).
 ///
-/// Muestra la lista de usuarios registrados (desde Firestore) y permite:
-/// - Ver datos personales
-/// - Editar datos (nombre, teléfono, cargo)
+/// Muestra las cuentas registradas y permite:
+/// - Ver los datos de contacto
+/// - Editar los datos (nombre, teléfono, cargo)
 /// - Cambiar el rol (administrador / operador)
-/// - Activar / desactivar
+/// - Activar o desactivar la cuenta
 /// - Eliminar el perfil
+///
+/// **Las operaciones pasan por el servicio, no por la base de datos.** Antes
+/// esta pantalla leía la colección `usuarios` directamente desde la aplicación,
+/// y dejó de funcionar cuando las reglas de seguridad de Firestore cerraron el
+/// acceso directo. Además, esa vía eludía dos protecciones que el servicio sí
+/// aplica: que el rol pertenezca al catálogo del sistema y que la administración
+/// no pueda quitarse a sí misma el rol ni desactivar su propia cuenta. La
+/// autorización se comprueba en el servidor: que el botón esté oculto no es
+/// autorización.
 class UsuariosAdminScreen extends StatefulWidget {
   const UsuariosAdminScreen({super.key});
 
@@ -23,12 +33,37 @@ class UsuariosAdminScreen extends StatefulWidget {
 }
 
 class _UsuariosAdminScreenState extends State<UsuariosAdminScreen> {
-  final UsuarioRepository _repository = UsuarioRepository();
+  late final UsuariosApiRepository _repositorio;
 
-  Future<void> _editar(UsuarioPerfil usuario) async {
+  Future<List<PerfilUsuario>>? _cuentas;
+
+  @override
+  void initState() {
+    super.initState();
+    _repositorio = UsuariosApiRepository(context.read<ApiCliente>());
+    _recargar();
+  }
+
+  void _recargar() {
+    setState(() {
+      _cuentas = _repositorio.listarCuentas();
+    });
+  }
+
+  /// Lee el error del servicio y devuelve un mensaje presentable.
+  String _mensajeDeError(Object error) {
+    final texto = error.toString();
+    if (texto.contains('403') || texto.toLowerCase().contains('permiso')) {
+      return 'La cuenta con la que inició sesión no tiene atribuciones de '
+          'administración.';
+    }
+    return texto;
+  }
+
+  Future<void> _editar(PerfilUsuario usuario) async {
     final nombre = TextEditingController(text: usuario.nombre);
-    final telefono = TextEditingController(text: usuario.telefono);
-    final cargo = TextEditingController(text: usuario.cargo);
+    final telefono = TextEditingController(text: usuario.telefono ?? '');
+    final cargo = TextEditingController(text: usuario.cargo ?? '');
 
     final guardar = await showDialog<bool>(
       context: context,
@@ -73,65 +108,66 @@ class _UsuariosAdminScreenState extends State<UsuariosAdminScreen> {
       ),
     );
 
-    if (guardar == true && context.mounted) {
-      final uid = usuario.uid ?? '';
+    if (guardar == true && mounted) {
       try {
-        await _repository.actualizarDatos(
-          uid: uid,
+        await _repositorio.modificarCuenta(
+          usuario.id,
           nombre: nombre.text,
           telefono: telefono.text,
           cargo: cargo.text,
         );
         _aviso('Datos actualizados.');
+        _recargar();
       } catch (e) {
-        _aviso('No se pudo actualizar: $e');
+        _aviso('No se pudo actualizar: ${_mensajeDeError(e)}');
       }
     }
   }
 
-  Future<void> _cambiarRol(UsuarioPerfil usuario) async {
+  Future<void> _cambiarRol(PerfilUsuario usuario) async {
     final nuevo = Roles.alternar(usuario.rol);
     final confirmar = await _confirmar(
       titulo: 'Cambiar rol',
-      mensaje: '¿Cambiar a ${usuario.email} de "${Roles.etiqueta(usuario.rol)}" '
+      mensaje: '¿Cambiar a ${usuario.email} de "${usuario.etiquetaRol}" '
           'a "${Roles.etiqueta(nuevo)}"?',
     );
     if (confirmar != true || !mounted) return;
-    final uid = usuario.uid ?? '';
     try {
-      await _repository.cambiarRol(uid: uid, rol: nuevo);
-      _aviso('Rol actualizado a $nuevo.');
+      await _repositorio.modificarCuenta(usuario.id, rol: nuevo);
+      _aviso('Rol actualizado a ${Roles.etiqueta(nuevo)}.');
+      _recargar();
     } catch (e) {
-      _aviso('No se pudo cambiar el rol: $e');
+      _aviso('No se pudo cambiar el rol: ${_mensajeDeError(e)}');
     }
   }
 
-  Future<void> _cambiarActivo(UsuarioPerfil usuario) async {
-    final uid = usuario.uid ?? '';
+  Future<void> _cambiarActivo(PerfilUsuario usuario) async {
     try {
-      await _repository.cambiarActivo(uid: uid, activo: !usuario.activo);
-      _aviso(usuario.activo ? 'Usuario desactivado.' : 'Usuario activado.');
+      await _repositorio.modificarCuenta(usuario.id, activo: !usuario.activo);
+      _aviso(usuario.activo ? 'Cuenta desactivada.' : 'Cuenta activada.');
+      _recargar();
     } catch (e) {
-      _aviso('No se pudo cambiar el estado: $e');
+      _aviso('No se pudo cambiar el estado: ${_mensajeDeError(e)}');
     }
   }
 
-  Future<void> _eliminar(UsuarioPerfil usuario) async {
+  Future<void> _eliminar(PerfilUsuario usuario) async {
     final confirmar = await _confirmar(
-      titulo: 'Eliminar usuario',
+      titulo: 'Eliminar cuenta',
       mensaje:
           '¿Eliminar el perfil de ${usuario.email}?\n'
-          'Esto lo quita del sistema. (La cuenta de Firebase Auth no se '
-          'borra; requiere Cloud Functions).',
+          'Esto lo quita del sistema. La credencial de Firebase Authentication '
+          'permanece, porque eliminarla exige privilegios de administración del '
+          'proveedor que no están en el alcance.',
       peligro: true,
     );
     if (confirmar != true || !mounted) return;
-    final uid = usuario.uid ?? '';
     try {
-      await _repository.eliminar(uid);
+      await _repositorio.eliminarCuenta(usuario.id);
       _aviso('Perfil eliminado.');
+      _recargar();
     } catch (e) {
-      _aviso('No se pudo eliminar: $e');
+      _aviso('No se pudo eliminar: ${_mensajeDeError(e)}');
     }
   }
 
@@ -173,25 +209,22 @@ class _UsuariosAdminScreenState extends State<UsuariosAdminScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Usuarios')),
+      appBar: AppBar(
+        title: const Text('Usuarios'),
+        actions: <Widget>[
+          IconButton(
+            tooltip: 'Actualizar',
+            icon: const Icon(Icons.refresh),
+            onPressed: _recargar,
+          ),
+        ],
+      ),
       body: MaxWidthBox(
-        child: StreamBuilder<List<UsuarioPerfil>>(
-          stream: _repository.verTodos(),
+        child: FutureBuilder<List<PerfilUsuario>>(
+          future: _cuentas,
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      const Icon(Icons.error_outline, size: 52),
-                      const SizedBox(height: 12),
-                      Text('Error: ${snapshot.error}'),
-                    ],
-                  ),
-                ),
-              );
+              return _estadoDeError(snapshot.error!);
             }
             if (!snapshot.hasData) {
               return const Center(child: CircularProgressIndicator());
@@ -199,7 +232,7 @@ class _UsuariosAdminScreenState extends State<UsuariosAdminScreen> {
             final usuarios = snapshot.data!;
             if (usuarios.isEmpty) {
               return const Center(
-                child: Text('Todavía no hay usuarios registrados.'),
+                child: Text('Todavía no hay cuentas registradas.'),
               );
             }
             return ListView.separated(
@@ -215,11 +248,49 @@ class _UsuariosAdminScreenState extends State<UsuariosAdminScreen> {
     );
   }
 
-  Widget _tarjetaUsuario(BuildContext context, UsuarioPerfil usuario) {
-    final colorRol = usuario.esAdmin
+  /// Estado de error de la vista, con acción de reintento.
+  Widget _estadoDeError(Object error) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            const Icon(Icons.error_outline, size: 52),
+            const SizedBox(height: 12),
+            const Text(
+              'No se pudo obtener la lista de cuentas',
+              style: TextStyle(fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _mensajeDeError(error),
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.black54),
+            ),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              onPressed: _recargar,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Reintentar'),
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xFF39B54A),
+                foregroundColor: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _tarjetaUsuario(BuildContext context, PerfilUsuario usuario) {
+    final colorRol = usuario.esAdministrador
         ? const Color(0xFF2E7D32)
         : const Color(0xFF1565C0);
-    final soyYo = usuario.uid == context.read<UsuarioController>().perfil?.uid;
+    final yo = context.read<PerfilController>().perfil;
+    final soyYo = yo != null && yo.id == usuario.id;
 
     return Card(
       margin: EdgeInsets.zero,
@@ -256,7 +327,7 @@ class _UsuariosAdminScreenState extends State<UsuariosAdminScreen> {
                   ),
                 ),
                 Chip(
-                  label: Text(usuario.rol),
+                  label: Text(usuario.etiquetaRol),
                   visualDensity: VisualDensity.compact,
                   backgroundColor: colorRol.withValues(alpha: 0.15),
                   labelStyle: TextStyle(color: colorRol, fontSize: 12),
@@ -264,12 +335,12 @@ class _UsuariosAdminScreenState extends State<UsuariosAdminScreen> {
               ],
             ),
             const SizedBox(height: 8),
-            if (usuario.cargo.isNotEmpty ||
-                usuario.telefono.isNotEmpty) ...<Widget>[
+            if ((usuario.cargo ?? '').isNotEmpty ||
+                (usuario.telefono ?? '').isNotEmpty) ...<Widget>[
               Text(
                 [
-                  if (usuario.cargo.isNotEmpty) usuario.cargo,
-                  if (usuario.telefono.isNotEmpty) usuario.telefono,
+                  if ((usuario.cargo ?? '').isNotEmpty) usuario.cargo!,
+                  if ((usuario.telefono ?? '').isNotEmpty) usuario.telefono!,
                 ].join('  ·  '),
                 style: const TextStyle(fontSize: 13, color: Colors.black54),
               ),
@@ -281,10 +352,19 @@ class _UsuariosAdminScreenState extends State<UsuariosAdminScreen> {
                   const Padding(
                     padding: EdgeInsets.only(right: 8),
                     child: Chip(
-                      label: Text('Inactivo'),
+                      label: Text('Inactiva'),
                       visualDensity: VisualDensity.compact,
                       backgroundColor: Colors.orange,
                       labelStyle: TextStyle(color: Colors.white, fontSize: 11),
+                    ),
+                  ),
+                if (soyYo)
+                  const Padding(
+                    padding: EdgeInsets.only(right: 8),
+                    child: Chip(
+                      label: Text('Su cuenta'),
+                      visualDensity: VisualDensity.compact,
+                      labelStyle: TextStyle(fontSize: 11),
                     ),
                   ),
                 const Spacer(),
@@ -296,7 +376,9 @@ class _UsuariosAdminScreenState extends State<UsuariosAdminScreen> {
                 IconButton(
                   tooltip: 'Cambiar rol',
                   icon: const Icon(Icons.admin_panel_settings_outlined),
-                  onPressed: () => _cambiarRol(usuario),
+                  // La administración no puede cambiarse el rol a sí misma: el
+                  // servicio lo rechaza con 409.
+                  onPressed: soyYo ? null : () => _cambiarRol(usuario),
                 ),
                 IconButton(
                   tooltip: usuario.activo ? 'Desactivar' : 'Activar',
@@ -305,7 +387,7 @@ class _UsuariosAdminScreenState extends State<UsuariosAdminScreen> {
                         ? Icons.visibility_off_outlined
                         : Icons.visibility_outlined,
                   ),
-                  onPressed: () => _cambiarActivo(usuario),
+                  onPressed: soyYo ? null : () => _cambiarActivo(usuario),
                 ),
                 IconButton(
                   tooltip: 'Eliminar',

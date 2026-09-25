@@ -54,8 +54,13 @@ service cloud.firestore {
       return hasProfile() && get(profilePath()).data.activo != false;
     }
 
+    // Los nombres de rol deben coincidir con los que usa el servicio, que los
+    // lee de su configuración (`ROL_ADMINISTRADOR` y `ROL_OPERADOR` en
+    // `backend/app/config.py`). Si aquí quedara el vocabulario anterior, el
+    // administrador dejaría de ser reconocido y toda regla que dependa de
+    // `isAdmin()` denegaría el acceso.
     function isAdmin() {
-      return isEnabled() && currentRole() == 'admin';
+      return isEnabled() && currentRole() == 'administrador';
     }
 
     function replyEmail() {
@@ -72,16 +77,16 @@ service cloud.firestore {
 
       // El perfil se crea una sola vez, al registrarse: el id debe coincidir con
       // el uid, el correo con el del token (sin distinguir mayúsculas, porque el
-      // formulario no normaliza el correo) y el rol solo puede ser 'usuario'.
-      // El rol de administrador se asigna después desde el panel o desde la
-      // consola, nunca en el alta.
+      // formulario no normaliza el correo) y el rol solo puede ser el de
+      // operación. El rol de administrador se asigna después desde el panel o
+      // desde la consola, nunca en el alta: es el principio de menor privilegio.
       allow create: if signedIn()
         && userId == uid()
         && request.resource.data.email.lower() == replyEmail().lower()
         && request.resource.data.activo == true
         && (
-             request.resource.data.rol == 'usuario'
-             || (request.resource.data.rol == 'admin'
+             request.resource.data.rol == 'operador'
+             || (request.resource.data.rol == 'administrador'
                  && replyEmail().lower() == 'admin@sigvach.com')
            );
 
