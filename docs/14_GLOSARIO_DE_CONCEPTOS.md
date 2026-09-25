@@ -434,7 +434,7 @@ subir.
 
 **Historial de avance progresivo** — Que el repositorio muestre el trabajo repartido
 en el tiempo, con mensajes claros.
-*En el proyecto:* es el **requisito mínimo 5**: 120 confirmaciones en 13 fechas.
+*En el proyecto:* es el **requisito mínimo 5**: 121 confirmaciones en 13 fechas.
 
 **Despliegue automático** — Que al subir cambios, la plataforma publique sola.
 *En el proyecto:* está activado en Render ("On Commit").
@@ -519,7 +519,7 @@ avance.
 | Índices compuestos | **5** |
 | Roles del alcance | **2** (Administrador y Operador) |
 | Pruebas automáticas del servicio | **87** |
-| Confirmaciones en el repositorio | **120** en **13 fechas** |
+| Confirmaciones en el repositorio | **121** en **13 fechas** |
 | Tamaño del archivo instalable | **53,8 MB** |
 | Demora admitida al despertar el servicio | **60 s** (RNF-05) |
 | Reducción del paquete de iconos | **99,4 %** |
