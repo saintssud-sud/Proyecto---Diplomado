@@ -81,7 +81,7 @@
 |---|---|
 | **Contrato de la API** | 32 operaciones |
 | **Pruebas automatizadas** | **199** — 106 del servicio y 93 de la aplicación |
-| **Confirmaciones** | 119, repartidas en 13 días distintos |
+| **Confirmaciones** | 120, repartidas en 13 días distintos |
 | **Aplicación publicada** | `https://sigvach26-bd.web.app` |
 | **Servicio publicado** | `https://sigvach-api.onrender.com` |
 | **Módulo de adquisición** | Midiendo y publicando cinco variables en producción |

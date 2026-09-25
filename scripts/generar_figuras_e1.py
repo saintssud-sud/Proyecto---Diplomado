@@ -177,32 +177,43 @@ def figura_tablero():
 # Figura 4 — Modelo de datos
 # ---------------------------------------------------------------------------
 
+def tinte(color, factor=0.88):
+    """Aclara un color acercándolo al blanco, para el cuerpo de la caja.
+
+    Cada entidad lleva su propio color: la barra del título va saturada con el
+    nombre en blanco, y el cuerpo es un tinte claro del mismo tono. Así se
+    distingue una colección de otra de un vistazo —que es lo que se busca al
+    mirar el modelo— sin perder la legibilidad del texto.
+    """
+    return tuple(round(componente + (255 - componente) * factor) for componente in color)
+
+
 ENTIDADES = (
-    # (título, x, y, ancho, alto, relleno, borde, campos)
+    # (título, x, y, ancho, alto, color, campos)
     # Las coordenadas dejan hueco suficiente entre cajas para que el rótulo de
     # cada relación quepa en el espacio libre y no se monte sobre el vecino.
-    ("usuarios", 40, 90, 360, 210, MORADO_CLARO, MORADO, [
+    ("usuarios", 40, 90, 360, 210, (21, 101, 192), [
         "id  (uid de Authentication)",
         "email · nombre · telefono · cargo",
         "rol: administrador | operador",
         "activo: booleano",
     ]),
-    ("perfiles_cultivo", 470, 90, 340, 170, AZUL_CLARO, AZUL, [
+    ("perfiles_cultivo", 470, 90, 340, 170, (106, 27, 154), [
         "id · nombre",
         "descripcion",
         "predefinido: booleano",
     ]),
-    ("rangos", 890, 90, 360, 190, AZUL_CLARO, AZUL, [
+    ("rangos", 890, 90, 360, 190, (0, 105, 92), [
         "id · perfil_id → perfiles_cultivo",
         "variable (catálogo de seis)",
         "minimo · maximo · unidad",
     ]),
-    ("modulos_cultivo", 470, 350, 340, 190, VERDE_CLARO, VERDE, [
+    ("modulos_cultivo", 470, 350, 340, 190, (46, 125, 50), [
         "id · nombre · tipo_cultivo",
         "perfil_id → perfiles_cultivo",
         "ubicacion · activo",
     ]),
-    ("lecturas", 430, 620, 390, 230, NARANJA_CLARO, NARANJA, [
+    ("lecturas", 430, 620, 390, 230, (230, 81, 0), [
         "id · modulo_id → modulos_cultivo",
         "variable · valor · unidad",
         "origen: automatico | manual",
@@ -210,15 +221,37 @@ ENTIDADES = (
         "timestamp · estado_rango",
         "observacion · creado_en",
     ]),
-    ("alertas", 920, 620, 340, 230, NARANJA_CLARO, NARANJA, [
+    ("alertas", 920, 620, 340, 252, (198, 40, 40), [
         "id · lectura_id → lecturas",
         "modulo_id · variable",
-        "valor · rango_minimo · rango_maximo",
+        "valor · unidad",
+        "rango_minimo · rango_maximo",
         "desviacion: bajo | alto",
         "estado: activa | atendida",
         "timestamp · observacion",
     ]),
 )
+
+
+ALTO_TITULO = 40
+
+
+def dibujar_entidad(dibujo, x, y, ancho, alto, color, titulo, campos):
+    """Dibuja una colección: barra de título en color y cuerpo en tono claro.
+
+    La barra se traza redondeada arriba y recta abajo: se dibuja el rectángulo
+    redondeado del título y se le cuadra la base con un rectángulo liso encima,
+    de modo que la esquina redondeada quede solo donde coincide con el contorno
+    del cuadro.
+    """
+    claro = tinte(color)
+    dibujo.rounded_rectangle([x, y, x + ancho, y + alto], radius=12, fill=claro)
+    dibujo.rounded_rectangle([x, y, x + ancho, y + ALTO_TITULO], radius=12, fill=color)
+    dibujo.rectangle([x, y + ALTO_TITULO - 12, x + ancho, y + ALTO_TITULO], fill=color)
+    dibujo.rounded_rectangle([x, y, x + ancho, y + alto], radius=12, outline=color, width=3)
+    texto_centrado(dibujo, titulo, x, y + 11, ancho, 19, BLANCO, True)
+    for i, campo in enumerate(campos):
+        dibujo.text((x + 16, y + ALTO_TITULO + 16 + i * 26), campo, font=fuente(15), fill=TEXTO)
 
 
 def figura_modelo_de_datos():
@@ -229,13 +262,11 @@ def figura_modelo_de_datos():
     texto_centrado(dibujo, "Modelo de datos — colecciones y relaciones", 0, 24, ancho, 24, TEXTO, True)
 
     posiciones = {}
-    for titulo, x, y, caja_ancho, caja_alto, relleno, borde, campos in ENTIDADES:
-        caja(dibujo, x, y, caja_ancho, caja_alto, relleno, borde, radio=12, grosor=3)
-        texto_centrado(dibujo, titulo, x, y + 12, caja_ancho, 20, TEXTO, True)
-        dibujo.line([x, y + 44, x + caja_ancho, y + 44], fill=borde, width=2)
-        for i, campo in enumerate(campos):
-            dibujo.text((x + 16, y + 56 + i * 26), campo, font=fuente(15), fill=TEXTO)
+    colores = {}
+    for titulo, x, y, caja_ancho, caja_alto, color, campos in ENTIDADES:
+        dibujar_entidad(dibujo, x, y, caja_ancho, caja_alto, color, titulo, campos)
         posiciones[titulo] = (x, y, caja_ancho, caja_alto)
+        colores[titulo] = color
 
     def hay_choque(centro_x, centro_y, ancho_rotulo, alto_rotulo=30):
         """Indica si una etiqueta en esa posición se montaría sobre una caja."""
@@ -260,17 +291,17 @@ def figura_modelo_de_datos():
         etiqueta_relacion(etiqueta_texto, origen_x, origen_y, destino_x, destino_y, color)
 
     def etiqueta_relacion(texto, origen_x, origen_y, destino_x, destino_y, color):
-        """Coloca el rótulo siempre al costado del trazo, nunca encima.
+        """Coloca el rótulo al costado del trazo, sin fondo y sin taparlo.
 
         El rótulo se aparta en perpendicular al sentido de la flecha —de modo que
         queda por encima de las flechas horizontales y a la derecha de las
         verticales— y, si en ese lado se montaría sobre una caja, se prueba el
-        lado contrario. Así el trazo se ve entero, sin cortes, que es lo que se
-        busca al mirar el diagrama de un vistazo.
+        lado contrario. Va escrito en el color de su relación y sin recuadro, que
+        es como se lee en los diagramas de modelo de datos.
         """
         delta_x, delta_y = destino_x - origen_x, destino_y - origen_y
         largo = (delta_x ** 2 + delta_y ** 2) ** 0.5
-        ancho_rotulo = ancho_texto(dibujo, texto, 16, True) + 18
+        ancho_rotulo = ancho_texto(dibujo, texto, 16, True)
         medio_x, medio_y = (origen_x + destino_x) / 2, (origen_y + destino_y) / 2
 
         elegido = None
@@ -278,7 +309,7 @@ def figura_modelo_de_datos():
             perpendicular_x = signo * delta_y / largo
             perpendicular_y = -signo * delta_x / largo
             separacion = (
-                abs(perpendicular_x) * ancho_rotulo / 2 + abs(perpendicular_y) * 15 + 12
+                abs(perpendicular_x) * ancho_rotulo / 2 + abs(perpendicular_y) * 15 + 16
             )
             centro_x = medio_x + perpendicular_x * separacion
             centro_y = medio_y + perpendicular_y * separacion
@@ -288,19 +319,21 @@ def figura_modelo_de_datos():
         if elegido is None:
             # Los dos lados están ocupados: se aparta más y se acepta el primero.
             elegido = (medio_x, medio_y - 44)
-        etiqueta(dibujo, texto, elegido[0], elegido[1], 16, color, BLANCO, True)
+        texto_centrado(dibujo, texto, elegido[0] - ancho_rotulo / 2, elegido[1] - 9,
+                       ancho_rotulo, 16, color, True)
 
-    # Relaciones del dominio.
-    conectar("perfiles_cultivo", "rangos", "1 : N", AZUL, False, "derecha", "izquierda")
-    conectar("perfiles_cultivo", "modulos_cultivo", "1 : N  (perfil asociado)", VERDE)
-    conectar("modulos_cultivo", "lecturas", "1 : N", NARANJA)
+    # Relaciones del dominio. Cada flecha lleva el color de la colección de la que
+    # sale, de modo que siguiendo un color se ven sus relaciones de un vistazo.
+    conectar("perfiles_cultivo", "rangos", "1 : N", colores["perfiles_cultivo"], False, "derecha", "izquierda")
+    conectar("perfiles_cultivo", "modulos_cultivo", "1 : N  (perfil asociado)", colores["perfiles_cultivo"])
+    conectar("modulos_cultivo", "lecturas", "1 : N", colores["modulos_cultivo"])
     # Lecturas y alertas son cajas vecinas: la relación va por el hueco que queda
     # entre ambas y no en diagonal por encima de ellas.
-    conectar("lecturas", "alertas", "1 : 0..1", NARANJA, False, "derecha", "izquierda")
+    conectar("lecturas", "alertas", "1 : 0..1", colores["lecturas"], False, "derecha", "izquierda")
     # El usuario que registró la lectura manual. Sin esta relación, la caja de
     # usuarios quedaba suelta en el diagrama aunque el diccionario declara la
     # referencia `registrado_por`.
-    conectar("usuarios", "lecturas", "1 : N  (registro manual)", MORADO, True, "abajo", "izquierda")
+    conectar("usuarios", "lecturas", "1 : N  (registro manual)", colores["usuarios"], True, "abajo", "izquierda")
     # El rango evalúa la lectura y el usuario autoriza el acceso. Esta relación no
     # une dos cajas vecinas sino que cruza el diagrama en diagonal.
     x1, y1, w1, h1 = posiciones["rangos"]
@@ -310,13 +343,13 @@ def figura_modelo_de_datos():
     # derecha: si bajara hasta el centro, el trazo entraría en el vértice
     # inferior derecho de la caja de módulos, que es la caja que queda en medio.
     fin_x, fin_y = x2 + w2 - 20, y2
-    flecha(dibujo, inicio_x, inicio_y, fin_x, fin_y, AZUL, 5, 26, True)
-    etiqueta_relacion("evalúa la lectura", inicio_x, inicio_y, fin_x, fin_y, AZUL)
+    flecha(dibujo, inicio_x, inicio_y, fin_x, fin_y, colores["rangos"], 5, 26, True)
+    etiqueta_relacion("evalúa la lectura", inicio_x, inicio_y, fin_x, fin_y, colores["rangos"])
 
     texto_centrado(
         dibujo,
         "El perfil de cultivo define los rangos; el módulo se asocia a un perfil; cada lectura se evalúa contra el rango de su variable; la alerta referencia la lectura que la originó.",
-        0, 878, ancho, 17, GRIS,
+        0, 892, ancho, 17, GRIS,
     )
 
     imagen.save(SALIDA / "14-modelo-de-datos.png")
