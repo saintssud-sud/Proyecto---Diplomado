@@ -1,9 +1,17 @@
 # 16 · Simulador del módulo de adquisición (ESP32)
 
 **Proyecto:** SI.G.VA.C.H. · **Fecha:** 22 de septiembre de 2026
+**Actualizado:** 25 de septiembre de 2026
 **Requisito que atiende:** el entregable E2 pide la aplicación funcionando contra la
-API publicada con **dispositivo simulado**: una alerta generada por un valor fuera de
-rango tiene que poder verse en el panel.
+API publicada con un dispositivo que envíe lecturas, de modo que una alerta generada
+por un valor fuera de rango pueda verse en el panel.
+
+> **Nota de actualización.** El módulo real ya está construido, calibrado y publicando
+> en producción (`hardware/`). El simulador **conserva su utilidad** por tres motivos:
+> permite probar el servicio sin hardware, sirve de **plan B** en la demostración si
+> falla la red del aula, y es la herramienta con la que se **fuerza una alerta** sin
+> esperar a que el cultivo se desvíe. El guion de la demostración vigente está en
+> `docs/17_GUION_DE_LA_DEMOSTRACION.md`.
 
 ---
 
@@ -16,17 +24,17 @@ El sistema está diseñado para que las lecturas entren por dos caminos:
 | **Automático** | El módulo de adquisición (ESP32) | Clave de dispositivo en la cabecera `X-Device-Key` |
 | **Manual** | El operador, con instrumentos portátiles | Token de identidad de Firebase |
 
-El ESP32 real todavía no está construido —su modelo está por definir—, de modo que el
-camino automático quedaría sin demostrar. El simulador **ocupa el lugar del
-dispositivo**: envía las lecturas por el mismo endpoint, con la misma clave y el mismo
-cuerpo que enviará el firmware, de manera que el servicio no distingue una lectura
-simulada de una real. Eso permite demostrar el flujo completo —adquisición, evaluación
-contra el rango del perfil, almacenamiento y alerta— sin hardware.
+El simulador **ocupa el lugar del dispositivo**: envía las lecturas por el mismo
+endpoint, con la misma clave y el mismo cuerpo que envía el firmware, de manera que el
+servicio no distingue una lectura simulada de una real. Eso permite probar el flujo
+completo —adquisición, evaluación contra el rango del perfil, almacenamiento y
+alerta— sin hardware, y **forzar una alerta a voluntad**.
 
 Además, el simulador reproduce el comportamiento que el firmware **debe** tener: si el
 servicio no responde, la lectura **no se descarta**, queda en memoria y se reintenta.
 Es la respuesta al problema del arranque en frío de la capa gratuita, donde la primera
-petición puede demorar hasta sesenta segundos.
+petición puede demorar hasta sesenta segundos. **El firmware lo cumple**, con una cola
+en memoria no volátil que además sobrevive al corte de energía.
 
 ---
 
@@ -162,6 +170,11 @@ límite que corresponde vigilar, no un riesgo para el prototipo.
 ---
 
 ## 5. Guion para la demostración del E2
+
+> **El guion vigente está en `docs/17_GUION_DE_LA_DEMOSTRACION.md`**, que ya contempla
+> el módulo real como protagonista y deja al simulador como plan B. El que sigue se
+> conserva como referencia del procedimiento alternativo: es el que se usa cuando no
+> hay módulo o no hay red.
 
 | Paso | Acción | Qué se ve |
 |---|---|---|
