@@ -3,11 +3,13 @@ import 'package:provider/provider.dart';
 
 import '../controllers/estado_de_vista.dart';
 import '../controllers/panel_controller.dart';
+import '../controllers/perfil_controller.dart';
 import '../controllers/preferences_controller.dart';
 import '../models/api/modelos_api.dart';
 import '../services/api_errores.dart';
 import '../services/auth_service.dart';
 import '../utils/formato_fecha.dart';
+import '../widgets/encabezado_del_menu.dart';
 import '../widgets/max_width_box.dart';
 import '../widgets/tarjeta_de_modulo.dart';
 import '../widgets/vista_con_estados.dart';
@@ -27,6 +29,35 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _tabIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // El nombre y el rol de la cuenta los resuelve el servicio, no el
+    // dispositivo: se piden una vez al entrar para que el menú lateral pueda
+    // presentarlos. Se hace después del primer fotograma porque la consulta
+    // notifica a sus oyentes y eso no puede ocurrir durante la construcción.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      final PerfilController perfil = context.read<PerfilController>();
+      if (perfil.perfil == null) {
+        perfil.cargar();
+      }
+    });
+  }
+
+  /// Refresca el perfil cada vez que se abre el menú lateral.
+  ///
+  /// Si un administrador cambia el rol mientras la sesión está abierta, el menú
+  /// lo refleja en la siguiente apertura en lugar de seguir mostrando el valor
+  /// de cuando se inició sesión.
+  void _alAbrirElMenu(bool abierto) {
+    if (abierto) {
+      context.read<PerfilController>().cargar();
+    }
+  }
 
   void _onTabSelected(int index) {
     setState(() => _tabIndex = index);
@@ -59,6 +90,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final preferences = context.watch<PreferencesController>();
+    // Perfil de la cuenta según el servicio. Es la fuente del rol: la aplicación
+    // lo presenta, pero no lo decide ni lo guarda en el dispositivo.
+    final PerfilUsuario? perfil = context.watch<PerfilController>().perfil;
     // Nombre del usuario autenticado en Firebase (displayName o correo).
     final authUser = AuthService().currentUser;
     final fireName = (authUser?.displayName ?? '').trim();
@@ -68,9 +102,19 @@ class _HomeScreenState extends State<HomeScreen> {
         : emailName.isNotEmpty
         ? emailName
         : (preferences.name.isEmpty ? 'Diplomante' : preferences.name);
+    // El nombre del perfil manda sobre el de Firebase: es el que la cuenta
+    // registró y el que la administración ve en el listado de usuarios.
+    final String nombreDelPerfil = (perfil?.nombre ?? '').trim();
+    final String nombreMostrado = nombreDelPerfil.isNotEmpty
+        ? nombreDelPerfil
+        : name;
+    // El distintivo desaparece mientras el rol no se conozca —al cargar o sin
+    // conexión— antes que suponer un rol que la cuenta no tiene.
+    final String? rolMostrado = perfil?.etiquetaRol;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF2F3F5),
+      onDrawerChanged: _alAbrirElMenu,
       appBar: AppBar(
         backgroundColor: const Color(0xFF39B54A),
         foregroundColor: Colors.white,
@@ -100,46 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            DrawerHeader(
-              decoration: const BoxDecoration(color: Color(0xFF39B54A)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Image.asset(
-                          'assets/images/logo.png',
-                          width: 42,
-                          height: 42,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      const Text(
-                        'SI.G.VA.C.H.',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 17,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Hola, $name',
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
-                  ),
-                ],
-              ),
-            ),
+            EncabezadoDeMenu(nombre: nombreMostrado, etiquetaRol: rolMostrado),
             const Padding(
               padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: Text(
