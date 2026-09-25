@@ -68,7 +68,6 @@
 | T-22 | **Módulo de adquisición real:** firmware sobre ESP-IDF, con calibración de fábrica del convertidor analógico, cola de lecturas en memoria no volátil y publicación por HTTPS validando el certificado del servidor | RF-05 · Requisito mínimo 1 | 23/09 |
 | T-23 | Verificación de los cuatro sensores del módulo con ensayos propios: contraste del DS18B20 contra el AM2302, prueba de la sal del TDS y comprobación de la compensación por temperatura | 2.8 | 23/09 |
 | T-27 | Alineación del vocabulario de roles con el alcance aprobado (administrador y operador) | RF-02 | 24/09 |
-| T-29 | **Entregable E2:** apartado 2.6 Implementación, diccionario de datos de las seis colecciones, eliminación de los restos de plantilla y declaración de la cuenta para la evaluación | Entregable E2 | 24/09 |
 | T-33 | **Prototipo versionado:** firmware, diagrama, documentación y evidencias de los ensayos, con la clave del dispositivo fuera del repositorio | Requisito mínimo 5 | 25/09 |
 | T-35 | **Panel de usuarios migrado al servicio** (cierra la observación B-1): deja de leer Firestore directamente y usa las operaciones de administración del contrato, con las reglas de seguridad alineadas al vocabulario de roles vigente | RF-02 | 25/09 |
 | T-34 | **Guion de la demostración** del E2 y de la defensa, con el módulo real como protagonista, plan de contingencia y las preguntas previsibles del tribunal | Entregable E2 · Defensa | 25/09 |
@@ -82,12 +81,16 @@
 |---|---|
 | **Contrato de la API** | 32 operaciones |
 | **Pruebas automatizadas** | **199** — 106 del servicio y 93 de la aplicación |
-| **Confirmaciones** | 103, repartidas en 12 días distintos |
+| **Confirmaciones** | 110, repartidas en 13 días distintos |
 | **Aplicación publicada** | `https://sigvach26-bd.web.app` |
 | **Servicio publicado** | `https://sigvach-api.onrender.com` |
 | **Módulo de adquisición** | Midiendo y publicando cinco variables en producción |
 
-**Estado al cierre de la Semana 3:** 31 tareas terminadas · 2 en curso · 4 en el backlog.
+**Estado al cierre de la Semana 3:** 30 tareas terminadas · 2 en curso · 4 en el backlog.
+
+> **Sobre la tarea T-29.** El entregable E2 permanece en la columna «En curso»: el
+> documento está redactado, pero la entrega no se ha subido al aula virtual, que es
+> parte de la tarea. Por eso no figura también entre las terminadas.
 
 > **Sobre el módulo de adquisición.** El firmware está versionado en `hardware/`.
 > El archivo `configuracion.h` —que contiene la clave del dispositivo y la red
