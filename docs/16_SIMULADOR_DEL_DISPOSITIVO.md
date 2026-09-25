@@ -46,7 +46,7 @@ en el código ni se muestra en pantalla**.
 
 | Para qué | Comando |
 |---|---|
-| Enviar las siete variables una vez (lo más útil para la demostración) | `python scripts/simulador_dispositivo.py --modulo modulo-1 --ciclos 1` |
+| Enviar las seis variables una vez (lo más útil para la demostración) | `python scripts/simulador_dispositivo.py --modulo modulo-1 --ciclos 1` |
 | Enviar contra el servicio publicado | `python scripts/simulador_dispositivo.py --url https://sigvach-api.onrender.com --modulo <ID> --ciclos 1` |
 | Forzar una alerta | `python scripts/simulador_dispositivo.py --modulo <ID> --ciclos 1 --fuera-de-rango ph` |
 | Envío continuo cada cinco minutos | `python scripts/simulador_dispositivo.py --modulo <ID> --intervalo 300` |
@@ -78,7 +78,6 @@ escribió ningún documento en la base real.
     temp_solucion      21.31 °C      201  dentro
     temp_ambiental     21.22 °C      201  dentro
     humedad            59.53 %       201  dentro
-    nivel_agua         18.53 cm      201  sin_rango
 
   Lecturas intentadas:                  7
   Almacenadas por el servicio (201):    7
@@ -87,9 +86,10 @@ escribió ningún documento en la base real.
 ```
 
 El valor forzado de pH (4,3, por debajo del mínimo 5,5 del perfil de lechuga) quedó
-evaluado como **`bajo`**, que es lo que genera la alerta que aparece en el panel. La
-variable `nivel_agua` informa `sin_rango` porque el perfil de demostración no tiene
-rango configurado para ella: el sistema no inventa una alerta sin rango de referencia.
+evaluado como **`bajo`**, que es lo que genera la alerta que aparece en el panel. El
+sistema admite que una variable no tenga rango configurado y en ese caso informa
+`sin_rango`, sin inventar una alerta; hoy el perfil de demostración define un rango
+para las seis variables del catálogo.
 
 ### 3.2 Arranque en frío: memoria y reintento
 
@@ -134,7 +134,7 @@ en las observaciones de la tutoría.
 ## 4. Consumo de la base de datos (cuota diaria)
 
 Cada envío del dispositivo escribe **un documento por variable** en la colección
-`lecturas`: **siete documentos por envío**, más un documento en `alertas` por cada valor
+`lecturas`: **seis documentos por envío**, más un documento en `alertas` por cada valor
 fuera de rango que se detecte.
 
 La capa gratuita de Cloud Firestore (edición estándar) permite, por día, **20 000
@@ -178,8 +178,8 @@ límite que corresponde vigilar, no un riesgo para el prototipo.
 
 | Paso | Acción | Qué se ve |
 |---|---|---|
-| 1 | Abrir `https://sigvach26-bd.web.app` e iniciar sesión | El panel con el estado de las siete variables |
-| 2 | Ejecutar `python scripts/simulador_dispositivo.py --url https://sigvach-api.onrender.com --modulo <ID> --ciclos 1` | Siete lecturas almacenadas con origen automático |
+| 1 | Abrir `https://sigvach26-bd.web.app` e iniciar sesión | El panel con el estado de las seis variables |
+| 2 | Ejecutar `python scripts/simulador_dispositivo.py --url https://sigvach-api.onrender.com --modulo <ID> --ciclos 1` | Seis lecturas almacenadas con origen automático |
 | 3 | Refrescar el panel | Los valores y la hora de la última lectura actualizados |
 | 4 | Ejecutar el simulador con `--fuera-de-rango ph` | Una lectura `bajo` y la **alerta** correspondiente en el panel |
 | 5 | Abrir el historial de pH | La serie con el valor desviado y la tendencia |

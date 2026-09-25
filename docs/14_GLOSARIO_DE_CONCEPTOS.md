@@ -39,7 +39,7 @@ solución.
 solución.
 
 **pH** — Medida de acidez o alcalinidad, de 0 a 14.
-*En el proyecto:* una de las siete variables; fuera de rango impide que la planta
+*En el proyecto:* una de las seis variables; fuera de rango impide que la planta
 absorba nutrientes aunque estén presentes.
 
 **Conductividad eléctrica (EC)** — Capacidad de la solución de conducir
@@ -461,7 +461,7 @@ se cumplió.
 *En el proyecto:* "invocación del endpoint de salud tras quince minutos sin uso".
 
 **Alcance** — Lo que el proyecto **sí** incluye (y lo que deja fuera).
-*En el proyecto:* un módulo piloto, 7 variables, 2 roles; **sin** control de
+*En el proyecto:* un módulo piloto, 6 variables, 2 roles; **sin** control de
 actuadores.
 
 **MoSCoW** — Técnica para priorizar requisitos: **M**ust (debe), **S**hould

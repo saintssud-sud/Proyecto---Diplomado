@@ -75,7 +75,7 @@ no una versión local.
 | **1–4** | **Demostración** con el módulo | Los ocho pasos del apartado 3, condensados |
 | **4–5** | **Arquitectura**, en una frase por pieza | *"La aplicación presenta y recoge; el servicio decide, valida y autoriza; la base guarda el estado y nadie la toca sin pasar por el servicio."* |
 | **5–6** | **El módulo**: lo que aporta | *"Mide cinco variables de forma automática; guarda las lecturas en memoria no volátil si el servicio no responde, y las publica con la hora en que se midieron."* |
-| **6–7** | **Riesgos y límites** | El arranque en frío de la capa gratuita, la variable de pH pendiente de calibración y el nivel de agua que se registra a mano |
+| **6–7** | **Riesgos y límites** | El arranque en frío de la capa gratuita, la variable de pH pendiente de calibración |
 
 ---
 
@@ -123,7 +123,7 @@ El detalle completo está en `docs/16_SIMULADOR_DEL_DISPOSITIVO.md`.
 | **¿Qué pasa si se corta la luz?** | Las lecturas pendientes están en **memoria no volátil**: sobreviven al reinicio y se publican con la hora en que se midieron. **Se probó**: diez lecturas sobrevivieron a dos reinicios |
 | **¿Por qué el servicio y no la base directamente?** | *"Nadie toca la base sin pasar por el servicio."* La validación y la autorización no pueden depender del cliente. Las reglas de Firestore cierran el acceso directo |
 | **¿Cómo se que un sensor mide bien?** | Con **ensayos propios** documentados: el DS18B20 se contrastó contra el AM2302 y coincidieron en 0,01 °C; el TDS se probó alterando la concentración de la solución. Los registros están en el repositorio |
-| **¿Qué queda fuera del alcance?** | El **control de actuadores** —el módulo mide y publica, no acciona la bomba—, y tres variables con tratamiento particular: el pH espera la calibración del electrodo, y el nivel de agua se registra a mano |
+| **¿Qué queda fuera del alcance?** | El **control de actuadores** —el módulo mide y publica, no acciona la bomba—, y la **variable de pH**, que espera la recuperación del electrodo y su calibración |
 | **¿Cuánto cuesta operarlo?** | La capa gratuita del servicio y de la base; a cinco minutos por ciclo se usa el **10 % de la cuota diaria** de escrituras |
 | **¿Qué error les costó más?** | Decirlo con honestidad: el asentamiento del convertidor analógico, que hacía que la **primera lectura publicada tras encender fuera falsa** y con apariencia normal |
 

@@ -8,7 +8,7 @@
 
 ## 1. Nombre y descripción del proyecto
 
-**SIGVACH** es una aplicación desarrollada con **Flutter** —para Android y web— que permite monitorear y gestionar las **siete variables** de un cultivo hidropónico: **pH, sólidos disueltos totales, conductividad eléctrica, temperatura de la solución, temperatura ambiental, humedad relativa y nivel de agua**. Las mediciones se evalúan contra los **rangos de referencia del cultivo** que se siembra en cada módulo, y el sistema genera una alerta cuando un valor sale de rango.
+**SIGVACH** es una aplicación desarrollada con **Flutter** —para Android y web— que permite monitorear y gestionar las **seis variables** de un cultivo hidropónico: **pH, sólidos disueltos totales, conductividad eléctrica, temperatura de la solución, temperatura ambiental, humedad relativa y nivel de agua**. Las mediciones se evalúan contra los **rangos de referencia del cultivo** que se siembra en cada módulo, y el sistema genera una alerta cuando un valor sale de rango.
 
 Se compone de dos piezas: la **aplicación Flutter** y el **servicio backend** que expone la API y concentra la validación, la autorización y las reglas de negocio (apartado 5).
 
@@ -38,8 +38,8 @@ El **archivo instalable de Android** se compila apuntando al servicio publicado,
 |---|---|
 | Presentación | Splash con logo, nombre del sistema y animación de aparición. |
 | Autenticación | Registro e inicio de sesión con **Firebase Authentication** (correo + contraseña); el perfil del usuario (nombres, apellidos, teléfono, cargo, rol) se guarda en **Cloud Firestore** y se consulta a través del servicio. |
-| Inicio (panel) | Las **siete variables** del módulo vigente, con su último valor, su rango de referencia y su estado; aviso de alertas activas, selector de módulo y registro de mediciones manuales. |
-| Variables | Detalle de las siete variables del módulo, contra los rangos del cultivo que se siembra en él. |
+| Inicio (panel) | Las **seis variables** del módulo vigente, con su último valor, su rango de referencia y su estado; aviso de alertas activas, selector de módulo y registro de mediciones manuales. |
+| Variables | Detalle de las seis variables del módulo, contra los rangos del cultivo que se siembra en él. |
 | Módulo | Alta, edición, activación y baja de los módulos de cultivo; cada uno se asocia a un cultivo y a una ubicación. |
 | Cultivos | Catálogo de especies con sus **rangos de referencia** (lechuga, acelga, apio u otra hortaliza): alta, edición de rangos y baja. |
 | Alertas | Pestañas Activas/Historial **del módulo vigente**; las genera el **servicio** cuando una lectura sale del rango del cultivo; se marcan como atendidas. |
@@ -81,7 +81,7 @@ El sistema cuenta además con un **servicio backend** (FastAPI sobre Python 3.13
 - **Simulador del módulo de adquisición** (envía lecturas como lo hará el ESP32, con la clave de dispositivo):
 
 ```bash
-python scripts/simulador_dispositivo.py --modulo <ID> --ciclos 1                     # un envío de las siete variables
+python scripts/simulador_dispositivo.py --modulo <ID> --ciclos 1                     # un envío de las seis variables
 python scripts/simulador_dispositivo.py --modulo <ID> --ciclos 1 --fuera-de-rango ph # fuerza una alerta
 python scripts/simulador_dispositivo.py --url https://sigvach-api.onrender.com --modulo <ID> --intervalo 300
 python scripts/simulador_dispositivo.py --listar-modulos                            # qué módulos hay registrados

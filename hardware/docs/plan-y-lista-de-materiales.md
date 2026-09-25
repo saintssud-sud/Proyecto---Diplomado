@@ -14,7 +14,7 @@ simulador— y conectarlo al servicio publicado.
 >
 > Además resuelve la observación **A-4** de la tutoría: el "módulo piloto" dejaría de
 > ser una expresión del documento y pasaría a ser la cama hidropónica real, en un lugar
-> concreto, con las siete variables medidas allí.
+> concreto, con las seis variables medidas allí.
 
 ---
 
@@ -85,7 +85,7 @@ conexionado y el firmware— se define sobre esta única variante.
 
 ## 1. Qué tiene que medir el módulo
 
-El sistema gestiona **siete variables**. La correspondencia con los dispositivos que ya
+El sistema gestiona **seis variables**. La correspondencia con los dispositivos que ya
 tenés es la siguiente (a confirmar con las fotos y la hoja de datos de cada placa):
 
 | Variable del sistema | Sensor disponible | Observación |
@@ -93,12 +93,11 @@ tenés es la siguiente (a confirmar con las fotos y la hoja de datos de cada pla
 | `temp_ambiental` (temperatura ambiental) | Sensor de temperatura ambiente | Si es un DHT11/DHT22 **también entrega la humedad**: cubre dos variables con una pieza |
 | `humedad` (humedad relativa) | El mismo sensor anterior (DHT/SHT) | — |
 | `temp_solucion` (temperatura de la solución) | **DS18B20** (sonda de acero inoxidable) | Es el sensor adecuado para el agua: sumergible, digital y preciso. Necesita una resistencia de **4,7 kΩ** |
-| `nivel_agua` (nivel de agua) | **Ultrasónico** | Mide la distancia al agua; hay que convertirla a **centímetros de columna** según la geometría del depósito |
 | `tds` (sólidos disueltos totales, ppm) | **Sensor TDS** (analógico) | Mide conductividad y la presenta como ppm; requiere **compensación por temperatura**, que aporta el DS18B20 |
 | `ec` (conductividad eléctrica, mS/cm) | ⚠️ **No hay sensor de EC aparte** | La EC se **deriva del TDS**: `TDS (ppm) ≈ EC (mS/cm) × 500`. El módulo puede medir el TDS y publicar la EC calculada, o publicar solo el TDS. Hay que decidirlo y documentarlo |
 | `ph` | **Sensor de pH** (analógico, con conector BNC) | Es el más delicado: necesita **calibración con soluciones patrón** (4,00 y 6,86) y su electrodo **nunca debe secarse** |
 
-**Conclusión del inventario:** con lo que tenés se cubren **las siete variables**. No
+**Conclusión del inventario:** con lo que tenés se cubren **las seis variables**. No
 falta ningún sensor; faltan accesorios eléctricos, calibración y la puesta en marcha.
 
 > **El prototipo mide y publica; no acciona nada.** El documento declara fuera de
@@ -110,16 +109,15 @@ falta ningún sensor; faltan accesorios eléctricos, calibración y la puesta en
 
 ## 2. Advertencias eléctricas (leer antes de conectar nada)
 
-Son las cinco trampas clásicas de este montaje. Ninguna es difícil, pero las tres
-primeras **dañan el ESP32** si se pasan por alto:
+Son las cuatro trampas clásicas de este montaje. Ninguna es difícil, pero la primera
+**daña el ESP32** si se pasa por alto:
 
 | # | Advertencia | Por qué |
 |---|---|---|
 | 1 | **El ESP32 tolera 3,3 V en sus entradas.** El pH y el TDS trabajan a **5 V** y su salida analógica puede llegar a esa tensión | Conectar 5 V a una entrada del ESP32 lo daña. Hay que usar un **divisor de tensión** (por ejemplo 10 kΩ y 20 kΩ) o alimentar la placa a 3,3 V si su hoja de datos lo permite |
 | 2 | **Usar solo entradas analógicas del ADC1** (GPIO 32 a 39) | El **ADC2 no funciona mientras el WiFi está activo**. Es el error más frecuente: el sensor "no lee" y en realidad el canal está ocupado por la radio |
-| 3 | **El pin ECHO del ultrasónico** devuelve 5 V si es un **HC-SR04** | Necesita divisor (1 kΩ y 2 kΩ) o un módulo que ya acepte 3,3 V. Si es **JSN-SR04T** (un solo cilindro, impermeable) trabaja mejor sobre una cama húmeda |
-| 4 | **El ADC del ESP32 es ruidoso y no lineal** | Se leen 15 a 30 muestras y se toma la **mediana**; después se aplica la recta de calibración de dos puntos |
-| 5 | **Masa común obligatoria** | Todos los módulos y el ESP32 comparten GND; sin eso las lecturas son basura |
+| 3 | **El ADC del ESP32 es ruidoso y no lineal** | Se leen 15 a 30 muestras y se toma la **mediana**; después se aplica la recta de calibración de dos puntos |
+| 4 | **Masa común obligatoria** | Todos los módulos y el ESP32 comparten GND; sin eso las lecturas son basura |
 
 **Y tres cuidados del montaje:** la electrónica va **fuera** de la cama, en una caja
 estanca con prensacables; las sondas de pH y EC **no deben secarse nunca** (se guardan
@@ -134,7 +132,7 @@ computadora cuando las sondas estén en el agua, para evitar lazos de masa y rui
 |---|---|---|
 | **Protoboard** y cables dupont (macho-hembra y macho-macho) | Conectar sin soldar | Sí |
 | **Resistencia de 4,7 kΩ** | Pull-up del DS18B20 | Sí |
-| **Resistencias para divisores** (10 kΩ y 20 kΩ; 1 kΩ y 2 kΩ) | Bajar de 5 V a 3,3 V las señales de pH, TDS y ECHO | Sí |
+| **Resistencias para divisores** (10 kΩ y 20 kΩ) | Bajar de 5 V a 3,3 V las señales de pH y TDS | Sí |
 | **Fuente de 5 V ≥ 2 A** (cargador USB) y cable | Alimentar el conjunto | Sí |
 | **Caja estanca (IP65)** y prensacables | Proteger la electrónica de la humedad | Sí |
 | **Soluciones de calibración de pH**: 4,00 y 6,86 (o 7,00) | Calibrar el electrodo de pH | Sí |
@@ -142,7 +140,6 @@ computadora cuando las sondas estén en el agua, para evitar lazos de masa y rui
 | **Agua destilada** y dos recipientes | Enjuagar las sondas entre calibraciones | Sí |
 | **Multímetro** | Verificar tensiones antes de conectar | Muy recomendable |
 | **Termómetro de referencia** | Contrastar el DS18B20 | Deseable |
-| **JSN-SR04T** (ultrasónico impermeable) | Si el que tenés es HC-SR04, mide mejor sobre el agua | Opcional |
 
 ---
 
@@ -157,8 +154,8 @@ lugar natural es la defensa del 13/10.
 |---|---|---|---|
 | **1. Inventario e identificación** | 23 y 24/09 | Fotos de cada placa y de cada etiqueta; se identifican modelos, tensiones y pines | Tabla de conexionado definitiva (sensor → GPIO) y lista exacta de lo que falta |
 | **2. Banco de pruebas, sin agua** | 24 y 25/09 | Firmware mínimo: conexión WiFi y lectura de cada sensor por el Monitor Serie | Cada sensor responde y se conoce su escala real |
-| **3. Publicación contra el servicio** | 25 y 26/09 | Firmware completo: envío al endpoint con la clave de dispositivo, **reintento y memoria** ante cortes | Las siete variables aparecen en el panel de la aplicación |
-| **4. Calibración** | 28/09 al 4/10 | Rectas de calibración de pH y de TDS, contraste del DS18B20, geometría del nivel de agua | Curvas y constantes documentadas (material directo para el Capítulo 2) |
+| **3. Publicación contra el servicio** | 25 y 26/09 | Firmware completo: envío al endpoint con la clave de dispositivo, **reintento y memoria** ante cortes | Las seis variables aparecen en el panel de la aplicación |
+| **4. Calibración** | 28/09 al 4/10 | Rectas de calibración de pH y de TDS y contraste del DS18B20 | Curvas y constantes documentadas (material directo para el Capítulo 2) |
 | **5. Instalación en la cama y marcha continua** | 5 al 11/10 | El módulo instalado midiendo de forma sostenida, con las alertas del sistema funcionando | Evidencia para la defensa: fotos, capturas del panel y datos reales del cultivo |
 | **6. Documentación** | 11 y 12/10 | Apartado del prototipo: materiales, conexionado, calibración, dificultades y resultados | Capítulo nuevo, verificado y con evidencia propia |
 
@@ -175,10 +172,9 @@ en un recipiente controlado, y la cama se reserva para la instalación definitiv
 
 1. La placa **ESP32** (interesa leer si dice `ESP32-WROOM-32` y cuántos pines tiene)
 2. El sensor de **humedad y temperatura ambiente** (¿DHT11, DHT22, SHT31?)
-3. El **ultrasónico** (¿dos cilindros = HC-SR04, o uno solo = JSN-SR04T?)
-4. El módulo de **pH** (¿plaqueta con conector BNC redondo?)
-5. El módulo de **TDS** (¿plaqueta con sonda de dos placas?)
-6. La sonda **DS18B20** (¿cable con tres hilos y punta de acero?)
+3. El módulo de **pH** (¿plaqueta con conector BNC redondo?)
+4. El módulo de **TDS** (¿plaqueta con sonda de dos placas?)
+5. La sonda **DS18B20** (¿cable con tres hilos y punta de acero?)
 
 **Datos que necesito que me confirmes:**
 

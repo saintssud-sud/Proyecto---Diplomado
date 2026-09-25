@@ -21,7 +21,7 @@ anexo correspondiente; aquí se indica qué debe mostrar cada una.
 **Cómo se comprueba**
 
 1. Abrir la dirección de la aplicación web e iniciar sesión con una cuenta del sistema.
-2. El panel debe mostrar las siete variables del módulo con sus valores, rangos y estados.
+2. El panel debe mostrar las seis variables del módulo con sus valores, rangos y estados.
 3. Abrir `https://sigvach-api.onrender.com/api/v1/salud`: debe responder
    `{"estado":"ok","version_api":"v1","entorno":"produccion","base_de_datos":"conectada"}`.
 

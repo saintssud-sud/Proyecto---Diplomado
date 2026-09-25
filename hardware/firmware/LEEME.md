@@ -37,7 +37,6 @@ Los cuatro sensores del montaje actual están **verificados con ensayos propios*
 | `tds` | TDS Meter V1.0 | **Prueba de la sal: 155 mV → 2 415 mV** |
 | `ec` | derivada del TDS | `ppm ÷ 500` |
 | `ph` | PH-4502C | Pendiente: electrodo en recuperación |
-| `nivel_agua` | manual (regla) | Por diseño: el ultrasónico quedó fuera |
 
 ---
 
@@ -50,7 +49,6 @@ Los cuatro sensores del montaje actual están **verificados con ensayos propios*
 | DS18B20 sumergible | ✅ **verificado en P32** |
 | TDS Meter V1.0 + sonda | ✅ **verificado en SVN** |
 | PH-4502C + electrodo BNC | ⏸️ electrodo en recuperación (24–48 h en KCl) |
-| HC-SR04 | ⏸️ **fuera del montaje** — el nivel se registra a mano |
 | Sonda NTC de suelo (Thermoreg) | ⏸️ fuera: mide sustrato, que no es una variable |
 | Protoboard, cables dupont, multímetro | ✅ |
 | **Resistencia de 4,7 kΩ** | ⚠️ **necesaria para el DS18B20** (véase 3.3) |
@@ -349,7 +347,6 @@ El catálogo vive en `backend/app/esquemas.py` (`CATALOGO_VARIABLES`):
 | `ec` | `"mS/cm"` |
 | `humedad` | `"%"` |
 | `ph` | `""` (vacía) |
-| `nivel_agua` | `"cm"` |
 
 ### 8.5 El driver `dht` NO configura el pull-up
 

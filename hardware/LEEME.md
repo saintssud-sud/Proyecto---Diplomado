@@ -34,7 +34,6 @@ alcance aprobado en la tutoría.
 | `tds` | TDS Meter V1.0 | ✅ Verificado |
 | `ec` | derivada del TDS (`ppm ÷ 500`) | ✅ |
 | `ph` | PH-4502C | ⏳ electrodo en recuperación |
-| `nivel_agua` | manual, con regla | Por diseño |
 
 ---
 

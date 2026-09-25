@@ -22,7 +22,6 @@
 | TDS y EC | TDS Meter V1.0 | **Sí**: un patrón (707 ppm) | `FACTOR_TDS` |
 | Temperatura de la solución | DS18B20 | Contraste con termómetro | `AJUSTE_TEMPERATURA` |
 | Temperatura ambiental y humedad | DHT22 | No requiere; se verifica coherencia | — |
-| Nivel de agua | Manual (regla) | No aplica | — |
 
 ---
 
@@ -125,7 +124,7 @@ AJUSTE_TEMPERATURA = temperatura de referencia − temperatura del DS18B20
 | Agua con hielo (≈ 0 °C) | | | | |
 | Ambiente | | | | |
 
-> La temperatura importa **dos veces** en este proyecto: es una de las siete variables y,
+> La temperatura importa **dos veces** en este proyecto: es una de las seis variables y,
 > además, el TDS se corrige por temperatura usando justamente esta medición. Un error de
 > 3 °C en el DS18B20 desvía el TDS alrededor de un 6 %.
 
@@ -144,23 +143,7 @@ comprobación:
 
 ---
 
-## 7. Nivel de agua (registro manual)
-
-El nivel **no se mide con sensor**: se mide con una regla graduada y se registra desde la
-aplicación, en *Registrar medición manual*, cuando se rellena el depósito.
-
-| Fecha | Nivel medido (cm) | Acción realizada |
-|---|---|---|
-| | | |
-
-**Si algún día se instala el ultrasónico**, hay que medir dos cosas con la regla y
-anotarlas en el programa: la **altura total del agua cuando el depósito está lleno**
-(`ALTURA_TANQUE_CM`) y la **distancia desde el sensor hasta la superficie con el depósito
-lleno** (`DISTANCIA_SENSOR_CM`).
-
----
-
-## 8. Registro de la calibración (evidencia)
+## 7. Registro de la calibración (evidencia)
 
 | Fecha | Qué se calibró | Resultado | Responsable | Observaciones |
 |---|---|---|---|---|
@@ -170,7 +153,7 @@ lleno** (`DISTANCIA_SENSOR_CM`).
 
 ---
 
-## 9. Mantenimiento
+## 8. Mantenimiento
 
 | Pieza | Cuidado | Frecuencia |
 |---|---|---|
@@ -182,7 +165,7 @@ lleno** (`DISTANCIA_SENSOR_CM`).
 
 ---
 
-## 10. Verificación final
+## 9. Verificación final
 
 Con la calibración aplicada, el sistema queda correcto si:
 

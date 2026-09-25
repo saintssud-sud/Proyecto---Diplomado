@@ -16,10 +16,10 @@
 | 5 | `SensorDS18b20.jpg` | **DS18B20** sumergible, punta de acero inoxidable, cable negro | Temperatura de la solución |
 | 6 | `SensorDHT22.jpg` | **DHT22 / AM2302** en plaqueta de 3 pines (`+`, `out`, `−`) | Temperatura ambiental **y** humedad relativa. **Elegido para el montaje** (véase §1.2) |
 | 7 | `SensorAM2302.jpg` | **AM2302 (DHT22)** con cable de tres hilos, sin plaqueta | Segunda unidad, reserva. **Mejor ubicación** si se quiere alejar del calor de la electrónica (véase §1.2) |
-| 8 | `SENSOR ULTRASÓNICO HC-SR04.jpg` | **HC-SR04** (dos cilindros, rótulo `Vcc Trig Echo Gnd`), ya montado en un soporte de cartón | Nivel de agua. **Funciona a 5 V y su salida Echo también es de 5 V** |
+| 8 | `SENSOR ULTRASÓNICO HC-SR04.jpg` | **HC-SR04** (dos cilindros, rótulo `Vcc Trig Echo Gnd`), ya montado en un soporte de cartón | **Fuera del alcance.** La variable de nivel de agua se retiró del sistema, así que la pieza queda como repuesto; su salida Echo es de 5 V y exigiría un divisor |
 | 9 | `MiniBomba.jpg` | **Bomba sumergible de corriente continua** con su fuente (adaptador negro con conector de barril) | Recirculación del NFT. No la controla el sistema: funciona siempre o con temporizador |
 | 10 | `MaquetaAccesorios.jpg`, `PartesMaqueta.jpeg` | **Estructura NFT**: cuatro tubos con orificios, colector con codos, dos canastillas, microtubo negro con goteros y manguera corrugada de retorno | Fotografiada sobre el piso, todavía sin armar sobre las patas |
-| 11 | `SensorDesconocido.jpg` | **Sensor de temperatura de suelo (sonda NTC) para termostato Thermoreg** | **Identificado el 23/09.** No se usa en el prototipo: mide la temperatura del **suelo o sustrato**, que no es una de las siete variables del sistema, y al ser una sonda resistiva del termostato exige una curva de calibración propia. La temperatura de la solución la mide el **DS18B20**, que es digital, calibrado y sumergible |
+| 11 | `SensorDesconocido.jpg` | **Sensor de temperatura de suelo (sonda NTC) para termostato Thermoreg** | **Identificado el 23/09.** No se usa en el prototipo: mide la temperatura del **suelo o sustrato**, que no es una de las seis variables del sistema, y al ser una sonda resistiva del termostato exige una curva de calibración propia. La temperatura de la solución la mide el **DS18B20**, que es digital, calibrado y sumergible |
 
 ---
 
@@ -27,7 +27,7 @@
 
 | Pregunta | Respuesta |
 |---|---|
-| ¿Mide alguna de las siete variables? | **No.** El sistema mide temperatura **ambiental**, humedad **relativa**, temperatura de la **solución**, nivel de agua, pH, TDS y EC. La temperatura del sustrato no está en el alcance |
+| ¿Mide alguna de las seis variables? | **No.** El sistema mide temperatura **ambiental**, humedad **relativa**, temperatura de la **solución**, pH, TDS y EC. La temperatura del sustrato no está en el alcance |
 | ¿Puede reemplazar al DS18B20? | **No conviene.** Es una sonda resistiva (NTC) pensada para un termostato comercial: habría que averiguar su curva de calibración y armar un divisor para leerla, mientras que el DS18B20 ya entrega la temperatura en grados, calibrada y por un solo hilo |
 | ¿Sirve para algo más adelante? | Sí: si el proyecto mayor mide el **sustrato** en lugar de la solución, es una pieza aprovechable |
 
@@ -52,7 +52,7 @@ que cambia es **cómo viene presentado**:
 **Criterio de elección.** El ESP32 y su placa de expansión **generan calor**: si el sensor
 queda pegado a ellos, la temperatura ambiental que informa el sistema es la del
 microcontrolador y no la del cultivo, con una desviación de 1 a 3 °C. Eso afecta a una de
-las siete variables y, de paso, a la compensación por temperatura del TDS.
+las seis variables y, de paso, a la compensación por temperatura del TDS.
 
 | Momento | Cuál usar | Por qué |
 |---|---|---|
@@ -151,12 +151,10 @@ ojo: cuando se cargue el programa, el Monitor Serie lo informará.
 2. **La salida del PH-4502C puede superar los 3,3 V** → necesita **divisor de tensión** antes de
    entrar al ESP32. La calibración se hace **con el divisor ya conectado**, de modo que el factor
    del divisor queda absorbido por la recta de calibración.
-3. **El Echo del HC-SR04 devuelve 5 V** → **divisor obligatorio** (por ejemplo 1 kΩ y 2 kΩ). El
-   disparo (`Trig`) con 3,3 V suele funcionar; si no, se agrega un adaptador de nivel.
-4. **El DS18B20 necesita una resistencia de 4,7 kΩ** entre el pin de datos y 3,3 V.
-5. **El DHT22 en plaqueta** suele traer su resistencia de pull-up incorporada; el **AM2302 con
+3. **El DS18B20 necesita una resistencia de 4,7 kΩ** entre el pin de datos y 3,3 V.
+4. **El DHT22 en plaqueta** suele traer su resistencia de pull-up incorporada; el **AM2302 con
    cable no**, y necesita 10 kΩ entre datos y 3,3 V.
-6. **Masa común** para todas las piezas y alimentación de las placas de pH y TDS desde el riel de
+5. **Masa común** para todas las piezas y alimentación de las placas de pH y TDS desde el riel de
    **5 V**, mientras que el DS18B20 y el DHT22 van al de **3,3 V**.
 
 ---
@@ -173,9 +171,6 @@ ojo: cuando se cargue el programa, el Monitor Serie lo informará.
 | DS18B20 | `VDD` / `GND` | `3,3V` / `GND` | 3,3 V |
 | DHT22 | `out` | `P33` | 3,3 V |
 | DHT22 | `+` / `−` | `3,3V` / `GND` | 3,3 V |
-| HC-SR04 | `Trig` | `P25` | 3,3 V |
-| HC-SR04 | `Echo` | `P26`, **con divisor** | 5 V → 3,3 V |
-| HC-SR04 | `Vcc` / `Gnd` | `5V` / `GND` | 5 V |
 
 **Los seis pines del ADC1 quedan así ocupados en dos** (`SVP` y `SVN`): el resto se usa como
 entrada o salida digital, que no tiene esa restricción.
@@ -222,8 +217,7 @@ el electrodo** (es la pieza más económica del conjunto y se consigue sola, con
 BNC).
 
 **Mientras tanto, el proyecto no se detiene:** el firmware y la maqueta se prueban con
-las demás variables —temperatura ambiental, humedad relativa, temperatura de la solución,
-nivel de agua y TDS—, que no dependen de ninguna solución. El sistema admite que una
+las demás variables —temperatura ambiental, humedad relativa, temperatura de la solución y TDS—, que no dependen de ninguna solución. El sistema admite que una
 variable no tenga lecturas: simplemente informa que no hay datos, sin inventar valores.
 
 ### 5.2 Los tubos de PVC
