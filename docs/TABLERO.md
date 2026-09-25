@@ -15,7 +15,6 @@
 | T-32 | Calibrar el sensor de TDS con el patrón de 707 ppm | 2.8 · calibración | Must |
 | T-19 | Verificación de adaptabilidad con capturas en tres anchos (320, 768 y 1920 px) | RNF-04 · RNF-06 | Should |
 | T-34 | Guion de la demostración del E2 y de la defensa, con plan de contingencia | Entregable E2 · Defensa | Should |
-| T-35 | Desplegar el panel de usuarios contra las operaciones del servicio | RF-02 | Could |
 
 ---
 
@@ -72,6 +71,7 @@
 | T-27 | Alineación del vocabulario de roles con el alcance aprobado (administrador y operador) | RF-02 | 24/09 |
 | T-29 | **Entregable E2:** apartado 2.6 Implementación, diccionario de datos de las seis colecciones, eliminación de los restos de plantilla y declaración de la cuenta para la evaluación | Entregable E2 | 24/09 |
 | T-33 | **Prototipo versionado:** firmware, diagrama, documentación y evidencias de los ensayos, con la clave del dispositivo fuera del repositorio | Requisito mínimo 5 | 25/09 |
+| T-35 | **Panel de usuarios migrado al servicio** (cierra la observación B-1): deja de leer Firestore directamente y usa las operaciones de administración del contrato, con las reglas de seguridad alineadas al vocabulario de roles vigente | RF-02 | 25/09 |
 
 ---
 
@@ -80,13 +80,13 @@
 | Elemento | Estado |
 |---|---|
 | **Contrato de la API** | 32 operaciones |
-| **Pruebas automatizadas** | **186** — 106 del servicio y 80 de la aplicación |
-| **Confirmaciones** | 100, repartidas en 12 días distintos |
+| **Pruebas automatizadas** | **196** — 106 del servicio y 90 de la aplicación |
+| **Confirmaciones** | 103, repartidas en 12 días distintos |
 | **Aplicación publicada** | `https://sigvach26-bd.web.app` |
 | **Servicio publicado** | `https://sigvach-api.onrender.com` |
 | **Módulo de adquisición** | Midiendo y publicando cinco variables en producción |
 
-**Estado al cierre de la Semana 3:** 28 tareas terminadas · 2 en curso · 6 en el backlog.
+**Estado al cierre de la Semana 3:** 29 tareas terminadas · 2 en curso · 5 en el backlog.
 
 > **Sobre el módulo de adquisición.** El firmware está versionado en `hardware/`.
 > El archivo `configuracion.h` —que contiene la clave del dispositivo y la red
