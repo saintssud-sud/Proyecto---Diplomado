@@ -137,7 +137,7 @@ void main() {
       await panel.cargar();
 
       expect(panel.estado, EstadoVista.conDatos);
-      expect(panel.variables, hasLength(7));
+      expect(panel.variables, hasLength(6));
       final EstadoDeVariable ph = panel.variables.firstWhere((EstadoDeVariable v) => v.codigo == 'ph');
       expect(ph.valor, 6.1, reason: 'Se toma el valor más reciente');
       expect(ph.minimo, 5.5);
@@ -252,7 +252,7 @@ void main() {
 
       expect(panel.estado, EstadoVista.vacio);
       expect(panel.modulo, isNotNull);
-      expect(panel.variables, hasLength(7));
+      expect(panel.variables, hasLength(6));
     });
 
     test('un fallo de conexión queda como error de conexión', () async {

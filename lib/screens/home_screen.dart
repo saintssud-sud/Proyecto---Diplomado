@@ -469,7 +469,6 @@ class _TarjetaVariable extends StatelessWidget {
     'temp_solucion': Icons.thermostat_outlined,
     'temp_ambiental': Icons.thermostat_outlined,
     'humedad': Icons.water_drop_outlined,
-    'nivel_agua': Icons.water_drop_outlined,
   };
 
   static const Map<String, Color> _colores = <String, Color>{
@@ -479,7 +478,6 @@ class _TarjetaVariable extends StatelessWidget {
     'temp_solucion': Color(0xFFE65100),
     'temp_ambiental': Color(0xFFEF6C00),
     'humedad': Color(0xFF1565C0),
-    'nivel_agua': Color(0xFF0277BD),
   };
 
   @override

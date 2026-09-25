@@ -578,7 +578,7 @@ escribir(81, "Tabla 11. Diccionario de datos de la entidad lecturas. Fuente: ela
 diccionario = [
     ["id", "Texto", "20", "Sí", "Identificador del documento", "Identificador único de la lectura"],
     ["modulo_id", "Texto", "20", "Sí", "Referencia a modulos_cultivo", "Módulo de cultivo al que pertenece la lectura"],
-    ["variable", "Texto", "12", "Sí", "Catálogo de siete variables", "Variable medida: ph, ec, tds, temp_solucion, temp_ambiental, humedad o nivel_agua"],
+    ["variable", "Texto", "12", "Sí", "Catálogo de seis variables", "Variable medida: ph, ec, tds, temp_solucion, temp_ambiental o humedad"],
     ["valor", "Numérico", "—", "Sí", "Dentro del límite físico de la variable", "Valor medido, en la unidad de la variable"],
     ["unidad", "Texto", "8", "Sí", "Heredada del catálogo", "Unidad de medida correspondiente a la variable"],
     ["origen", "Texto", "10", "Sí", "automatico o manual", "Procedencia de la lectura: módulo de adquisición o medición manual"],

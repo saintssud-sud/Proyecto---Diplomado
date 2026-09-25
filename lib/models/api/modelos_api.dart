@@ -64,7 +64,6 @@ const List<VariableCatalogo> catalogoVariables = <VariableCatalogo>[
     unidad: '°C',
   ),
   VariableCatalogo(codigo: 'humedad', nombre: 'Humedad relativa', unidad: '%'),
-  VariableCatalogo(codigo: 'nivel_agua', nombre: 'Nivel de agua', unidad: 'cm'),
 ];
 
 /// Nombre presentable de una variable; si el código es desconocido, lo devuelve tal cual.

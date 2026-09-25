@@ -62,7 +62,6 @@ PERFILES = {
     "temp_solucion": ("Temperatura de la solución", "°C", 21.0, 0.7, -10.0, 60.0),
     "temp_ambiental": ("Temperatura ambiental", "°C", 24.0, 1.2, -20.0, 70.0),
     "humedad": ("Humedad relativa", "%", 62.0, 3.0, 0.0, 100.0),
-    "nivel_agua": ("Nivel de agua", "cm", 18.0, 0.5, 0.0, 200.0),
 }
 
 # Valor que se envía cuando se pide forzar una desviación. Está fuera de los
@@ -75,7 +74,6 @@ FUERA_DE_RANGO = {
     "temp_solucion": 31.5,
     "temp_ambiental": 39.0,
     "humedad": 24.0,
-    "nivel_agua": 2.5,
 }
 
 

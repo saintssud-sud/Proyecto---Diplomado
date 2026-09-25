@@ -194,7 +194,7 @@ ENTIDADES = (
     ]),
     ("rangos", 890, 90, 360, 190, AZUL_CLARO, AZUL, [
         "id · perfil_id → perfiles_cultivo",
-        "variable (catálogo de siete)",
+        "variable (catálogo de seis)",
         "minimo · maximo · unidad",
     ]),
     ("modulos_cultivo", 470, 350, 340, 190, VERDE_CLARO, VERDE, [

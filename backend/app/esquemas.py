@@ -44,7 +44,6 @@ CATALOGO_VARIABLES: dict[str, DefinicionVariable] = {
         "temp_ambiental", "Temperatura ambiental", "°C", -20.0, 70.0
     ),
     "humedad": DefinicionVariable("humedad", "Humedad relativa", "%", 0.0, 100.0),
-    "nivel_agua": DefinicionVariable("nivel_agua", "Nivel de agua", "cm", 0.0, 200.0),
 }
 
 ORIGENES = ("automatico", "manual")
