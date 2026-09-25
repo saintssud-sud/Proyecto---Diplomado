@@ -14,7 +14,6 @@
 | T-31 | Calibrar el sensor de pH con las soluciones patrón 4,00 y 6,86 | 2.8 · calibración | Must |
 | T-32 | Calibrar el sensor de TDS con el patrón de 707 ppm | 2.8 · calibración | Must |
 | T-19 | Verificación de adaptabilidad con capturas en tres anchos (320, 768 y 1920 px) | RNF-04 · RNF-06 | Should |
-| T-33 | Versionar el prototipo (firmware, diagrama y documentos) en el repositorio | Requisito mínimo 5 | Should |
 | T-34 | Guion de la demostración del E2 y de la defensa, con plan de contingencia | Entregable E2 · Defensa | Should |
 | T-35 | Desplegar el panel de usuarios contra las operaciones del servicio | RF-02 | Could |
 
@@ -64,7 +63,7 @@
 | T-17 | Gestión de cuentas desde el servicio (listar, consultar, modificar y eliminar) | RF-02 | 22/09 |
 | T-24 | Simulador del módulo de adquisición para el E2 | RF-05 | 22/09 |
 
-### Semana 3 (23 al 24/09)
+### Semana 3 (23 al 25/09)
 
 | ID | Tarea | Requisito | Fecha |
 |---|---|---|---|
@@ -72,23 +71,25 @@
 | T-23 | Verificación de los cuatro sensores del módulo con ensayos propios: contraste del DS18B20 contra el AM2302, prueba de la sal del TDS y comprobación de la compensación por temperatura | 2.8 | 23/09 |
 | T-27 | Alineación del vocabulario de roles con el alcance aprobado (administrador y operador) | RF-02 | 24/09 |
 | T-29 | **Entregable E2:** apartado 2.6 Implementación, diccionario de datos de las seis colecciones, eliminación de los restos de plantilla y declaración de la cuenta para la evaluación | Entregable E2 | 24/09 |
+| T-33 | **Prototipo versionado:** firmware, diagrama, documentación y evidencias de los ensayos, con la clave del dispositivo fuera del repositorio | Requisito mínimo 5 | 25/09 |
 
 ---
 
-## 📊 Estado del sistema al 24 de septiembre de 2026
+## 📊 Estado del sistema al 25 de septiembre de 2026
 
 | Elemento | Estado |
 |---|---|
 | **Contrato de la API** | 32 operaciones |
 | **Pruebas automatizadas** | **186** — 106 del servicio y 80 de la aplicación |
-| **Confirmaciones** | 98, repartidas en 12 días distintos |
+| **Confirmaciones** | 100, repartidas en 12 días distintos |
 | **Aplicación publicada** | `https://sigvach26-bd.web.app` |
 | **Servicio publicado** | `https://sigvach-api.onrender.com` |
 | **Módulo de adquisición** | Midiendo y publicando cinco variables en producción |
 
-**Estado al cierre de la Semana 3:** 27 tareas terminadas · 2 en curso · 7 en el backlog.
+**Estado al cierre de la Semana 3:** 28 tareas terminadas · 2 en curso · 6 en el backlog.
 
-> **Sobre el módulo de adquisición.** El firmware vive hoy en el espacio de trabajo
-> del autor y todavía no se versionó (tarea T-33). Cuando se incorpore, el archivo
-> `configuracion.h` —que contiene la clave del dispositivo y la red WiFi— debe
-> quedar fuera del repositorio, como el `.env` del servicio.
+> **Sobre el módulo de adquisición.** El firmware está versionado en `hardware/`.
+> El archivo `configuracion.h` —que contiene la clave del dispositivo y la red
+> WiFi— queda fuera del repositorio, excluido tanto por el `.gitignore` de la
+> carpeta del firmware como por el de la raíz. La plantilla
+> `configuracion.ejemplo.h` sí se versiona.
