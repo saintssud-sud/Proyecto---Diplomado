@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../models/roles.dart';
 import '../models/usuario_perfil.dart';
 
 /// Repositorio de usuarios sobre Cloud Firestore.
@@ -57,10 +58,13 @@ class UsuarioRepository {
   }
 
   /// Determina el rol según el correo (opción 2 de diseño).
+  ///
+  /// El rol de administración se asigna por correo; cualquier otra cuenta nace
+  /// con el rol de menor privilegio, conforme al principio de menor privilegio.
   String _rolPara(String email) =>
       email.trim().toLowerCase() == correoAdmin.toLowerCase()
-      ? 'admin'
-      : 'usuario';
+      ? Roles.administrador
+      : Roles.porDefecto;
 
   /// Lee el perfil de un usuario por su uid. Devuelve null si no existe.
   Future<UsuarioPerfil?> obtenerPorUid(String uid) async {
@@ -112,10 +116,9 @@ class UsuarioRepository {
     }
   }
 
-  /// Cambia el rol de un usuario ('admin' o 'usuario').
+  /// Cambia el rol de un usuario.
   Future<void> cambiarRol({required String uid, required String rol}) async {
-    final nuevo = rol == 'admin' ? 'admin' : 'usuario';
-    await _doc(uid).update(<String, dynamic>{'rol': nuevo});
+    await _doc(uid).update(<String, dynamic>{'rol': Roles.normalizar(rol)});
   }
 
   /// Activa o desactiva un usuario.

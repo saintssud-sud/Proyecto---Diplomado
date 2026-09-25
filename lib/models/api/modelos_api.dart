@@ -7,6 +7,7 @@
 /// porque su forma es distinta y forzar la conversión perdería información.
 library;
 
+import '../roles.dart';
 import '../../services/api_errores.dart';
 
 // Los errores de la capa de API viven en `services/api_errores.dart`, junto con
@@ -427,19 +428,10 @@ class PerfilUsuario {
   final String? telefono;
   final String? cargo;
 
-  bool get esAdministrador => rol == 'admin';
+  bool get esAdministrador => Roles.esAdministrador(rol);
 
   /// Texto presentable del rol.
-  String get etiquetaRol {
-    switch (rol) {
-      case 'admin':
-        return 'Administrador';
-      case 'usuario':
-        return 'Operador';
-      default:
-        return rol.isEmpty ? 'Sin rol' : rol;
-    }
-  }
+  String get etiquetaRol => Roles.etiqueta(rol);
 
   factory PerfilUsuario.fromJson(Map<String, dynamic> json) {
     return PerfilUsuario(

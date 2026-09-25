@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../controllers/usuario_controller.dart';
+import '../../models/roles.dart';
 import '../../models/usuario_perfil.dart';
 import '../../repositories/usuario_repository.dart';
 import '../../widgets/max_width_box.dart';
 
-/// Pantalla de administración de usuarios (solo para rol admin).
+/// Pantalla de administración de usuarios (solo para el rol de administración).
 ///
 /// Muestra la lista de usuarios registrados (desde Firestore) y permite:
 /// - Ver datos personales
 /// - Editar datos (nombre, teléfono, cargo)
-/// - Cambiar el rol (admin / usuario)
+/// - Cambiar el rol (administrador / operador)
 /// - Activar / desactivar
 /// - Eliminar el perfil
 class UsuariosAdminScreen extends StatefulWidget {
@@ -89,10 +90,11 @@ class _UsuariosAdminScreenState extends State<UsuariosAdminScreen> {
   }
 
   Future<void> _cambiarRol(UsuarioPerfil usuario) async {
-    final nuevo = usuario.rol == 'admin' ? 'usuario' : 'admin';
+    final nuevo = Roles.alternar(usuario.rol);
     final confirmar = await _confirmar(
       titulo: 'Cambiar rol',
-      mensaje: '¿Cambiar a ${usuario.email} de "${usuario.rol}" a "$nuevo"?',
+      mensaje: '¿Cambiar a ${usuario.email} de "${Roles.etiqueta(usuario.rol)}" '
+          'a "${Roles.etiqueta(nuevo)}"?',
     );
     if (confirmar != true || !mounted) return;
     final uid = usuario.uid ?? '';

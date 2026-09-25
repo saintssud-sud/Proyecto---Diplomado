@@ -3,7 +3,12 @@
 /// Se guarda en Firestore, colección `usuarios`, con el documento cuyo id
 /// es el `uid` de Firebase Authentication. Además de las credenciales de
 /// acceso (que viven en Firebase Auth), aquí se almacenan los datos
-/// personales y el rol (admin / usuario).
+/// personales y el rol.
+///
+/// Los nombres de los roles viven en `roles.dart`, para que coincidan con los
+/// del servicio en un solo lugar.
+import 'roles.dart';
+
 class UsuarioPerfil {
   const UsuarioPerfil({
     this.uid,
@@ -11,7 +16,7 @@ class UsuarioPerfil {
     this.nombre = '',
     this.telefono = '',
     this.cargo = '',
-    this.rol = 'usuario',
+    this.rol = Roles.porDefecto,
     this.activo = true,
     this.creadoEn,
   });
@@ -21,11 +26,14 @@ class UsuarioPerfil {
   final String nombre;
   final String telefono;
   final String cargo;
-  final String rol; // 'admin' | 'usuario'
+  final String rol;
   final bool activo;
   final DateTime? creadoEn;
 
-  bool get esAdmin => rol == 'admin';
+  bool get esAdmin => Roles.esAdministrador(rol);
+
+  /// Texto presentable del rol, para la interfaz.
+  String get etiquetaRol => Roles.etiqueta(rol);
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -46,7 +54,7 @@ class UsuarioPerfil {
       nombre: map['nombre']?.toString() ?? '',
       telefono: map['telefono']?.toString() ?? '',
       cargo: map['cargo']?.toString() ?? '',
-      rol: map['rol']?.toString() == 'admin' ? 'admin' : 'usuario',
+      rol: Roles.normalizar(map['rol']),
       activo: map['activo'] as bool? ?? true,
       creadoEn: DateTime.tryParse(map['creado_en']?.toString() ?? ''),
     );
