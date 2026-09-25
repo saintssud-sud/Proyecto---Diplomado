@@ -1,0 +1,103 @@
+=== contraste DS18B20 vs AM2302 - inicio 15:48:18 ===
+[15:48:22] I (531714) SIGVACH: Ambiente -> 21.10 C   33.00 % HR
+[15:48:22] I (532524) SIGVACH: Solucion -> 22.56 C
+[15:48:27] I (537564) SIGVACH: Ambiente -> 21.10 C   33.00 % HR
+[15:48:28] I (538374) SIGVACH: Solucion -> 22.19 C
+[15:48:33] I (543414) SIGVACH: Ambiente -> 21.20 C   33.20 % HR
+[15:48:34] I (544224) SIGVACH: Solucion -> 21.44 C
+[15:48:39] I (549264) SIGVACH: Ambiente -> 21.10 C   33.70 % HR
+[15:48:40] I (550074) SIGVACH: Solucion -> 20.88 C
+[15:48:45] I (555114) SIGVACH: Ambiente -> 21.10 C   33.20 % HR
+[15:48:46] I (555924) SIGVACH: Solucion -> 20.44 C
+[15:48:51] I (560964) SIGVACH: Ambiente -> 21.10 C   32.90 % HR
+[15:48:52] I (561774) SIGVACH: Solucion -> 20.06 C
+[15:48:57] I (566814) SIGVACH: Ambiente -> 21.20 C   32.80 % HR
+[15:48:58] I (567624) SIGVACH: Solucion -> 19.75 C
+[15:49:03] I (572664) SIGVACH: Ambiente -> 21.20 C   33.10 % HR
+[15:49:03] I (573474) SIGVACH: Solucion -> 19.50 C
+[15:49:08] I (578514) SIGVACH: Ambiente -> 21.20 C   33.30 % HR
+[15:49:09] I (579324) SIGVACH: Solucion -> 19.31 C
+[15:49:14] I (584364) SIGVACH: Ambiente -> 21.20 C   33.80 % HR
+[15:49:15] I (585174) SIGVACH: Solucion -> 19.19 C
+[15:49:20] I (590214) SIGVACH: Ambiente -> 21.30 C   33.60 % HR
+[15:49:21] I (591024) SIGVACH: Solucion -> 19.00 C
+[15:49:26] I (596064) SIGVACH: Ambiente -> 21.30 C   33.60 % HR
+[15:49:27] I (596874) SIGVACH: Solucion -> 19.13 C
+[15:49:32] I (601914) SIGVACH: Ambiente -> 21.40 C   33.40 % HR
+[15:49:33] I (602724) SIGVACH: Solucion -> 20.88 C
+[15:49:38] I (607764) SIGVACH: Ambiente -> 21.40 C   33.50 % HR
+[15:49:38] I (608574) SIGVACH: Solucion -> 21.56 C
+[15:49:43] I (613614) SIGVACH: Ambiente -> 21.40 C   33.60 % HR
+[15:49:44] I (614424) SIGVACH: Solucion -> 21.88 C
+[15:49:49] I (619464) SIGVACH: Ambiente -> 21.50 C   33.70 % HR
+[15:49:50] I (620274) SIGVACH: Solucion -> 22.13 C
+[15:49:55] I (625314) SIGVACH: Ambiente -> 21.50 C   33.80 % HR
+[15:49:56] I (626124) SIGVACH: Solucion -> 22.19 C
+[15:50:01] I (631164) SIGVACH: Ambiente -> 21.50 C   33.80 % HR
+[15:50:02] I (631974) SIGVACH: Solucion -> 22.25 C
+[15:50:07] I (637014) SIGVACH: Ambiente -> 21.50 C   33.70 % HR
+[15:50:08] I (637824) SIGVACH: Solucion -> 22.25 C
+[15:50:13] I (642864) SIGVACH: Ambiente -> 21.60 C   33.50 % HR
+[15:50:14] I (643674) SIGVACH: Solucion -> 22.25 C
+[15:50:19] I (648714) SIGVACH: Ambiente -> 21.60 C   33.40 % HR
+[15:50:19] I (649524) SIGVACH: Solucion -> 22.25 C
+[15:50:24] I (654564) SIGVACH: Ambiente -> 21.60 C   33.30 % HR
+[15:50:25] I (655374) SIGVACH: Solucion -> 22.25 C
+[15:50:30] I (660414) SIGVACH: Ambiente -> 21.60 C   33.30 % HR
+[15:50:31] I (661224) SIGVACH: Solucion -> 22.25 C
+[15:50:36] I (666264) SIGVACH: Ambiente -> 21.60 C   33.20 % HR
+[15:50:37] I (667074) SIGVACH: Solucion -> 22.25 C
+[15:50:42] I (672114) SIGVACH: Ambiente -> 21.60 C   33.20 % HR
+[15:50:43] I (672924) SIGVACH: Solucion -> 22.25 C
+[15:50:48] I (677964) SIGVACH: Ambiente -> 21.60 C   33.00 % HR
+[15:50:49] I (678774) SIGVACH: Solucion -> 22.25 C
+[15:50:54] I (683814) SIGVACH: Ambiente -> 21.60 C   32.50 % HR
+[15:50:55] I (684624) SIGVACH: Solucion -> 22.25 C
+[15:51:00] I (689664) SIGVACH: Ambiente -> 21.60 C   32.20 % HR
+[15:51:00] I (690474) SIGVACH: Solucion -> 22.25 C
+[15:51:05] I (695514) SIGVACH: Ambiente -> 21.60 C   32.10 % HR
+[15:51:06] I (696324) SIGVACH: Solucion -> 22.25 C
+[15:51:11] I (701364) SIGVACH: Ambiente -> 21.60 C   32.10 % HR
+[15:51:12] I (702174) SIGVACH: Solucion -> 22.25 C
+[15:51:17] I (707214) SIGVACH: Ambiente -> 21.60 C   32.30 % HR
+[15:51:18] I (708024) SIGVACH: Solucion -> 22.25 C
+[15:51:23] I (713064) SIGVACH: Ambiente -> 21.60 C   32.60 % HR
+[15:51:24] I (713874) SIGVACH: Solucion -> 22.25 C
+[15:51:29] I (718914) SIGVACH: Ambiente -> 21.60 C   32.70 % HR
+[15:51:30] I (719724) SIGVACH: Solucion -> 22.25 C
+[15:51:35] I (724764) SIGVACH: Ambiente -> 21.60 C   32.70 % HR
+[15:51:35] I (725574) SIGVACH: Solucion -> 22.25 C
+[15:51:40] I (730614) SIGVACH: Ambiente -> 21.60 C   32.80 % HR
+[15:51:41] I (731424) SIGVACH: Solucion -> 22.25 C
+[15:51:46] I (736464) SIGVACH: Ambiente -> 21.60 C   32.70 % HR
+[15:51:47] I (737274) SIGVACH: Solucion -> 22.25 C
+[15:51:52] I (742314) SIGVACH: Ambiente -> 21.60 C   32.50 % HR
+[15:51:53] I (743124) SIGVACH: Solucion -> 22.25 C
+[15:51:58] I (748164) SIGVACH: Ambiente -> 21.70 C   32.40 % HR
+[15:51:59] I (748974) SIGVACH: Solucion -> 22.25 C
+[15:52:04] I (754014) SIGVACH: Ambiente -> 21.60 C   32.60 % HR
+[15:52:05] I (754824) SIGVACH: Solucion -> 22.25 C
+[15:52:10] I (759864) SIGVACH: Ambiente -> 21.60 C   32.90 % HR
+[15:52:11] I (760674) SIGVACH: Solucion -> 22.19 C
+[15:52:16] I (765714) SIGVACH: Ambiente -> 21.60 C   33.00 % HR
+[15:52:16] I (766524) SIGVACH: Solucion -> 22.19 C
+[15:52:21] I (771564) SIGVACH: Ambiente -> 21.70 C   33.00 % HR
+[15:52:22] I (772374) SIGVACH: Solucion -> 22.19 C
+[15:52:27] I (777414) SIGVACH: Ambiente -> 21.60 C   33.00 % HR
+[15:52:28] I (778224) SIGVACH: Solucion -> 22.19 C
+[15:52:33] I (783264) SIGVACH: Ambiente -> 21.60 C   32.70 % HR
+[15:52:34] I (784074) SIGVACH: Solucion -> 22.19 C
+[15:52:39] I (789114) SIGVACH: Ambiente -> 21.60 C   32.50 % HR
+[15:52:40] I (789924) SIGVACH: Solucion -> 22.19 C
+[15:52:45] I (794964) SIGVACH: Ambiente -> 21.60 C   32.40 % HR
+[15:52:46] I (795774) SIGVACH: Solucion -> 22.19 C
+[15:52:51] I (800814) SIGVACH: Ambiente -> 21.60 C   32.30 % HR
+[15:52:52] I (801624) SIGVACH: Solucion -> 22.19 C
+[15:52:57] I (806664) SIGVACH: Ambiente -> 21.60 C   32.20 % HR
+[15:52:57] I (807474) SIGVACH: Solucion -> 22.19 C
+[15:53:02] I (812514) SIGVACH: Ambiente -> 21.60 C   32.40 % HR
+[15:53:03] I (813324) SIGVACH: Solucion -> 22.13 C
+[15:53:08] I (818364) SIGVACH: Ambiente -> 21.60 C   32.20 % HR
+[15:53:09] I (819174) SIGVACH: Solucion -> 22.19 C
+[15:53:14] I (824214) SIGVACH: Ambiente -> 21.60 C   32.00 % HR
+[15:53:15] I (825024) SIGVACH: Solucion -> 22.19 C

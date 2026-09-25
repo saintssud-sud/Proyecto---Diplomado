@@ -1,0 +1,36 @@
+# ============================================================================
+#  Proyecto ESP-IDF — SI.G.VA.C.H.
+#  Lo que NO se versiona.
+# ============================================================================
+
+# --- Datos privados ----------------------------------------------------------
+# Contiene la clave del dispositivo (DEVICE_API_KEY) y la red WiFi.
+# Si se sube, cualquiera puede publicar lecturas falsas en el sistema.
+#
+# Se excluye con asterisco a propósito: no alcanza con el nombre exacto, porque
+# al hacer respaldos o pruebas aparecen variantes —`configuracion.h.respaldo`,
+# `configuracion.h.bueno`, `configuracion.h.old`— que también llevan los
+# secretos dentro. Con el nombre exacto solo, esas variantes se filtrarían.
+#
+# La plantilla `configuracion.ejemplo.h` NO entra en esta regla y SÍ se versiona:
+# es la guía para reconstruir el archivo.
+configuracion.h*
+*.respaldo
+*.bueno
+*.old
+
+# --- Archivos que genera la compilación --------------------------------------
+build/
+sdkconfig
+sdkconfig.old
+managed_components/
+dependencies.lock
+
+# Registros temporales que se vuelcan al compilar o cargar
+build_salida.txt
+flash_salida.txt
+*.log
+
+# --- Respaldos del editor ----------------------------------------------------
+*.bak
+*~

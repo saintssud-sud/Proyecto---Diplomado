@@ -1,0 +1,47 @@
+# ============================================================================
+#  Valores por defecto de configuración — SI.G.VA.C.H.
+#  ---------------------------------------------------------------------------
+#  Este archivo se aplica la PRIMERA vez que se genera `sdkconfig`.
+#  Si después cambiás algo con `idf.py menuconfig`, ese cambio manda y este
+#  archivo deja de tener efecto: para volver a empezar, borrá `sdkconfig`.
+# ============================================================================
+
+# --- Placa -------------------------------------------------------------------
+CONFIG_IDF_TARGET="esp32"
+
+# --- Registro por el Monitor Serie -------------------------------------------
+# Nivel INFO: los mensajes del programa, sin el ruido de depuración del sistema.
+CONFIG_LOG_DEFAULT_LEVEL_INFO=y
+CONFIG_LOG_DEFAULT_LEVEL=3
+
+# --- Pila de la tarea principal ----------------------------------------------
+# El envío por HTTPS y el manejo de cadenas consumen bastante pila.
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=8192
+
+# --- Monitor Serie -----------------------------------------------------------
+# El mismo valor que usa el firmware de Arduino, para no cambiar de costumbre.
+CONFIG_ESPTOOLPY_MONITOR_BAUD=115200
+
+# --- Memoria flash de la placa -----------------------------------------------
+# El módulo trae 4 MB, pero el valor por defecto de ESP-IDF es 2 MB: si no se
+# declara, se desperdicia la mitad y el arranque avisa con
+#   "Detected size(4096k) larger than the size in the binary image header(2048k)".
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+
+# El chip de esta placa es un Boya. Sin esta opción el arranque lo trata como
+# "generic" y avisa que conviene activarla.
+CONFIG_SPI_FLASH_SUPPORT_BOYA_CHIP=y
+
+# --- Memoria (NVS) para la cola de lecturas pendientes -----------------------
+# Partición de datos no volátiles: ahí sobreviven las lecturas si se corta la luz.
+CONFIG_PARTITION_TABLE_SINGLE_APP_LARGE=y
+
+# --- WiFi --------------------------------------------------------------------
+# Ahorro de energía desactivado: el módulo está enchufado y necesita respuesta
+# inmediata, no batería.
+CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM=10
+CONFIG_ESP_WIFI_DYNAMIC_RX_BUFFER_NUM=32
+CONFIG_ESP_WIFI_AMPDU_RX_ENABLED=y
+
+# --- Hora por Internet (SNTP) ------------------------------------------------
+CONFIG_LWIP_SNTP_MAX_SERVERS=2

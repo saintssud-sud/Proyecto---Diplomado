@@ -57,3 +57,11 @@ android/key.properties
 serviceAccountKey.json
 firebase-adminsdk*.json
 serviceAccountKey.json
+
+# ==================== Prototipo (hardware/) ====================
+# La clave del dispositivo y la red WiFi del modulo viven en configuracion.h.
+# El .gitignore de la carpeta del firmware ya lo excluye, pero se repite aqui
+# como red de seguridad: si alguien mueve el archivo de lugar, la regla sigue
+# vigente. La plantilla configuracion.ejemplo.h SI se versiona.
+hardware/firmware/main/configuracion.h
+configuracion.h
