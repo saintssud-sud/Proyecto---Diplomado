@@ -72,6 +72,7 @@
 | T-33 | **Prototipo versionado:** firmware, diagrama, documentación y evidencias de los ensayos, con la clave del dispositivo fuera del repositorio | Requisito mínimo 5 | 25/09 |
 | T-35 | **Panel de usuarios migrado al servicio** (cierra la observación B-1): deja de leer Firestore directamente y usa las operaciones de administración del contrato, con las reglas de seguridad alineadas al vocabulario de roles vigente | RF-02 | 25/09 |
 | T-34 | **Guion de la demostración** del E2 y de la defensa, con el módulo real como protagonista, plan de contingencia y las preguntas previsibles del tribunal | Entregable E2 · Defensa | 25/09 |
+| T-36 | **Identidad y rol en el menú lateral:** el encabezado presenta el nombre de la cuenta y el tipo de rol que el servicio le reconoce, consultado al abrir el menú, en lugar del saludo genérico | RF-01 · RF-02 | 25/09 |
 
 ---
 
@@ -80,13 +81,13 @@
 | Elemento | Estado |
 |---|---|
 | **Contrato de la API** | 32 operaciones |
-| **Pruebas automatizadas** | **196** — 106 del servicio y 90 de la aplicación |
+| **Pruebas automatizadas** | **199** — 106 del servicio y 93 de la aplicación |
 | **Confirmaciones** | 103, repartidas en 12 días distintos |
 | **Aplicación publicada** | `https://sigvach26-bd.web.app` |
 | **Servicio publicado** | `https://sigvach-api.onrender.com` |
 | **Módulo de adquisición** | Midiendo y publicando cinco variables en producción |
 
-**Estado al cierre de la Semana 3:** 30 tareas terminadas · 2 en curso · 4 en el backlog.
+**Estado al cierre de la Semana 3:** 31 tareas terminadas · 2 en curso · 4 en el backlog.
 
 > **Sobre el módulo de adquisición.** El firmware está versionado en `hardware/`.
 > El archivo `configuracion.h` —que contiene la clave del dispositivo y la red
