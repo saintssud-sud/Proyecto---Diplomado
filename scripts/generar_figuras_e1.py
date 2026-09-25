@@ -246,8 +246,22 @@ def figura_modelo_de_datos():
         destino_x = x2 + w2 / 2 if hasta_lado == "arriba" else x2
         destino_y = y2 if hasta_lado == "arriba" else y2 + h2 / 2
         flecha(dibujo, origen_x, origen_y, destino_x, destino_y, color, 4, 20, discontinua)
-        etiqueta(dibujo, etiqueta_texto, (origen_x + destino_x) / 2, (origen_y + destino_y) / 2,
-                 15, color, BLANCO, True)
+
+        # El rótulo se coloca encima del trazo solo cuando la flecha es lo bastante
+        # larga para que quede trazo a los dos lados. En las flechas cortas —las
+        # que unen cajas vecinas— el rótulo tapa casi toda la línea y la deja
+        # partida en dos trozos sueltos, con un hueco antes de la punta; en ese
+        # caso va al costado, sin tocar el trazo.
+        medio_x = (origen_x + destino_x) / 2
+        medio_y = (origen_y + destino_y) / 2
+        largo = ((destino_x - origen_x) ** 2 + (destino_y - origen_y) ** 2) ** 0.5
+        ancho_rotulo = ancho_texto(dibujo, etiqueta_texto, 15, True) + 18
+        if largo < 200:
+            if abs(destino_x - origen_x) >= abs(destino_y - origen_y):
+                medio_y -= 34
+            else:
+                medio_x += ancho_rotulo / 2 + 16
+        etiqueta(dibujo, etiqueta_texto, medio_x, medio_y, 15, color, BLANCO, True)
 
     # Relaciones del dominio.
     conectar("perfiles_cultivo", "rangos", "1 : N", AZUL, False, "derecha", "izquierda")
@@ -268,7 +282,10 @@ def figura_modelo_de_datos():
     x1, y1, w1, h1 = posiciones["rangos"]
     x2, y2, w2, h2 = posiciones["lecturas"]
     inicio_x, inicio_y = x1 + 40, y1 + h1
-    fin_x, fin_y = x2 + w2 - 60, y2
+    # La punta no apunta al centro de la caja de lecturas sino un poco a su
+    # derecha: si bajara hasta el centro, el trazo entraría en el vértice
+    # inferior derecho de la caja de módulos, que es la caja que queda en medio.
+    fin_x, fin_y = x2 + w2 - 20, y2
     flecha(dibujo, inicio_x, inicio_y, fin_x, fin_y, AZUL, 4, 20, True)
     franja = 575
     avance = (franja - inicio_y) / (fin_y - inicio_y)
