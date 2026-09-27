@@ -35,11 +35,13 @@ El E2 pide una **vertical funcional desplegada**:
 
 | # | Verificación | Cómo |
 |---|---|---|
-| 1 | **El servicio está despierto** | Abrir `https://sigvach-api.onrender.com/api/v1/salud`: debe responder `{"estado":"ok",...}`. Si tarda, es el arranque en frío: esperar y volver a intentar |
+| 1 | **El servicio está despierto** | Abrir `https://sigvach-api.onrender.com/api/v1/salud` **dos o tres minutos antes de empezar**: debe responder `{"estado":"ok",...}`. Si tarda, es el arranque en frío: esperar y volver a intentar |
 | 2 | **El módulo está publicando** | El Monitor Serie debe mostrar `... -> almacenada` en cada variable. Si no, revisar la alimentación y el WiFi |
 | 3 | **La aplicación abre en incógnito** | Abrir la dirección en una ventana de incógnito y entrar. **Esto es lo que hace el evaluador** |
 | 4 | **La sesión está iniciada** | Entrar una vez antes de la demostración: así la base y el servicio ya respondieron una vez |
 | 5 | **El módulo está a la vista** | Que se vean la placa, los sensores y el Monitor Serie |
+| 6 | **Ningún bloqueador corta la conexión** | Usar **Chrome o Firefox**. En **Brave**, bajar los escudos para `sigvach26-bd.web.app`: el servicio vive en otro dominio, y los bloqueadores cortan esa llamada. El síntoma es «No se pudo conectar con el servidor» |
+| 7 | **El despliegue es el correcto** | `python scripts/verificar_despliegue.py`, que comprueba que la aplicación publicada apunta a la API pública y no a una dirección local |
 
 > ⚠️ **Regla de oro: no cerrar la ventana del Monitor Serie durante la demostración.**
 > Es la prueba de que las lecturas salen del hardware y no de un archivo.
@@ -54,7 +56,7 @@ El E2 pide una **vertical funcional desplegada**:
 | **2** | Entrar con la cuenta declarada | El panel con las variables del módulo | *"El servicio valida el token en el servidor y resuelve el rol; no es la aplicación la que decide."* |
 | **3** | Señalar el **Monitor Serie** | Las lecturas entrando solas | *"Estas lecturas no las escribió nadie a mano: las publica el módulo por HTTPS cada cinco minutos, autenticándose con su clave de dispositivo."* |
 | **4** | **Refrescar el panel** | Los valores y la hora de la última lectura actualizados | *"El dato nació en el sensor, viajó por el módulo, cruzó el servicio y llegó acá."* |
-| **5** | Registrar una **lectura manual** | El valor aparece en el panel | *"El sistema distingue el origen: esta es manual y quedó registrada con quién la ingresó."* |
+| **5** | Registrar una **lectura manual** (el pH es el caso natural) | El valor aparece en el panel, marcado como manual | *"El sistema distingue el origen: esta la ingresó una persona y queda registrado quién. El pH entra a mano mientras se recupera el electrodo, que es lo que el documento declara como pendiente."* |
 | **6** | Registrar un **valor fuera de rango** | Aparece la **alerta** | *"El servicio evaluó el valor contra el rango del perfil del cultivo y generó la alerta. Ni la aplicación ni la base deciden eso."* |
 | **7** | Abrir el **historial** de esa variable | La serie con el valor desviado | *"El historial conserva la serie completa, que es lo que el antecedente local no registraba."* |
 | **8** | **Marcar la alerta como atendida** | Sale de las activas y queda en el historial | *"Atender una alerta no la borra: deja constancia."* |
@@ -88,7 +90,8 @@ no una versión local.
 | **El servicio está dormido** (primera petición lenta) | Esperar y pulsar **Reintentar**. La aplicación muestra el estado de error con esa opción. Mientras tanto: *"La capa gratuita suspende el servicio por inactividad; es una limitación declarada."* |
 | **El módulo no publica** | Seguir con la demostración y **explicar la cola**: *"Si el servicio no responde, la lectura queda en memoria no volátil y se reintenta. Puedo mostrarlo apagando el WiFi."* — y hacerlo, que es más convincente |
 | **El WiFi del aula falla** | Usar el **simulador** (apartado 6). El flujo se ve igual: mismo endpoint, misma clave, mismo cuerpo |
-| **La aplicación no carga en el navegador** | Abrir en **otro navegador** o en incógnito. Casi siempre es la caché del service worker |
+| **La aplicación no carga en el navegador** | Abrir en **otro navegador** o en incógnito. Casi siempre es la caché del service worker, y desde ahora los archivos que deciden qué versión se carga se publican **sin caché**, así que esto debería desaparecer |
+| **«No se pudo conectar con el servidor»** | Tres causas, en este orden: (1) el servicio está **dormido** → esperar y pulsar *Reintentar*; (2) un **bloqueador** corta la llamada → probar en Chrome o bajar los escudos en Brave; (3) el paquete publicado **apunta a otra dirección** → comprobarlo con `python scripts/verificar_despliegue.py` |
 | **La base rechaza una escritura** | Mostrar el `422` y el campo señalado: *"La validación está en el servidor y el error dice qué corregir."* |
 | **Nada de lo anterior funciona** | Quedan las **capturas fechadas** y el **repositorio**, que es donde el docente verifica. La demostración en vivo suma, pero la entrega ya está subida |
 
@@ -124,6 +127,7 @@ El detalle completo está en `docs/16_SIMULADOR_DEL_DISPOSITIVO.md`.
 | **¿Por qué el servicio y no la base directamente?** | *"Nadie toca la base sin pasar por el servicio."* La validación y la autorización no pueden depender del cliente. Las reglas de Firestore cierran el acceso directo |
 | **¿Cómo se que un sensor mide bien?** | Con **ensayos propios** documentados: el DS18B20 se contrastó contra el AM2302 y coincidieron en 0,01 °C; el TDS se probó alterando la concentración de la solución. Los registros están en el repositorio |
 | **¿Qué queda fuera del alcance?** | El **control de actuadores** —el módulo mide y publica, no acciona la bomba—, y la **variable de pH**, que espera la recuperación del electrodo y su calibración |
+| **¿Ese pH del panel lo mide el módulo?** | No, y conviene decirlo antes de que lo pregunten: el módulo publica **cinco** variables. Las lecturas de pH del historial son **manuales y de prueba**; la variable espera la recuperación del electrodo y su calibración, como declara el documento |
 | **¿Cuánto cuesta operarlo?** | La capa gratuita del servicio y de la base; a cinco minutos por ciclo se usa el **10 % de la cuota diaria** de escrituras |
 | **¿Qué error les costó más?** | Decirlo con honestidad: el asentamiento del convertidor analógico, que hacía que la **primera lectura publicada tras encender fuera falsa** y con apariencia normal |
 
