@@ -22,7 +22,6 @@
 | ID | Tarea | Requisito | Responsable | Inicio |
 |---|---|---|---|---|
 | T-28 | Montaje de la maqueta hidropónica y ensayos del módulo sobre el cultivo | RF-05 · Requisito mínimo 1 | Autor | 23/09 |
-| T-29 | Entregable E2: vertical funcional desplegada, documento y evidencias | Entregable E2 | Autor | 22/09 |
 
 ---
 
@@ -73,24 +72,32 @@
 | T-34 | **Guion de la demostración** del E2 y de la defensa, con el módulo real como protagonista, plan de contingencia y las preguntas previsibles del tribunal | Entregable E2 · Defensa | 25/09 |
 | T-36 | **Identidad y rol en el menú lateral:** el encabezado presenta el nombre de la cuenta y el tipo de rol que el servicio le reconoce, consultado al abrir el menú, en lugar del saludo genérico | RF-01 · RF-02 | 25/09 |
 
+### Semana 4 (26/09 al 02/10)
+
+| ID | Tarea | Requisito | Fecha |
+|---|---|---|---|
+| T-29 | **Entregable E2:** vertical funcional desplegada, documento y evidencias, subidos al aula virtual | Entregable E2 | 26/09 |
+
 ---
 
-## 📊 Estado del sistema al 25 de septiembre de 2026
+## 📊 Estado del sistema al 27 de septiembre de 2026
 
 | Elemento | Estado |
 |---|---|
 | **Contrato de la API** | 32 operaciones |
 | **Pruebas automatizadas** | **199** — 106 del servicio y 93 de la aplicación |
-| **Confirmaciones** | 125, repartidas en 13 días distintos |
+| **Confirmaciones** | 126, repartidas en 14 días distintos |
 | **Aplicación publicada** | `https://sigvach26-bd.web.app` |
 | **Servicio publicado** | `https://sigvach-api.onrender.com` |
 | **Módulo de adquisición** | Midiendo y publicando cinco variables en producción |
 
-**Estado al cierre de la Semana 3:** 30 tareas terminadas · 2 en curso · 4 en el backlog.
+**Estado al 27 de septiembre de 2026:** 31 tareas terminadas · 1 en curso · 4 en el backlog.
 
-> **Sobre la tarea T-29.** El entregable E2 permanece en la columna «En curso»: el
-> documento está redactado, pero la entrega no se ha subido al aula virtual, que es
-> parte de la tarea. Por eso no figura también entre las terminadas.
+> **Sobre la tarea T-29.** El entregable E2 se subió al aula virtual el sábado 26 de
+> septiembre: el documento en PDF, con las figuras ajustadas al ancho de la página, y
+> los datos de acceso en el campo de texto de la entrega. Por eso figura entre las
+> terminadas. El cuestionario Q2, que es una actividad aparte, también quedó
+> completado el mismo día.
 
 > **Sobre el módulo de adquisición.** El firmware está versionado en `hardware/`.
 > El archivo `configuracion.h` —que contiene la clave del dispositivo y la red
