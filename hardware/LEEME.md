@@ -105,6 +105,17 @@ registros están en `evidencias/`:
 | `prueba-sal-tds.txt` | Respuesta del sensor de TDS al alterar la concentración de la solución | **155 mV → 2 415 mV** (×173 en cuentas crudas) |
 | `contraste-temperatura.txt` | Contraste del DS18B20 contra el AM2302 | Sonda mojada: **3,3 °C por debajo** del aire (enfriamiento por evaporación) |
 | `contraste-reposo.csv` · `contraste-reposo-parte2.csv` | Convergencia de los dos termómetros en reposo | Coinciden dentro de **0,01 °C** |
+| `arranque-y-ciclo-2026-09-27.txt` | Registro del arranque y de un ciclo de lectura, con el fallo del sensor de ambiente y su causa | El sensor **respondía al arrancar y fallaba después**: era un **contacto flojo** en el cable de datos. Al reencajarlo, el módulo pasó a publicar las cinco variables |
+
+**Sobre el fallo del sensor de ambiente.** El registro del Monitor Serie conserva el
+error `dht: Initialization error, problem in phase 'B'` y las advertencias
+`temp_ambiental sin dato: no se publica`. El síntoma —responder al arrancar y fallar en
+todos los ciclos siguientes— es la firma de un contacto deficiente, y no de un sensor
+agotado. El firmware, en vez de publicar un valor inválido, **omite la variable**: por eso
+el panel mostraba solo tres de las cinco.
+
+El nombre de la red WiFi aparece sustituido por `<red>` en ese registro; el real solo está
+en `configuracion.h`, que no se versiona.
 
 **Sobre el contraste de temperatura.** La diferencia entre los dos sensores
 **cambió de signo** entre un ensayo y otro (+0,65 °C con la sonda en la mano,

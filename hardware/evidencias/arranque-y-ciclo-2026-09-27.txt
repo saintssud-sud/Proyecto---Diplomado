@@ -1,0 +1,134 @@
+EVIDENCIA — Arranque y ciclo del módulo. Domingo 27 de septiembre de 2026
+=========================================================================
+
+Qué es este archivo
+-------------------
+Es el registro del Monitor Serie del ESP32 tomado durante la sesión del domingo
+27/09, cuando el módulo volvió a encenderse después de estar apagado desde el
+25/09 a las 04:45. Se conserva como evidencia del apartado 2.8, porque en él se
+ve el fallo del sensor de ambiente, su causa y la decisión del firmware de no
+publicar un valor inválido.
+
+Se leyó el puerto serie desde el equipo (COM6, 115200 baudios) con el script
+`Diagnostico/leer_serial.ps1`, sin tocar las líneas DTR ni RTS: en las placas
+ESP32 esas dos líneas están conectadas al circuito de reinicio.
+
+El nombre de la red WiFi se sustituye aquí por «<red>»: el real está solo en
+`configuracion.h`, que no se versiona.
+
+
+1. Arranque de la placa
+-----------------------
+    ets Jul 29 2019 12:21:46
+    rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+    I (27) boot: ESP-IDF v5.5.3-dirty 2nd stage bootloader
+    I (27) boot: compile time Sep 23 2026 14:29:06
+    I (481) app_init: Project name:     sigvach_modulo
+    I (564) SIGVACH: =================================================
+    I (564) SIGVACH:  SI.G.VA.CH. - modulo de adquisicion (ESP-IDF)
+    I (564) SIGVACH: =================================================
+    I (604) SIGVACH: Memoria no volatil (NVS) lista
+    I (604) COLA: Memoria de pendientes lista (vacia)
+    I (604) SIGVACH: Calibracion de fabrica: tension de referencia del eFuse
+    I (614) SIGVACH: Conversor listo. Calibracion de fabrica: SI
+    I (4614) SIGVACH: Conversor asentado (4000 ms de espera)
+
+Nota: esos 4000 ms de espera son la corrección del error que hacía que la
+primera lectura publicada tras encender fuera falsa.
+
+
+2. Detección de los sensores
+----------------------------
+    I (4614) SENSORES: Buscando el sensor de ambiente (primero en P33)...
+    E (4734) dht: Initialization error, problem in phase 'B'
+    E (6954) dht: Initialization error, problem in phase 'B'
+    W (6954) SENSORES: Sin respuesta en P33. Se prueban los demas pines de la placa:
+    W (9174) SENSORES: ENCONTRADO: AM2302 / DHT22 en GPIO 33
+    I (9174) SIGVACH: Ambiente en uso: AM2302 (DHT22) en GPIO 33 (responde)
+    I (9174) SENSORES: Bus OneWire instalado en GPIO 32 (periferico RMT)
+    I (9334) SENSORES: DS18B20 en uso: ROM D528EBD4469FA928 (resolucion 12 bits)
+    I (9334) SENSORES: Sensores DS18B20 encontrados: 1
+
+
+3. Diagnóstico de las entradas analógicas (al arrancar, sin sensores de pH)
+--------------------------------------------------------------------------
+    I (9834) SIGVACH: PIN           PREVISTO        MEDIANA DISPERSION  ESTADO
+    I (9834) SIGVACH: SVP GPIO 36   pH               142 mV          0  senal estable
+    I (9844) SIGVACH: SVN GPIO 39   TDS              637 mV         33  senal estable
+    I (9854) SIGVACH: P34 GPIO 34   alternativa      142 mV          0  senal estable
+    I (9854) SIGVACH: P35 GPIO 35   alternativa      142 mV          0  senal estable
+    I (9864) SIGVACH: Un sensor conectado da una dispersion de decenas;
+    I (9874) SIGVACH: una entrada al aire salta cientos o miles de cuentas.
+
+Lectura: la entrada del pH marca 142 mV, exactamente lo mismo que los dos pines
+al aire (GPIO 34 y 35). Es decir, el módulo de pH todavía no está conectado, que
+es lo correcto mientras el electrodo se recupera.
+
+
+4. Red y servicio
+-----------------
+    I (10054) SIGVACH: Conectando a la red <red>
+    I (12574) wifi:connected with <red>, channel 4, BW20, rssi: -63
+    I (15844) SIGVACH: Conectado. Direccion IP: 192.168.100.215
+    I (17844) SIGVACH: Hora del dispositivo: 2026-09-27T22:48:50Z
+    I (17844) SIGVACH: Modulo: v6wrYSXxeHyttf3prDd7 | Servicio: sigvach-api.onrender.com
+
+
+5. Ciclo de lectura: aquí se ve el fallo del sensor de ambiente
+--------------------------------------------------------------
+    I (18674) SIGVACH: Solucion -> 24.81 C
+    I (18684) SIGVACH: pH  ->    142 mV (0.14 V) crudo    0  dispersion    0  senal estable
+    I (18684) SIGVACH: TDS ->    634 mV (0.63 V) crudo  599  dispersion  115  algo ruidosa
+    I (18694) SIGVACH:   -> 238.20 ppm   0.48 mS/cm   (compensado con la temperatura de la solucion)
+    E (17864) dht: Initialization error, problem in phase 'B'
+    W (17864) SIGVACH: Ambiente -> sin respuesta (ESP_ERR_TIMEOUT)
+    W (18704) SIGVACH:   temp_ambiental  sin dato: no se publica
+    W (18704) SIGVACH:   humedad         sin dato: no se publica
+    I (20174) esp-x509-crt-bundle: Certificate validated
+    I (21814) SIGVACH:   temp_solucion        24.81 C      ->  almacenada
+    I (24884) SIGVACH:   tds                 238.20 ppm     ->  almacenada
+    I (28064) SIGVACH:   ec                    0.48 mS/cm   ->  almacenada
+
+Qué significan esas dos advertencias, según el comentario del propio firmware
+(`sensores.c`):
+
+    «Si eso no ocurre, el error es "problem in phase 'B'" y significa que la
+    línea se quedó en alto: el pull-up la sostiene y nadie del otro lado la
+    baja, o sea que el sensor no está conectado a ESE pin, o no está
+    alimentado.»
+
+Es decir: el ESP32 baja la línea para saludar al sensor y nadie le contesta. Y
+el firmware, en vez de inventar un valor, **no publica**: de ahí que el panel
+mostrara solo tres variables.
+
+
+6. La causa y la solución
+-------------------------
+El síntoma era elocuente: **el sensor respondía al arrancar y fallaba en todos
+los ciclos siguientes**. Se revisó la conexión, parecía correcta, y aun así no
+daba datos. Al **desconectar y volver a conectar el cable de datos** empezó a
+responder: era un contacto eléctrico deficiente con aspecto correcto (terminal
+hembra flojo, óxido en el pin o un hilo roto dentro del aislamiento).
+
+Desde las 22:54 el módulo publica las **cinco** variables en el mismo ciclo,
+confirmado en el servicio:
+
+    22:54:01  temp_ambiental   26,3 °C
+    22:54:05  humedad          33,1 %
+    22:54:08  temp_solucion    24,56 °C
+    22:54:11  tds            239,31 ppm
+    22:54:15  ec               0,48 mS/cm
+
+
+7. Lo que queda pendiente en el módulo
+--------------------------------------
+1. **Pull-up externo del AM2302** (10 kΩ, o 4,7 kΩ de los que hay): el diagrama
+   de conexionado lo marca como obligatorio y el firmware solo usa el interno
+   del ESP32, de unos 45 kΩ. Una línea con pull-up flojo falla a ratos: es el
+   arreglo de fondo del fallo de hoy.
+2. **Comprobar que el puente de la placa esté en 3,3 V y no en 5 V** (lo advierte
+   el propio firmware).
+3. **Condensador de 100 nF** entre la entrada y masa en el TDS (dispersión 115,
+   «algo ruidosa») y en el pH, después del divisor ÷2.
+4. **Divisor ÷2 del pH** con dos resistencias iguales de 4,7 kΩ, y calibrar con
+   los patrones de 4,00 y 6,86 cuando el electrodo esté recuperado.
