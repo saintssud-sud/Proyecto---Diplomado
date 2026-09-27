@@ -97,6 +97,24 @@ Abrir también la documentación del contrato, que es la que se cita en el apart
 https://sigvach-api.onrender.com/docs
 ```
 
+**Comprobación completa del despliegue (recomendada después de cada publicación):**
+
+```powershell
+python scripts/verificar_despliegue.py
+```
+
+Revisa las cuatro cosas que se rompen en silencio: que el paquete publicado lleve la dirección
+**pública** del servicio, que coincida con lo que hay en `build/web`, que `/api/v1/salud` responda y
+que el origen de la aplicación esté autorizado, incluido el examen previo que hace el navegador
+antes de las peticiones con token.
+
+> **Por qué existe este verificador.** En la entrega del E2 se publicó en Firebase la carpeta
+> `build/web` de una compilación hecha para probar en local, de modo que la aplicación publicada
+> pedía los datos a `http://127.0.0.1:8011`: funcionaba en el equipo del autor y fallaba en todos los
+> demás. La dirección del servicio no se elige al ejecutar la aplicación, sino al compilarla con
+> `--dart-define=API_BASE_URL=...`. Por eso, después de publicar, conviene ejecutar esta
+> comprobación: detecta ese error en cinco segundos.
+
 Y probar la ingesta del dispositivo, que es la ruta que usarán los sensores:
 
 ```powershell
