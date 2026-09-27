@@ -42,6 +42,7 @@ El E2 pide una **vertical funcional desplegada**:
 | 5 | **El módulo está a la vista** | Que se vean la placa, los sensores y el Monitor Serie |
 | 6 | **Ningún bloqueador corta la conexión** | Usar **Chrome o Firefox**. En **Brave**, bajar los escudos para `sigvach26-bd.web.app`: el servicio vive en otro dominio, y los bloqueadores cortan esa llamada. El síntoma es «No se pudo conectar con el servidor» |
 | 7 | **El despliegue es el correcto** | `python scripts/verificar_despliegue.py`, que comprueba que la aplicación publicada apunta a la API pública y no a una dirección local |
+| 8 | **Sin secretos en el repositorio** | `python scripts/verificar_sin_secretos.py`: revisa que no se haya publicado la clave del dispositivo, las credenciales del WiFi ni claves privadas, ni en los archivos ni en el historial |
 
 > ⚠️ **Regla de oro: no cerrar la ventana del Monitor Serie durante la demostración.**
 > Es la prueba de que las lecturas salen del hardware y no de un archivo.
