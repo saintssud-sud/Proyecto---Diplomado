@@ -92,6 +92,7 @@ no una versión local.
 | **El WiFi del aula falla** | Usar el **simulador** (apartado 6). El flujo se ve igual: mismo endpoint, misma clave, mismo cuerpo |
 | **La aplicación no carga en el navegador** | Abrir en **otro navegador** o en incógnito. Casi siempre es la caché del service worker, y desde ahora los archivos que deciden qué versión se carga se publican **sin caché**, así que esto debería desaparecer |
 | **«No se pudo conectar con el servidor»** | Tres causas, en este orden: (1) el servicio está **dormido** → esperar y pulsar *Reintentar*; (2) un **bloqueador** corta la llamada → probar en Chrome o bajar los escudos en Brave; (3) el paquete publicado **apunta a otra dirección** → comprobarlo con `python scripts/verificar_despliegue.py` |
+| **El módulo deja de publicar dos variables** (`temp_ambiental` y `humedad`) | Es el **contacto del cable de datos del AM2302**: en el Monitor Serie aparece `dht: Initialization error, problem in phase 'B'` y `temp_ambiental sin dato: no se publica`. Sacar y volver a meter el cable en el GPIO 33; si vuelve a pasar, cambiar el cable, porque el terminal está flojo |
 | **La base rechaza una escritura** | Mostrar el `422` y el campo señalado: *"La validación está en el servidor y el error dice qué corregir."* |
 | **Nada de lo anterior funciona** | Quedan las **capturas fechadas** y el **repositorio**, que es donde el docente verifica. La demostración en vivo suma, pero la entrega ya está subida |
 
