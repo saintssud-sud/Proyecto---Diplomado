@@ -134,8 +134,21 @@ pull-up la sostiene y nadie del otro lado la baja, o sea que el sensor no está 
 ESE pin, o no está alimentado»*. El síntoma era elocuente: **respondía al arrancar y
 fallaba en todos los ciclos**, que es la firma de un contacto flojo.
 
-**La solución fue desconectar y volver a conectar el cable de datos del sensor.** Desde
-las 22:54 el módulo publica las **cinco** variables en el mismo ciclo:
+**La solución fue desconectar y volver a conectar el cable de datos del sensor**, con un
+matiz que conviene dejar anotado: **el cable parecía bien conectado**. Se revisó primero y
+a simple vista estaba en su sitio; aun así no daba datos, y fue al sacarlo y volver a
+meterlo cuando empezó a responder. Es decir, no era un cable fuera de su pin, sino un
+**contacto eléctrico deficiente con aspecto correcto**: la punta entraba, pero no llegaba
+a tocar bien. Suele deberse al terminal hembra que se abre con el uso, a óxido o suciedad
+en el pin, o a un hilo roto por dentro del aislamiento.
+
+Ese tipo de avería **vuelve sola**: por eso conviene sustituir el cable por uno nuevo si el
+terminal está flojo, sujetarlo con una brida o cinta para que nadie lo mueva, y —cuando la
+maqueta quede armada— dejarla publicando un buen rato y comprobar que **ningún ciclo se
+queda sin las dos variables de ambiente**. Si aparece un hueco, el contacto volvió a
+fallar.
+
+Desde las 22:54 el módulo publica las **cinco** variables en el mismo ciclo:
 
 ```
 22:54:01  temp_ambiental   26,3 °C
