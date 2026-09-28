@@ -128,6 +128,29 @@ Puntos a tener en cuenta:
 * Conviene medir con multímetro la tensión en `Po` y en el punto medio antes de conectar el
   ESP32, para no arriesgar el pin.
 
+### 2.6 Registro del remojo (en curso)
+
+**En marcha desde el lunes 28 de septiembre de 2026 a las 19:52.**
+
+| Dato | Valor |
+|---|---|
+| Inicio del remojo | **lunes 28/09/2026, 19:52** |
+| Patrón usado | **4,01** (sobre de polvo en 250 ml de agua desionizada) |
+| Recipiente | Vaso estrecho de vidrio, cubierto con la jarra medidora invertida |
+| KCl | **No se consiguió** el lunes; se sigue buscando en el laboratorio y las droguerías |
+
+**Puntos de control:**
+
+| Momento | Fecha y hora | Qué toca | Resultado |
+|---|---|---|---|
+| +24 h | martes 29/09, 19:52 | Enjuagar con agua desionizada y **revisar el estado del bulbo** | *(por anotar)* |
+| +48 h | miércoles 30/09, 19:52 | **Medir en los patrones 4,01 y 6,86** y decidir si revive | *(por anotar)* |
+
+> **Lo que hay que dejar listo para el miércoles.** La decisión no depende solo del electrodo:
+> hace falta el **divisor ÷2 montado** (dos resistencias de 4,7 kΩ entre la salida `Po` del
+> módulo PH-4502C y el GPIO 36) y el módulo alimentado a 5 V. Conviene armarlo el **martes**,
+> para que el miércoles solo sea medir.
+
 ---
 
 ## 3. Lista de compras
