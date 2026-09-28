@@ -137,18 +137,28 @@ Precios a consultar salvo los dos del sensor, que ya están en las capturas.
 | Qué | Para qué | Prioridad |
 |---|---|---|
 | KCl 3 M o solución de almacenamiento | recuperar y **guardar** el electrodo | alta, el lunes |
-| Solución patrón pH 4,00 y 6,86 | calibrar el pH (T-31) | alta, el lunes |
+| ~~Solución patrón pH 4,00 y 6,86~~ | calibrar el pH (T-31) | **ya se tienen**: sobres de polvo de pH **4,01**, **6,86** y **9,18** (250 ml cada uno), aparecidos el domingo |
+| Agua destilada | disolver los patrones (750 ml) y enjuagar el electrodo | alta, el lunes |
 | Solución patrón de 707 ppm | calibrar el TDS (T-32) | media |
 | Depósito de 5 a 10 litros, opaco o con tapa | la solución del cultivo | alta, el lunes |
 | Tabla o bandeja de apoyo (madera o plástico) | montar la electrónica | alta |
 | Sonda BNC de pH sola | **solo si el electrodo no revive** | decisión del miércoles |
 | Kit de pH: 280 Bs (SEN-73, ARDUNEL, dice «consulta stock») o 320 Bs (SEN-090, disponible) | si no venden la sonda sola | decisión del miércoles |
 
+> **Sobre los patrones que aparecieron.** Son sobres de polvo: cada uno se disuelve en
+> **250 ml de agua destilada** y da una solución de pH exacto a 25 °C. Se preparan en un
+> recipiente limpio, se guardan cerrados y etiquetados con su pH, y **no se reutilizan**:
+> para calibrar se echa un poco en un vaso aparte y lo usado se descarta, porque el
+> electrodo contamina lo que toca. El de 9,18 es el que más se degrada con el aire, así que
+> conviene prepararlo el mismo día que se use.
+>
+> Además, el patrón de **4,01** sirve como **remojo de emergencia** del electrodo si el KCl
+> no aparece el lunes (ver el apartado 2.2).
+
 **Conviene preguntar por WhatsApp a las dos tiendas el lunes temprano**, en un solo
-mensaje, por: KCl o solución de almacenamiento, patrones de 4,00 y 6,86, patrón de 707 ppm,
-sonda BNC sola, y si el kit de 280 Bs tiene stock. Los dos comercios venden sensores de pH,
-así que es probable que también vendan los patrones, y comprarlo todo en un viaje ahorra
-dos días.
+mensaje, por: KCl o solución de almacenamiento, patrón de 707 ppm, sonda BNC sola, y si el
+kit de 280 Bs tiene stock. Los patrones de pH **ya no hacen falta**: aparecieron el domingo.
+Comprar todo en un viaje ahorra dos días.
 
 **Sobre la compra del sensor:** si el electrodo no revive, primero preguntar si venden **la
 sonda sola**. El módulo PH-4502C probablemente siga bueno, y la sonda suelta tiene que ser
