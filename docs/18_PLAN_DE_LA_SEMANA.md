@@ -159,14 +159,24 @@ Precios a consultar salvo los dos del sensor, que ya están en las capturas.
 
 | Qué | Para qué | Prioridad |
 |---|---|---|
-| KCl 3 M o solución de almacenamiento | recuperar y **guardar** el electrodo | alta, el lunes |
+| Solución de almacenamiento Hanna **HI 70300-023** | recuperar y **guardar** el electrodo (es el KCl que no aparecía) | **encontrada el martes**: hay que pedir cotización |
 | ~~Solución patrón pH 4,00 y 6,86~~ | calibrar el pH (T-31) | **ya se tienen**: sobres de polvo de pH **4,01**, **6,86** y **9,18** (250 ml cada uno), aparecidos el domingo |
 | Agua destilada | disolver los patrones (750 ml) y enjuagar el electrodo | alta, el lunes |
-| Solución patrón de 707 ppm | calibrar el TDS (T-32) | media |
+| Patrón de conductividad Hanna **HI7031L** de 1413 µS/cm, 500 ml | calibrar el TDS (T-32) | **encontrado el martes**, 115,42 Bs |
 | Depósito de 5 a 10 litros, opaco o con tapa | la solución del cultivo | alta, el lunes |
 | Tabla o bandeja de apoyo (madera o plástico) | montar la electrónica | alta |
 | Sonda BNC de pH sola | **solo si el electrodo no revive** | decisión del miércoles |
 | Kit de pH: 280 Bs (SEN-73, ARDUNEL, dice «consulta stock») o 320 Bs (SEN-090, disponible) | si no venden la sonda sola | decisión del miércoles |
+
+> **Sobre el patrón del TDS.** El patrón de conductividad de **1413 µS/cm** es el que corresponde:
+> con el factor que usa el firmware (TDS = conductividad × 500) equivale a **706,5 ppm**, o sea los
+> **707 ppm** que cita la bibliografía. No hace falta seguir buscando el de 800 ppm: el número del
+> documento y el patrón quedan coincidiendo, y el mismo frasco calibra la conductividad y el TDS,
+> que salen de la misma sonda.
+>
+> **Cómo se usa:** se echan unos 50 ml en un vaso limpio y ahí se sumerge la sonda; **lo usado no se
+> devuelve al frasco**, porque la sonda contamina lo que toca. Con 500 ml alcanza para diez
+> calibraciones, y el frasco dura cinco años sin abrir.
 
 > **Sobre los patrones que aparecieron.** Son sobres de polvo: cada uno se disuelve en
 > **250 ml de agua destilada** y da una solución de pH exacto a 25 °C. Se preparan en un

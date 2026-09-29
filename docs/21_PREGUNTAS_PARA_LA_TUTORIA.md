@@ -10,6 +10,11 @@ el cuadradito cuando ya se hizo. Al final se leen los acuerdos en voz alta y se 
 > **Y no se pregunta lo que ya está respondido:** la fecha del E3 es el sábado 3 de octubre a las
 > 23:59, con hasta 72 horas de tolerancia y 10 puntos porcentuales por día de atraso, y el
 > cuestionario Q3 vence el mismo día sin tolerancia.
+>
+> **Tampoco el patrón del TDS:** ya no hace falta preguntar por el patrón de 800 ppm. Se consiguió el
+> de Hanna `HI7031L` de **1413 µS/cm**, que con el factor de conversión que usa el firmware
+> (TDS = EC × 500) equivale a **706,5 ppm**, es decir los **707 ppm** que cita la bibliografía. El
+> número del documento y el patrón quedan coincidiendo.
 
 ---
 
@@ -57,12 +62,7 @@ el cuadradito cuando ya se hizo. Al final se leen los acuerdos en voz alta y se 
 
   *Anoté:*
 
-- [ ] **2.3** «Para calibrar el TDS conseguimos un patrón de **800 ppm** en lugar del 707 ppm que
-  cita la bibliografía. ¿Es aceptable si queda documentado con qué patrón se calibró?»
-
-  *Anoté:*
-
-- [ ] **2.4** «¿Qué alcance espera para la **maqueta**: basta con el montaje midiendo, o quiere que
+- [ ] **2.3** «¿Qué alcance espera para la **maqueta**: basta con el montaje midiendo, o quiere que
   en esta entrega incluya también el cultivo con plantines?»
 
   *Anoté:*
