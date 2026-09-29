@@ -70,7 +70,10 @@ Comprobación con el multímetro **antes de conectar**: entre `Po` y `GND` debe 
 electrodo en el patrón, el nodo debe dar **la mitad** de lo que hay en `Po`.
 
 El procedimiento dibujado, con los siete pasos y la tabla de comprobaciones, está en
-`Figuras/23-divisor-ph.png`.
+`Figuras/23-divisor-ph.png`, y el lugar físico donde va sobre la placa, con el orden real de los
+seis pines del conector (`TO · DO · PO · GND · GND · VCC`), en `Figuras/24-divisor-ph-donde.png`.
+El divisor se arma **del lado del conector de 6 pines**, entre `PO` y uno de los dos `GND`; el
+BNC de la derecha es solo para enchufar el electrodo y de ese lado no se suelda nada.
 
 ---
 
