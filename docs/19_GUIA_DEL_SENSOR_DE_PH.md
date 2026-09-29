@@ -65,6 +65,20 @@ Po (PH-4502C) ---[ 4,7 kΩ ]---+--- SVP (GPIO 36)
 El punto del medio es el **nodo**: ahí se juntan la primera resistencia, la segunda y el cable al
 `SVP`, los tres en el mismo punto. La masa tiene que ser común a la placa del pH y al ESP32.
 
+**Va del lado que va al ESP32, no del lado de la sonda.** El electrodo se enchufa al BNC y su
+señal la acondiciona la propia placa; lo que hay que bajar es la salida de la placa antes de que
+entre al microcontrolador:
+
+```
+[electrodo] ──BNC──> [placa PH-4502C] ──PO──> [divisor] ──> SVP · GPIO 36
+   lado de la sonda                                ↑
+                                    acá va el divisor: del lado del ESP32
+```
+
+Del lado del BNC no se suelda nada. Y el divisor no tiene que quedar pegado al pin del conector:
+sirve en cualquier punto del cable que va de `PO` al `GPIO 36`, siempre que la pata de la segunda
+resistencia llegue al `GND` de la placa y ese `GND` sea el mismo del ESP32.
+
 Comprobación con el multímetro **antes de conectar**: entre `Po` y `GND` debe dar unos 9,4 kΩ
 (las dos resistencias en serie), entre el nodo y `GND` unos 4,7 kΩ, y con el módulo encendido y el
 electrodo en el patrón, el nodo debe dar **la mitad** de lo que hay en `Po`.
