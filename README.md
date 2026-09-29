@@ -22,6 +22,17 @@ Se desarrolla como **trabajo final del Módulo 4** del Diplomado en Desarrollo W
 | Servicio (API) | https://sigvach-api.onrender.com |
 | Documentación interactiva de la API | https://sigvach-api.onrender.com/docs |
 
+**Cuentas habilitadas para la revisión** (ficticias, creadas solo para evaluar el sistema):
+
+| Rol | Correo electrónico | Contraseña | Qué permite comprobar |
+|---|---|---|---|
+| Administrador | `mateosantos@yahoo.es` | `654321` | Acceso completo: administración de cuentas, módulos, perfiles y rangos |
+| Operador | `tecnico@gmail.com` | *(pendiente de anotar)* | Lectura de las variables y registro manual; **no** puede editar rangos |
+
+> El servicio publicado usa la capa gratuita, que **se suspende por inactividad**: la primera
+> consulta después de un rato puede tardar hasta un minuto. El módulo de adquisición tiene una cola
+> en memoria no volátil para no perder las lecturas durante ese arranque en frío.
+
 El **archivo instalable de Android** se compila apuntando al servicio publicado, de modo que la aplicación funciona desde cualquier red, sin depender del equipo del autor. El repositorio conserva además el histórico del proyecto de aula del que proviene: el mismo sistema, que fue creciendo sesión a sesión.
 
 ## 2. Problema u objetivo
