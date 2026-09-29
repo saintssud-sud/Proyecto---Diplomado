@@ -27,7 +27,11 @@ Se desarrolla como **trabajo final del Módulo 4** del Diplomado en Desarrollo W
 | Rol | Correo electrónico | Contraseña | Qué permite comprobar |
 |---|---|---|---|
 | Administrador | `mateosantos@yahoo.es` | `654321` | Acceso completo: administración de cuentas, módulos, perfiles y rangos |
-| Operador | `tecnico@gmail.com` | *(pendiente de anotar)* | Lectura de las variables y registro manual; **no** puede editar rangos |
+| Operador | `tecnico@gmail.com` | `qwerty` | Lectura de las variables y registro manual; **no** puede editar rangos ni administrar cuentas (responde 403) |
+
+> Las pruebas de acceso verificadas contra el servicio publicado —401 sin token, 403 con el rol
+> equivocado y 422 con el formato de error de la API— están registradas en
+> `docs/24_EVIDENCIA_401_403_422.txt`.
 
 > El servicio publicado usa la capa gratuita, que **se suspende por inactividad**: la primera
 > consulta después de un rato puede tardar hasta un minuto. El módulo de adquisición tiene una cola

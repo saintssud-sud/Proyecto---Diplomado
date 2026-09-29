@@ -1,0 +1,99 @@
+EVIDENCIA — Pruebas de acceso: 401, 403 y 422
+=============================================
+
+Para qué sirve este archivo
+---------------------------
+Es una de las evidencias del apartado **2.8 (Pruebas)** del E3. Responde a tres comprobaciones
+de la lista del docente:
+
+    · Sin token, una ruta protegida responde 401.
+    · Con el rol equivocado, responde 403.
+    · Un dato inválido responde 400 o 422 con el formato de error de la API.
+
+Se ejecutó **contra el servicio publicado**, no contra el entorno local, y con las **dos cuentas
+de prueba** que se declaran en el entregable (una por rol): sin dos cuentas no se puede verificar
+el 403.
+
+
+Entorno y fecha
+---------------
+    Fecha          : 29 de septiembre de 2026
+    Servicio       : https://sigvach-api.onrender.com
+    Aplicación     : https://sigvach26-bd.web.app  (origen usado en las cabeceras)
+    Cuenta rol 1   : administrador
+    Cuenta rol 2   : operador
+
+
+Cómo se reproduce
+-----------------
+Las cuentas son de Firebase Authentication, de modo que primero se obtiene el token de identidad
+y después se llama al servicio con la cabecera `Authorization`:
+
+    1. Obtener el token (cuenta operador):
+
+       curl -s -X POST -H "Content-Type: application/json" \
+         -d '{"email":"<correo>","password":"<contraseña>","returnSecureToken":true}' \
+         "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=<clave-web>"
+
+    2. Llamar al servicio con ese token:
+
+       curl -s -H "Origin: https://sigvach26-bd.web.app" \
+         -H "Authorization: Bearer <idToken>" \
+         "https://sigvach-api.onrender.com/api/v1/<ruta>"
+
+Las credenciales de las dos cuentas están en el README del repositorio y en el campo de texto de
+la entrega. La clave web de Firebase es pública por diseño: viaja dentro de la aplicación.
+
+
+Resultados
+----------
+Cada caso se ejecutó tal como lo haría un cliente externo, desde la línea de órdenes y **no desde
+la interfaz**, que es lo que exige la consigna.
+
+1) Sin token, en una ruta protegida
+
+       GET /api/v1/lecturas?limite=1     (sin cabecera Authorization)
+
+    HTTP 401
+    {"codigo":"no_autenticado","mensaje":"Falta el token de identidad en la cabecera Authorization.","detalle":{}}
+
+2) Con el rol equivocado, en una ruta de administración
+
+       GET /api/v1/usuarios              (con el token de la cuenta OPERADOR)
+
+    HTTP 403
+    {"codigo":"sin_permiso","mensaje":"La operación requiere el rol de administrador.",
+     "detalle":{"rol_requerido":["administrador"],"rol_actual":"operador"}}
+
+    El error nombra el rol requerido y el rol actual: el rechazo lo decide el servidor, a partir
+    del perfil de la cuenta, y no la interfaz.
+
+3) Con el mismo token, en una ruta permitida al operador
+
+       GET /api/v1/lecturas?limite=1     (con el token de la cuenta OPERADOR)
+
+    HTTP 200, con la lista de lecturas del módulo. Es decir: el 403 anterior no es un rechazo
+    general de la cuenta, sino de esa operación concreta.
+
+4) Un dato inválido
+
+       GET /api/v1/lecturas?limite=abc   (con el token de la cuenta OPERADOR)
+
+    HTTP 422
+    {"codigo":"validacion_rechazada","mensaje":"La petición no cumple el contrato: revise los
+     campos señalados.","detalle":{"campos":{"limite":"Input should be a valid integer"}}}
+
+    El formato de error es el mismo en toda la API: `codigo`, `mensaje` y `detalle`, con el campo
+    que falló señalado dentro de `detalle.campos`.
+
+
+Conclusión
+----------
+Las tres comprobaciones se cumplen contra el servicio publicado:
+
+    · 401 sin token ................... verificado
+    · 403 con el rol equivocado ....... verificado, con el rol requerido y el actual en el detalle
+    · 422 con el formato único ........ verificado
+
+Y un cuarto resultado que conviene citar en el documento: **la cuenta operador sí puede leer**
+(200 en el caso 3), de modo que la autorización es por operación y por rol, no un bloqueo global.
