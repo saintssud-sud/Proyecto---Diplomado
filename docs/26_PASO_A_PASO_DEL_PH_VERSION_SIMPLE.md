@@ -41,13 +41,23 @@ amarillo ──[ resistencia ]── PUNTO MEDIO ──[ resistencia ]── neg
 
 Cómo se hace, con el soldador:
 
-1. Soldá una resistencia en la punta del cable amarillo. Es igual que lo que hicimos con el AM2302.
-2. De la otra pata de esa resistencia sale el **punto medio**. Ahí vas a soldar dos cosas: la
-   segunda resistencia y el cable nuevo que va al ESP32.
-3. La segunda resistencia va del punto medio al cable **negro** (que es la masa).
+**Ojo: el cable amarillo se corta.** No es como el AM2302, donde pelábamos una ventana y la
+resistencia quedaba al costado. Acá la primera resistencia va **en el medio del camino**: si le
+pelás una ventana y soldás ahí la pata, el cable puentea la resistencia y el divisor no hace nada.
+
+1. **Cortá el cable amarillo** a unos 10 cm del conector. Quedan dos pedazos: el que viene de la
+   placa del pH y el que sigue hacia el ESP32.
+2. Soldá una resistencia **entre los dos pedazos**: una pata a cada lado. Es la misma soldadura que
+   hiciste en el AM2302, solo que ahora el cable va cortado.
+3. La pata de la derecha de esa resistencia es el **punto medio**. Ahí vas a soldar dos cosas más:
+   la segunda resistencia y el cable nuevo que va al ESP32.
+4. La segunda resistencia va del punto medio al cable **negro**. Al negro no se le corta nada: se
+   le pela una ventana de 3 mm y ahí se suelda la pata.
 
 **El punto medio es un solo punto:** ahí se juntan tres cosas, la primera resistencia, la segunda
 y el cable que va al ESP32.
+
+El dibujo de estos tres pasos está en `Figuras/25-divisor-cable-a-cable.png`.
 
 ---
 
