@@ -1,0 +1,99 @@
+EVIDENCIA — Ciclo completo de lectura con el AM2302 reparado
+===========================================================
+
+Para qué sirve este archivo
+---------------------------
+Es la evidencia de que el módulo de adquisición vuelve a leer las **cinco variables** de un
+ciclo completo, ya con la resistencia de *pull-up* soldada en el AM2302. Cierra el pendiente
+del apartado 4 de la bitácora del martes 29/09/2026 y sirve para el apartado **2.8 (Pruebas)**
+del E3: una prueba de funcionamiento normal, con su resultado.
+
+Antes de esta sesión el firmware avisaba `dht: Initialization error, problem in phase 'B'`:
+la línea de datos se quedaba en alto porque el AM2302 no traía la resistencia de *pull-up*.
+Después de soldarla (4,7 kΩ entre el cable rojo y el amarillo) el sensor responde.
+
+
+Entorno y fecha
+---------------
+    Fecha        : 29 de septiembre de 2026
+    Módulo       : ESP32, puerto COM6, 115200 baudios
+    Firmware     : modo servicio (PUBLICAR_EN_SERVICIO 1, una publicación cada 300 s)
+    Pin AM2302   : GPIO 33 · P33
+    Pin DS18B20  : GPIO 32 · P32
+
+
+Cómo se reproduce
+-----------------
+Con el módulo encendido y conectado por USB:
+
+    pwsh -File "Modulo ESP32\Diagnostico\leer_serial.ps1" -Puerto COM6 -Segundos 330
+
+La ventana debe superar los 300 segundos, porque en modo servicio el firmware solo imprime
+cuando lee: entre ciclo y ciclo queda en silencio. La lectura del puerto no toca las líneas
+DTR ni RTS, para no reiniciar la placa. Las líneas de depuración del WiFi (`ssn:5, winSize:64`)
+se descartan con el filtro del propio lector.
+
+
+Resultado
+---------
+Captura literal, agrupada en dos bloques: primero lo que el módulo lee de cada sonda y después
+lo que publica de cada variable.
+
+    ---- Lectura de las sondas ----
+
+    I (651364) SIGVACH: Ambiente -> 25.20 C   49.20 % HR
+    I (652174) SIGVACH: Solucion -> 22.31 C
+    I (652194) SIGVACH: pH  ->    142 mV (0.14 V) crudo    0  dispersion    0  senal estable
+    I (652194) SIGVACH: TDS ->    683 mV (0.68 V) crudo  659  dispersion  131  algo ruidosa
+    I (652194) SIGVACH:   -> 267.87 ppm   0.54 mS/cm   (compensado con la temperatura de la solucion)
+
+    ---- Publicación de las cinco variables ----
+
+    I (656814) SIGVACH:   temp_ambiental       25.20 C      ->  almacenada
+    I (659984) SIGVACH:   humedad              49.20 %      ->  almacenada
+    I (661414) SIGVACH:   temp_solucion        22.31 C      ->  almacenada
+    I (668384) SIGVACH:   tds                 267.87 ppm    ->  almacenada
+    I (669814) SIGVACH:   ec                    0.54 mS/cm   ->  almacenada
+
+(Los caracteres del símbolo de grado salen como `??` en la consola de Windows: es un problema
+de la página de códigos de la terminal, no del módulo.)
+
+Entre una variable y la siguiente aparece la línea
+`esp-x509-crt-bundle: Certificate validated`: es el certificado del servicio publicado, que se
+valida en cada envío. Es decir, las cinco variables **no solo se leyeron: llegaron al servicio**.
+
+Resumen del ciclo:
+
+    Variable          Valor          Origen
+    ----------------  -------------  ------------------------------
+    temp_ambiental    25.20 C        AM2302 (GPIO 33)
+    humedad           49.20 %        AM2302 (GPIO 33)
+    temp_solucion     22.31 C        DS18B20 (GPIO 32)
+    tds               267.87 ppm     Sonda TDS (SVN · GPIO 39)
+    ec                0.54 mS/cm     Calculada a partir del TDS
+
+
+Lectura de los resultados
+-------------------------
+1. **El AM2302 funciona.** Entrega temperatura y humedad del ambiente en el mismo ciclo, y el
+   error `problem in phase 'B'` no volvió a aparecer. La soldadura de la resistencia quedó bien.
+
+2. **Las cinco variables se publican.** Cada línea termina en `almacenada`, y cada envío va
+   acompañado de la validación del certificado del servicio: la lectura llegó al servidor.
+
+3. **El pH se lee estable.** 142 mV crudos, sin dispersión y con la señal marcada como estable.
+   El electrodo está en remojo en disolución patrón de pH 4,01 desde el lunes 28/09 a las 19:52.
+   El valor **no se publica todavía**: falta el cálculo de conversión y la calibración con los
+   tres patrones, así que el pH sigue declarado como pendiente en el documento.
+
+4. **El TDS sale algo ruidoso.** La sonda entrega 683 mV con una dispersión de 659 y el firmware
+   lo marca como `algo ruidosa`; aun así el valor publicado (267.87 ppm) es coherente con el
+   ciclo anterior (268.94 ppm). Queda anotado revisar el filtrado y la puesta a masa de la sonda
+   cuando se arme la maqueta, porque todavía está sobre la mesa y sin apantallar.
+
+
+Conclusión
+----------
+El módulo de adquisición está operativo: lee las cinco variables de un ciclo completo y las
+publica en el servicio. El AM2302, que era la pieza que faltaba, quedó reparado con la
+resistencia de *pull-up*.
