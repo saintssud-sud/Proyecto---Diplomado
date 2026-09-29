@@ -159,10 +159,10 @@ Precios a consultar salvo los dos del sensor, que ya están en las capturas.
 
 | Qué | Para qué | Prioridad |
 |---|---|---|
-| Solución de almacenamiento Hanna **HI 70300-023** | recuperar y **guardar** el electrodo (es el KCl que no aparecía) | **encontrada el martes**: hay que pedir cotización |
+| Solución de almacenamiento Hanna **HI 70300-023** | recuperar y **guardar** el electrodo (es el KCl que no aparecía) | **cotizada el martes**: 270 Bs (presentación de 230 ml) |
 | ~~Solución patrón pH 4,00 y 6,86~~ | calibrar el pH (T-31) | **ya se tienen**: sobres de polvo de pH **4,01**, **6,86** y **9,18** (250 ml cada uno), aparecidos el domingo |
 | Agua destilada | disolver los patrones (750 ml) y enjuagar el electrodo | alta, el lunes |
-| Patrón de conductividad Hanna **HI7031L** de 1413 µS/cm, 500 ml | calibrar el TDS (T-32) | **encontrado el martes**, 115,42 Bs |
+| Patrón de conductividad Hanna **HI7031L** de 1413 µS/cm, 500 ml | calibrar el TDS (T-32) | **cotizado el martes**: 310 Bs |
 | Depósito de 5 a 10 litros, opaco o con tapa | la solución del cultivo | alta, el lunes |
 | Tabla o bandeja de apoyo (madera o plástico) | montar la electrónica | alta |
 | Sonda BNC de pH sola | **solo si el electrodo no revive** | decisión del miércoles |
@@ -177,6 +177,42 @@ Precios a consultar salvo los dos del sensor, que ya están en las capturas.
 > **Cómo se usa:** se echan unos 50 ml en un vaso limpio y ahí se sumerge la sonda; **lo usado no se
 > devuelve al frasco**, porque la sonda contamina lo que toca. Con 500 ml alcanza para diez
 > calibraciones, y el frasco dura cinco años sin abrir.
+
+### 3.1 La cotización de Hanna Bolivia, del martes 29/09
+
+Llegó la cotización del distribuidor, con validez de 15 días y stock disponible:
+
+| N° | Código | Descripción | Precio |
+|---|---|---|---|
+| 1 | HI 7031L | Solución de conductividad 1413 µS/cm, 500 ml | 310 Bs |
+| 2 | HI 70300M | Solución de almacenamiento para electrodos, 230 ml | 270 Bs |
+| 3 | HI 7007L/C | Solución de pH 7,01, 500 ml con certificado | 280 Bs |
+| 4 | HI 7004L/C | Solución de pH 4,01, 500 ml con certificado | 280 Bs |
+| 5 | HI 7061L | Solución de limpieza de electrodos, 500 ml | 310 Bs |
+| 6 | 420301 | Gastos de despacho | 85 Bs |
+| | | **Total de la cotización completa** | **1.535 Bs** |
+
+**Se compran los dos primeros**, que son los que el proyecto necesita. Total a pagar:
+**665 Bs** (310 + 270 + 85), es decir **870 Bs menos** que la cotización completa.
+
+| No se compra | Por qué |
+|---|---|
+| HI 7007L/C y HI 7004L/C | Los patrones de pH ya se tienen en sobres de polvo de 4,01 y 6,86 |
+| HI 7061L | La solución de limpieza no es lo que este electrodo necesita: necesita rehidratarse |
+
+> **Si el presupuesto aprieta, primero la solución de almacenamiento** (270 + 85 = 355 Bs), porque
+> sin ella cualquier electrodo de pH se seca y muere, incluso uno nuevo. El patrón de conductividad
+> puede esperar: el TDS ya se publica, y lo que aporta es la calibración fina.
+>
+> **Y vale un último intento por el KCl antes de pagarlo:** si el laboratorio de la universidad o una
+> droguería pueden dar cloruro de potasio, la solución de almacenamiento se prepara en casa
+> (**KCl 3 M** en agua destilada) y se ahorran los 270 Bs. El patrón de conductividad, en cambio, no
+> conviene prepararlo: es 0,01 M de KCl y necesita balanza de precisión, así que el certificado de
+> Hanna es lo que corresponde comprar.
+
+> **Ojo con el total de la semana.** A estos 665 Bs se le pueden sumar los **280 o 320 Bs** de la
+> sonda de pH, si el electrodo no revive el miércoles. La semana puede cerrar cerca de **985 Bs**,
+> así que conviene decidir la compra de Hanna junto con la del electrodo, no por separado.
 
 > **Sobre los patrones que aparecieron.** Son sobres de polvo: cada uno se disuelve en
 > **250 ml de agua destilada** y da una solución de pH exacto a 25 °C. Se preparan en un
