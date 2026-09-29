@@ -234,13 +234,32 @@ el de 280 Bs dice «consulta stock», así que la disponibilidad decide.
 
 ### Martes 29
 
-- **Primera comprobación del electrodo** a las 24 horas: enjuagar y hacer la prueba rápida
-  de respuesta (sección 2.4). Anotar el resultado.
-- Armar el **divisor ÷2** con las dos resistencias de 4,7 kΩ y comprobar con multímetro la
-  tensión en `Po` y en el punto medio, antes de conectar el GPIO 36.
-- Montar las sondas de TDS y DS18B20 en el depósito y verificar que las cinco variables
-  siguen llegando a la aplicación con la sonda ya dentro del agua.
+**Pendientes que vienen del lunes por la noche** (lo que quedó sin cerrar):
+
+- [ ] **Confirmar el pull-up del AM2302**, que se montó pero no se comprobó:
+  * sin corriente, multímetro en Ω (20k): **P33 contra GND no debe dar cero**;
+  * con corriente, `V⎓` escala 20: pin del hilo **rojo → 3,3 V**, pin del hilo **amarillo → ~3,3 V**.
+- [ ] **Mirar el Monitor Serie** y confirmar que aparece `Ambiente -> 26.3 C   33.1 % HR`
+  **sin** el error `problem in phase 'B'`. Si el error sigue, revisar el contacto del cable.
+- [ ] **Buscar el KCl**, en este orden: laboratorio de la universidad (que lo pesen ahí) →
+  droguería o casa de reactivos → cotización de Hanna en La Paz.
+- [ ] **Pedir cotización a Hanna Instruments Bolivia** por: solución de almacenamiento
+  HI 70300 (30 ml) y HI 70300L (500 ml), y patrón de TDS HI 70080 (800 ppm) en la
+  presentación más pequeña. Preguntar **envío a Tarija, costo y plazo**, y si tienen
+  distribuidor en la ciudad.
+
+**Lo del plan de la semana:**
+
+- **Primera comprobación del electrodo a las 24 horas** (a las 19:52): sacarlo, enjuagarlo con
+  agua desionizada y **revisar el estado del bulbo** con buena luz. Anotar el resultado en el
+  registro del apartado 2.6 y volver a sumergirlo.
+- Armar el **divisor ÷2** con las dos resistencias de 4,7 kΩ (`Po` → R1 → nodo → SVP, y R2 del
+  nodo a GND) y comprobar con el multímetro la tensión en `Po` y en el punto medio **antes** de
+  conectar el GPIO 36. Sin esto, el miércoles no se puede medir.
+- Montar las sondas de TDS y DS18B20 en el depósito y verificar que las cinco variables siguen
+  llegando a la aplicación con la sonda ya dentro del agua.
 - Fotografiar el montaje: vista general, detalle del cableado y monitor serie.
+- Si sobra tiempo: conseguir el **depósito** y la **tabla** para la maqueta.
 
 ### Miércoles 30 — día de decisión
 
