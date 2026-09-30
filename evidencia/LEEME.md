@@ -19,6 +19,14 @@ una captura sin fecha.
 El informe `.xml` es el formato JUnit, de modo que los números se pueden leer sin abrir el texto
 (`tests`, `failures`, `errors`, `time`).
 
+### Las demás evidencias del día
+
+| Archivo | Qué demuestra |
+|---|---|
+| `cuentas-de-prueba-2026-09-29.txt` | Las dos cuentas `@proyecto.test`, una por rol: 401 sin token, 403 al operador, 200 al mismo operador en una ruta que le corresponde y 200 al administrador |
+| `reglas-firestore-2026-09-29.txt` | Que las reglas publicadas coinciden con las del repositorio y que la escalada de privilegios quedó cerrada: el intento de cambiarse el propio rol responde 403 `PERMISSION_DENIED` |
+| `despliegue-web-2026-09-29.txt` | Que la aplicación publicada pide los datos al servicio publicado, que coincide con la compilación local, que la ruta de salud responde y que el origen está autorizado |
+
 ---
 
 ## Cómo se vuelven a ejecutar

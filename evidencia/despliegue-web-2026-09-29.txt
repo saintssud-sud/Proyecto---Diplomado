@@ -1,0 +1,37 @@
+EVIDENCIA - Despliegue de la aplicacion web verificado
+Fecha   : 2026-09-30 00:02
+Comando : .venv\Scripts\python.exe scripts\verificar_despliegue.py
+Compilacion: flutter build web --dart-define=API_BASE_URL=https://sigvach-api.onrender.com
+Publicacion: firebase deploy --only hosting --project sigvach26-bd
+URL        : https://sigvach26-bd.web.app
+
+=== COMPROBACION DEL DESPLIEGUE ===
+  aplicacion: https://sigvach26-bd.web.app
+  servicio  : https://sigvach-api.onrender.com
+
+=== 1) DIRECCION QUE LLEVA LA APLICACION PUBLICADA ===
+  tamano del paquete      : 3128972 bytes
+  huella SHA-256          : d3a94ceca1101e918559e9d0491bb7a5
+  lleva la API publica    : SI
+  lleva la reserva local  : si (normal, es el valor de reserva)
+  -> CORRECTO: la aplicacion publicada pide los datos al servicio publicado.
+
+=== 2) COMPARACION CON LA COMPILACION LOCAL ===
+  build/web/main.dart.js: 3128972 bytes
+  coincide con lo publicado: SI
+
+=== 3) EL SERVICIO RESPONDE EN SU RUTA DE SALUD ===
+  HTTP 200  {"estado":"ok","version_api":"v1","entorno":"produccion","base_de_datos":"conectada"}
+  -> CORRECTO. Si tardo, es el arranque en frio: la capa gratuita se duerme.
+
+=== 4) ORIGEN AUTORIZADO (CORS) ===
+  peticion simple  : HTTP 200   access-control-allow-origin: https://sigvach26-bd.web.app
+  -> CORRECTO: el navegador permite leer la respuesta desde la aplicacion.
+  examen previo    : HTTP 200   metodos: GET, POST, PATCH, DELETE, OPTIONS
+  -> CORRECTO: el navegador podra hacer las peticiones con token.
+
+=== CONCLUSION ===
+  El despliegue esta correcto: la aplicacion publicada apunta al servicio
+  publicado, el servicio responde y autoriza a la aplicacion.
+
+  Recuerda: si publicas algo nuevo, vuelve a ejecutar esta comprobacion.

@@ -234,3 +234,146 @@ como comentarios en el archivo, están ahí y no hace falta esperar la respuesta
 > por el camino entre el módulo y la base. Por eso el apartado **2.7 (Seguridad)** y el guion de la
 > demostración tienen que explicar ese camino con este mismo cuadro.
 
+---
+
+## 9. El trabajo de la noche: los tres pendientes del E3 resueltos
+
+Después de la tutoría se leyó la plenaria **P4** (la última del módulo) y se trabajó sobre lo que
+pide. Quedaron hechos tres de los pendientes, con su evidencia.
+
+### 9.1 La plenaria P4: lo que pide y lo que faltaba
+
+El documento `P4_Pruebas_Despliegue_Defensa_Modulo4.pdf` se guardó en `docs/plenarias/`, y sus
+requisitos quedaron extraídos y cotejados con el estado del proyecto en
+`docs/27_LO_QUE_PIDE_LA_PLENARIA_P4.md`. Lo que apareció y no teníamos anotado:
+
+| Requisito de la plenaria | Estado al leerlo |
+|---|---|
+| Una cuenta `@proyecto.test` por rol, con contraseña de 10 o más caracteres | ✗ Se usaban correos personales con contraseñas de 6 |
+| Que la aplicación vuelva al inicio de sesión cuando el token vence | ✗ Estaba declarado en el código y nunca se usaba |
+| Nivel de rendimiento: una medición del RNF sobre la URL pública | ✗ Por hacer |
+| Nivel funcional: el flujo Must con capturas fechadas en producción | ✗ Por hacer |
+| Informes de los ejecutores de prueba versionados en el repositorio | ✗ Por hacer |
+
+También quedó anotado el calendario nuevo: la **T4 del Grupo 3 es el viernes 9 de octubre a las
+17:00**, con el ensayo de la defensa, y la defensa es del 12 al 15 de octubre, siete minutos de
+demostración y cinco de preguntas.
+
+### 9.2 El 401 devuelve al inicio de sesión
+
+Era la **pregunta 2 de la defensa** («¿qué pasa si el token vence?») y estaba sin resolver: la API
+respondía 401 correctamente, pero la aplicación se quedaba en la pantalla mostrando un error.
+
+| Archivo | Cambio |
+|---|---|
+| `lib/services/api_cliente.dart` | Cuando el servicio responde 401, avisa en lugar de sólo lanzar el error |
+| `lib/services/auth_service.dart` | Cierra la sesión y guarda el motivo |
+| `lib/main.dart` | Conecta el aviso con el cierre de sesión |
+| `lib/screens/login_screen.dart` | Muestra «Tu sesión venció. Volvé a iniciar sesión.» |
+
+**La decisión que conviene saber explicar:** sólo el 401 del **servidor** cierra la sesión, no la
+falta de token en el equipo. Al arrancar, el proveedor de identidad tarda unos milisegundos en
+restaurar la sesión; si una pantalla pidiera datos en ese instante, cerrar la sesión dejaría al
+usuario afuera sin motivo. Quedó escrito en el propio código, y hay una prueba que lo comprueba.
+
+### 9.3 Las dos cuentas de prueba, una por rol
+
+| Rol | Correo | Contraseña |
+|---|---|---|
+| Administrador | `administrador@proyecto.test` | `SIGVACH.Adm.2026` |
+| Operador | `operador@proyecto.test` | `SIGVACH.Ope.2026` |
+
+Se crearon en Firebase Authentication, se les creó el perfil con el **rol de menor privilegio** y el
+ascenso del administrador se hizo **por el servicio**, que es la vía correcta. Las credenciales
+quedaron en el README y en el campo de texto de la entrega, nunca en el documento. Las dos cuentas
+anteriores, con correos reales y contraseñas cortas, quedaron fuera de circulación.
+
+La comprobación contra el servicio publicado, en `evidencia/cuentas-de-prueba-2026-09-29.txt`:
+
+| Caso | Petición | Respuesta |
+|---|---|---|
+| 1 | `GET /usuarios` sin token | **401** |
+| 2 | `GET /usuarios` con el operador | **403**, con `rol_requerido` y `rol_actual` |
+| 3 | `GET /lecturas` con el mismo operador | **200** |
+| 4 | `GET /usuarios` con el administrador | **200** |
+
+El caso 3 es el que importa para la defensa: demuestra que el 403 no es un bloqueo de la cuenta,
+sino de la operación.
+
+### 9.4 Se cerró una escalada de privilegios
+
+Al revisar cómo se asigna el rol apareció esto: **el rol de administrador se concedía por correo**.
+El alta de un perfil admitía `rol: administrador` para `admin@sigvach.com`, en la aplicación y en
+las reglas de la base. Cualquiera que consiguiera registrarse con ese correo obtenía las
+atribuciones sin que nadie se las diera, lo que contradice el principio de menor privilegio que
+exige la plenaria.
+
+Se retiró la excepción en los dos lugares, se actualizaron los documentos que la describían y se
+publicaron las reglas con `firebase deploy --only firestore:rules`. Las reglas publicadas se
+compararon después contra el archivo del repositorio: **el contenido coincide, carácter por
+carácter**.
+
+Y se probó el efecto, no sólo la publicación: con el token de la cuenta de operador se intentó
+cambiar el rol propio a administrador contra la API de Firestore.
+
+```
+Petición  : PATCH usuarios/<uid propio>  con  rol = administrador
+Respuesta : HTTP 403
+            {"error":{"code":403,"message":"Missing or insufficient permissions.",
+                      "status":"PERMISSION_DENIED"}}
+```
+
+Es la respuesta que hay que saber dar en la defensa: **el rol no se concede desde el cliente; ni
+siquiera la base lo permite**.
+
+### 9.5 La aplicación publicada, actualizada
+
+Se volvió a compilar con la dirección del servicio publicado (`flutter build web` con
+`--dart-define=API_BASE_URL=https://sigvach-api.onrender.com`) y se desplegó a Firebase Hosting. La
+verificación posterior comprobó las cuatro cosas: que el paquete publicado pide los datos al
+servicio publicado, que coincide con la compilación local, que la ruta de salud responde
+`{"estado":"ok","base_de_datos":"conectada"}` y que el origen está autorizado (CORS y examen
+previo correctos).
+
+### 9.6 Las pruebas, con su informe versionado
+
+| Batería | Comando | Resultado |
+|---|---|---|
+| Servicio | `pytest backend -q --no-header -p no:cacheprovider` | **106 pruebas, 0 fallos** (7,24 s) |
+| Aplicación | `flutter test` | **96 pruebas en verde** (eran 93: se agregaron 3 del cierre de sesión) |
+| Análisis estático | `flutter analyze` | Sin observaciones |
+
+**Total: 202 pruebas automatizadas.** Los informes quedaron en `evidencia/` con la fecha en el
+nombre, y el del servicio también en formato JUnit (`.xml`), para poder leer los números sin abrir
+el texto. El README decía 90 casos y no mencionaba `flutter test`: quedó corregido.
+
+### 9.7 Lo que quedó guardado, y las confirmaciones del día
+
+| Pieza | Dónde |
+|---|---|
+| Informe del servicio y de la aplicación | `evidencia/pytest-2026-09-29.txt` y `.xml`, `evidencia/flutter-test-2026-09-29.txt` |
+| Análisis estático | `evidencia/flutter-analyze-2026-09-29.txt` |
+| Las dos cuentas y el control de rol | `evidencia/cuentas-de-prueba-2026-09-29.txt` |
+| Reglas de la base y escalada cerrada | `evidencia/reglas-firestore-2026-09-29.txt` |
+| Verificación del despliegue web | `evidencia/despliegue-web-2026-09-29.txt` |
+| Requisitos de la plenaria P4 | `docs/27_LO_QUE_PIDE_LA_PLENARIA_P4.md` |
+| La plenaria, archivada | `docs/plenarias/P4_Pruebas_Despliegue_Defensa_Modulo4.pdf` |
+
+Confirmaciones del día, en orden: `7c1f510` (pull-up del AM2302 y ciclo completo), `0a20ffa` y
+`d63fd59` (diagramas del divisor), `b8171b0` (aclaración del lado del divisor), `aa64057` (guía
+simple), `ff009ce` y `75e55a3` (patrón del TDS y cotización de Hanna), `6eda3d1` (la tutoría en la
+bitácora), `bad6ef5` (requisitos de la P4), `4bf4991` (arreglo del 401 con los informes),
+`deeda2b` (cuentas de prueba) y `d14aa39` (escalada de privilegios cerrada).
+
+### 9.8 Lo que sigue
+
+| Pendiente | Cuándo |
+|---|---|
+| **La prueba de los dos patrones del electrodo de pH** | miércoles 30 a las 19:52, y es lo del banco |
+| El divisor ÷2 del pH, con las dos resistencias de 4,7 kΩ | miércoles, con la prueba |
+| El mapa del repositorio para la defensa (dónde está cada cosa que pueden preguntar) | antes del 9 de octubre |
+| La tabla 2.8 con sus casos, y las capturas fechadas del flujo completo | para el E3 del sábado 3 |
+| La medición de rendimiento sobre la URL pública | para el E3 |
+| Escribir los apartados 2.1, 2.7 y 2.8 | para el E3 |
+
+
