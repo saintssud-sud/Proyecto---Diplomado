@@ -192,27 +192,48 @@ Llegó la cotización del distribuidor, con validez de 15 días y stock disponib
 | 6 | 420301 | Gastos de despacho | 85 Bs |
 | | | **Total de la cotización completa** | **1.535 Bs** |
 
-**Se compran los dos primeros**, que son los que el proyecto necesita. Total a pagar:
-**665 Bs** (310 + 270 + 85), es decir **870 Bs menos** que la cotización completa.
+**Se compran los dos primeros**, que son los que el proyecto necesita.
+
+### 3.2 El pedido, hecho el 30 de septiembre · cotización N° 66917
+
+Sobre esa base se emitió una **segunda cotización** (N° 66917, del 29/09, con vigencia hasta el
+14/10) que **baja el despacho de 85 a 35 Bs**:
+
+| N° | Código | Descripción | Precio |
+|---|---|---|---|
+| 1 | HI 7031L | Solución de conductividad 1413 µS/cm, 500 ml | 310 Bs |
+| 2 | HI 70300M | Solución de almacenamiento para electrodos, 230 ml | 270 Bs |
+| 3 | 420301 | Gastos de despacho | 35 Bs |
+| | | **Total del pedido** | **615 Bs** |
+
+**El pedido está hecho.** Quedan por confirmar la fecha de entrega y el número de lote con su
+vencimiento, que conviene pedir cuando respondan. Se espera que llegue **antes del fin de semana**.
+
+> **Qué cambia si llega antes del sábado.** El patrón de conductividad permite calibrar el TDS y la
+> conductividad, y esa calibración se puede sumar al E3 como evidencia. Si llega después, va al E4,
+> que es donde el informe de calibración tiene su lugar. La solución de almacenamiento, en cambio,
+> conviene tenerla cuanto antes: es lo que mantiene vivo el electrodo, sea el que se recuperó o el
+> que se compre nuevo.
 
 | No se compra | Por qué |
 |---|---|
 | HI 7007L/C y HI 7004L/C | Los patrones de pH ya se tienen en sobres de polvo de 4,01 y 6,86 |
 | HI 7061L | La solución de limpieza no es lo que este electrodo necesita: necesita rehidratarse |
 
-> **Si el presupuesto aprieta, primero la solución de almacenamiento** (270 + 85 = 355 Bs), porque
-> sin ella cualquier electrodo de pH se seca y muere, incluso uno nuevo. El patrón de conductividad
-> puede esperar: el TDS ya se publica, y lo que aporta es la calibración fina.
+> **Si el presupuesto aprieta, primero la solución de almacenamiento**, porque sin ella cualquier
+> electrodo de pH se seca y muere, incluso uno nuevo. El patrón de conductividad puede esperar: el
+> TDS ya se publica, y lo que aporta es la calibración fina.
 >
 > **Y vale un último intento por el KCl antes de pagarlo:** si el laboratorio de la universidad o una
 > droguería pueden dar cloruro de potasio, la solución de almacenamiento se prepara en casa
 > (**KCl 3 M** en agua destilada) y se ahorran los 270 Bs. El patrón de conductividad, en cambio, no
 > conviene prepararlo: es 0,01 M de KCl y necesita balanza de precisión, así que el certificado de
-> Hanna es lo que corresponde comprar.
+> Hanna es lo que corresponde comprar. *(El 30/09 apareció una alternativa de KCl 3 M de Mettler
+> Toledo en 250 ml, en cotización: si llega a buen precio, reemplaza a la de Hanna.)*
 
-> **Ojo con el total de la semana.** A estos 665 Bs se le pueden sumar los **280 o 320 Bs** de la
-> sonda de pH, si el electrodo no revive el miércoles. La semana puede cerrar cerca de **985 Bs**,
-> así que conviene decidir la compra de Hanna junto con la del electrodo, no por separado.
+> **Ojo con el total de la semana.** A estos 615 Bs se le pueden sumar los **280 o 320 Bs** de la
+> sonda de pH, si el electrodo no revive el miércoles. La semana puede cerrar cerca de **935 Bs**,
+> así que conviene decidir la compra del electrodo apenas se sepa el resultado de la prueba.
 
 > **Sobre los patrones que aparecieron.** Son sobres de polvo: cada uno se disuelve en
 > **250 ml de agua destilada** y da una solución de pH exacto a 25 °C. Se preparan en un
