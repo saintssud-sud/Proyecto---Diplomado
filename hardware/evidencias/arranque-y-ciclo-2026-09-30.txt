@@ -1,0 +1,109 @@
+EVIDENCIA — Arranque del módulo y ciclo completo, con el AM2302 reparado
+=====================================================================
+
+Para qué sirve este archivo
+---------------------------
+Es la evidencia de que el módulo, ya con la resistencia de *pull-up* soldada en el
+AM2302, **arranca, detecta sus sensores y publica las cinco variables** en el
+servicio publicado.
+
+Cierra el pendiente del apartado 9 de la bitácora del 29 de septiembre y sirve
+para el apartado **2.8 (Pruebas)** del E3: una prueba de funcionamiento normal,
+con su resultado y su fecha.
+
+    Fecha    : miércoles 30 de septiembre de 2026, 09:52
+    Módulo   : ESP32, puerto COM6, 115200 baudios
+    Firmware : modo servicio (una publicación cada 300 s)
+    Módulo id: v6wrYSXxeHyttf3prDd7
+
+Cómo se reproduce
+-----------------
+    pwsh -File "Modulo ESP32\Diagnostico\esperar_y_escuchar.ps1" -Puerto COM6 -EsperaMaxima 300 -Segundos 300
+
+El programa espera a que aparezca el puerto y después escucha: la placa no siempre
+está conectada cuando se quiere registrar un ciclo. La lectura no toca las líneas
+DTR ni RTS, para no reiniciar la placa. Las líneas de inicialización del WiFi y la
+traza de depuración del driver (`ssn:5, winSize:64`) se omiten por ruido; se
+conservan las que describen el arranque y el ciclo. El nombre de la red inalámbrica
+se reemplaza por `<red>`: es un dato del entorno del autor.
+
+
+Arranque: detección de los sensores
+-----------------------------------
+    I (4614) SIGVACH: Conversor asentado (4000 ms de espera)
+    I (4614) SENSORES: Buscando el sensor de ambiente (primero en P33)...
+    I (4734) SENSORES: Sensor de ambiente: AM2302 / DHT22 en GPIO 33  (+-0,5 C, +-2 % HR)
+    I (4734) SIGVACH: Ambiente en uso: AM2302 (DHT22) en GPIO 33 (responde)
+    I (4734) SENSORES: Bus OneWire instalado en GPIO 32 (periferico RMT)
+    I (4894) SENSORES: DS18B20 en uso: ROM D528EBD4469FA928 (resolucion 12 bits)
+    I (4894) SENSORES: Sensores DS18B20 encontrados: 1
+
+    I (5394) SIGVACH: --- Entradas analogicas (dispersion de 30 muestras) ---
+    I (5394) SIGVACH: PIN           PREVISTO        MEDIANA DISPERSION  ESTADO
+    I (5394) SIGVACH: SVP GPIO 36   pH               142 mV          0  senal estable
+    I (5404) SIGVACH: SVN GPIO 39   TDS              683 mV         60  algo ruidosa
+    I (5414) SIGVACH: P34 GPIO 34   alternativa      142 mV          0  senal estable
+    I (5414) SIGVACH: P35 GPIO 35   alternativa      142 mV          0  senal estable
+
+    I (5694) SIGVACH: Conectando a la red <red>
+    I (5874) wifi:connected with <red>, channel 4, BW20, rssi = -72
+    I (9614) esp_netif_handlers: sta ip: 192.168.100.215, mask: 255.255.255.0
+    I (9614) SIGVACH: Conectado. Direccion IP: 192.168.100.215
+    I (13614) SIGVACH: Hora del dispositivo: 2026-09-30T13:51:40Z
+    I (13614) SIGVACH: Modulo: v6wrYSXxeHyttf3prDd7 | Servicio: sigvach-api.onrender.com
+
+Lectura del ciclo
+-----------------
+    I (13634) SIGVACH: Ambiente -> 21.70 C   60.50 % HR
+    I (14454) SIGVACH: Solucion -> 22.56 C
+    I (14464) SIGVACH: pH  ->    142 mV (0.14 V) crudo    0  dispersion    0  senal estable
+    I (14464) SIGVACH: TDS ->    683 mV (0.68 V) crudo  659  dispersion   33  senal estable
+    I (14474) SIGVACH:   -> 266.55 ppm   0.53 mS/cm   (compensado con la temperatura de la solucion)
+
+Publicación de las cinco variables
+----------------------------------
+    I (54014) SIGVACH:   temp_ambiental       21.70 C      ->  almacenada
+    I (57164) SIGVACH:   humedad              60.50 %      ->  almacenada
+    I (60394) SIGVACH:   temp_solucion        22.56 C      ->  almacenada
+    I (64694) SIGVACH:   tds                 266.55 ppm    ->  almacenada
+    I (68074) SIGVACH:   ec                    0.53 mS/cm   ->  almacenada
+
+Entre una variable y la siguiente aparece la línea
+`esp-x509-crt-bundle: Certificate validated`: es el certificado del servicio publicado,
+que se valida en cada envío. Las cinco variables **llegaron al servidor**.
+
+(Los caracteres del símbolo de grado salen como `??` en la consola de Windows: es un
+problema de la página de códigos de la terminal, no del módulo.)
+
+
+Lectura de los resultados
+-------------------------
+1. **El AM2302 quedó reparado.** El firmware lo detecta en GPIO 33 y entrega las dos
+   magnitudes en el mismo ciclo: 21,70 °C y 60,50 % de humedad relativa. El error
+   `problem in phase 'B'` no volvió a aparecer. La resistencia de *pull-up* soldada el
+   29 de septiembre hizo su trabajo.
+
+2. **El DS18B20 responde** en GPIO 32 con su número de serie, a 12 bits de resolución:
+   la temperatura de la solución fue 22,56 °C.
+
+3. **El pH marca 142 mV con dispersión 0 y «señal estable»**, pero **no mide todavía**:
+   el cable amarillo (salida `Po` de la placa PH-4502C) está desconectado a propósito,
+   porque falta el divisor ÷2 que protege la entrada del ESP32. Las entradas `P34` y
+   `P35`, que no tienen nada conectado, dan el mismo valor: es la firma de una entrada
+   al aire. El valor se vuelve útil cuando el divisor esté armado.
+
+4. **El TDS entrega 683 mV y 266,55 ppm** (0,53 mS/cm), coherente con los ciclos
+   anteriores (267,87 ppm y 268,94 ppm). En esta lectura el firmware lo marcó como
+   «señal estable» con dispersión 33, mejor que en la madrugada.
+
+5. **La demora del primer envío.** Entre la lectura (13,6 s) y la primera variable
+   almacenada (54,0 s) pasaron unos 40 segundos: es el arranque en frío del servicio
+   publicado, que la capa gratuita suspende por inactividad. El requisito RNF-05 admite
+   hasta 60 segundos, y el módulo reintenta hasta lograrlo: **no se perdió ninguna
+   lectura**. Los envíos siguientes tardaron unos 3 segundos cada uno.
+
+
+Conclusión
+----------
+El módulo de adquisición está operativo y publicando: lee las cinco variables y las
+guarda en el servicio. El AM2302, la pieza que se reparó ayer, funciona.
