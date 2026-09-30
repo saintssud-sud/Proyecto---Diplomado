@@ -1,0 +1,25 @@
+EVIDENCIA - Cuentas de prueba @proyecto.test: autenticacion y control de rol
+Fecha    : 2026-09-29 22:36
+Servicio : https://sigvach-api.onrender.com/api/v1
+Origen   : https://sigvach26-bd.web.app
+Cuentas  : administrador@proyecto.test (administrador) y operador@proyecto.test (operador)
+
+CASO 1 - Sin token en una ruta protegida
+  GET /api/v1/usuarios  ->  HTTP 401
+  {"codigo":"no_autenticado","mensaje":"Falta el token de identidad en la cabecera Authorization.","detalle":{}}
+
+CASO 2 - El OPERADOR intenta una ruta de administracion
+  GET /api/v1/usuarios  ->  HTTP 403
+  {"codigo":"sin_permiso","mensaje":"La operación requiere el rol de administrador.","detalle":{"rol_requerido":["administrador"],"rol_actual":"operador"}}
+
+CASO 3 - El mismo OPERADOR en una ruta que si le corresponde
+  GET /api/v1/lecturas?limite=1  ->  HTTP 200
+  [{"id":"e1F6EE9IhlT0b6RcrVtZ","modulo_id":"v6wrYSXxeHyttf3prDd7","variable":"ec","valor":0.53,"unidad":"mS/cm","origen":"automatico","registrado_por":null,"timestamp":"2026-09-29T16:04:15Z","estado_rango":"bajo","observa ...
+
+CASO 4 - El ADMINISTRADOR en la misma ruta del caso 2
+  GET /api/v1/usuarios  ->  HTTP 200
+  La lista trae 5 cuentas
+
+CONCLUSION
+  El rechazo lo decide el servidor a partir del perfil de la cuenta, no la interfaz:
+  la misma ruta responde 403 al operador y 200 al administrador.
