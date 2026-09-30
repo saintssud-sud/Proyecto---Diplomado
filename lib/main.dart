@@ -84,7 +84,20 @@ Future<void> main() async {
   // Acceso al servicio de la API. Se registra siempre: si el proveedor de
   // identidad no estuviera disponible, el cliente lo informa como un fallo de
   // conexión y la pantalla lo presenta con su acción de reintento.
-  providers.add(Provider<ApiCliente>(create: (providerContext) => ApiCliente()));
+  //
+  // El aviso de sesión vencida se conecta acá: cuando el servicio responde 401,
+  // el cliente avisa, se cierra la sesión local y la pantalla de inicio de
+  // sesión vuelve a mostrarse con el motivo. Un token vencido no se arregla
+  // reintentando la misma petición.
+  providers.add(
+    Provider<ApiCliente>(
+      create: (providerContext) {
+        final AuthService? auth =
+            firebaseReady ? providerContext.read<AuthService>() : null;
+        return ApiCliente(alExpirarLaSesion: auth?.cerrarSesionPorExpiracion);
+      },
+    ),
+  );
   providers.add(
     ChangeNotifierProvider<PanelController>(
       create: (providerContext) {

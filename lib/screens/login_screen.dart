@@ -28,6 +28,15 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _message;
 
   @override
+  void initState() {
+    super.initState();
+    // Si se llegó acá porque el servicio rechazó la sesión con 401, la pantalla
+    // muestra el motivo: aparecer sin explicación haría pensar en un error del
+    // usuario cuando en realidad venció el token.
+    _message = AuthService.consumirAviso();
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _lastNameController.dispose();

@@ -10,6 +10,13 @@ import 'api_errores.dart';
 /// Devuelve el token de identidad de la sesión actual, o `null` si no hay sesión.
 typedef ObtenerToken = Future<String?> Function();
 
+/// Se ejecuta cuando el servicio rechaza la sesión con 401.
+///
+/// Es el aviso que permite cerrar la sesión local y volver al inicio de sesión:
+/// un token vencido o revocado no se arregla reintentando, así que la aplicación
+/// tiene que pedir las credenciales de nuevo.
+typedef AlExpirarLaSesion = void Function();
+
 /// Cliente de la API del backend.
 ///
 /// Concentra tres responsabilidades: adjuntar el token de identidad a cada
@@ -23,15 +30,18 @@ class ApiCliente {
     ObtenerToken? obtenerToken,
     String? baseUrl,
     Duration? espera,
+    AlExpirarLaSesion? alExpirarLaSesion,
   })  : _cliente = cliente ?? http.Client(),
         _obtenerToken = obtenerToken ?? _tokenDeFirebase,
         _baseUrl = _sinBarraFinal(baseUrl ?? ApiConfig.baseUrl),
-        _espera = espera ?? ApiConfig.esperaMaxima;
+        _espera = espera ?? ApiConfig.esperaMaxima,
+        _alExpirarLaSesion = alExpirarLaSesion;
 
   final http.Client _cliente;
   final ObtenerToken _obtenerToken;
   final String _baseUrl;
   final Duration _espera;
+  final AlExpirarLaSesion? _alExpirarLaSesion;
 
   /// Tiempo máximo para obtener el token de identidad.
   ///
@@ -54,6 +64,28 @@ class ApiCliente {
 
   /// Libera el cliente HTTP subyacente.
   void cerrar() => _cliente.close();
+
+  /// Avisa que el servicio rechazó la sesión.
+  ///
+  /// **Decisión:** sólo se avisa cuando el rechazo viene del servidor con 401,
+  /// no cuando el token falta en el equipo. La diferencia importa: al arrancar,
+  /// el proveedor de identidad tarda unos milisegundos en restaurar la sesión,
+  /// y si una pantalla pidiera datos en ese instante el cliente fallaría por
+  /// falta de token. Cerrar la sesión en ese caso cancelaría la restauración y
+  /// dejaría al usuario fuera sin motivo. En cambio, un 401 del servidor es un
+  /// rechazo real: ese token no sirve y hay que volver a pedir las credenciales.
+  ///
+  /// El aviso no puede tumbar la respuesta: si el cierre de sesión falla, el
+  /// error original se propaga igual y la pantalla lo informa.
+  void _avisarSesionExpirada() {
+    final AlExpirarLaSesion? aviso = _alExpirarLaSesion;
+    if (aviso == null) return;
+    try {
+      aviso();
+    } catch (_) {
+      // El cierre de sesión es un efecto secundario: no reemplaza al error real.
+    }
+  }
 
   // --- Operaciones del contrato -------------------------------------------
 
@@ -131,7 +163,7 @@ class ApiCliente {
       autenticada: autenticada,
     );
     if (respuesta.statusCode >= 400) {
-      throw _errorDesdeRespuesta(respuesta);
+      throw _errorDeRespuesta(respuesta);
     }
     return respuesta.bodyBytes;
   }
@@ -153,7 +185,7 @@ class ApiCliente {
       autenticada: autenticada,
     );
     if (respuesta.statusCode >= 400) {
-      throw _errorDesdeRespuesta(respuesta);
+      throw _errorDeRespuesta(respuesta);
     }
     return _decodificar(respuesta);
   }
@@ -272,6 +304,15 @@ class ApiCliente {
         causa: error,
       );
     }
+  }
+
+  /// Traduce una respuesta de error y avisa si el rechazo fue por falta de sesión.
+  ErrorApi _errorDeRespuesta(http.Response respuesta) {
+    final ErrorApi error = _errorDesdeRespuesta(respuesta);
+    if (error.esNoAutenticado) {
+      _avisarSesionExpirada();
+    }
+    return error;
   }
 
   ErrorApi _errorDesdeRespuesta(http.Response respuesta) {

@@ -65,3 +65,5 @@ serviceAccountKey.json
 # vigente. La plantilla configuracion.ejemplo.h SI se versiona.
 hardware/firmware/main/configuracion.h
 configuracion.h
+
+evidad/_tmp/

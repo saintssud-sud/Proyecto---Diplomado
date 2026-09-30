@@ -6,6 +6,7 @@ import 'package:http/testing.dart';
 import 'package:sigvach/config/api_config.dart';
 import 'package:sigvach/services/api_cliente.dart';
 import 'package:sigvach/services/api_errores.dart';
+import 'package:sigvach/services/auth_service.dart';
 
 /// Construye un cliente con un servicio simulado.
 ApiCliente _cliente(
@@ -298,6 +299,83 @@ void main() {
       } on ErrorApi catch (error) {
         expect(error.codigo, 'respuesta_inesperada');
       }
+    });
+
+    test('avisa que la sesión venció cuando el servicio responde 401', () async {
+      int avisos = 0;
+      final ApiCliente cliente = ApiCliente(
+        cliente: MockClient(
+          (http.Request peticion) async => _json(
+            <String, dynamic>{
+              'codigo': 'no_autenticado',
+              'mensaje': 'El token de identidad no es válido o expiró.',
+              'detalle': <String, dynamic>{},
+            },
+            estado: 401,
+          ),
+        ),
+        obtenerToken: () async => 'token-vencido',
+        baseUrl: 'https://api.ejemplo.test',
+        espera: const Duration(seconds: 2),
+        alExpirarLaSesion: () => avisos++,
+      );
+
+      await expectLater(
+        cliente.obtenerLista('/api/v1/lecturas'),
+        throwsA(isA<ErrorApi>()),
+      );
+
+      expect(avisos, 1, reason: 'El 401 del servicio debe cerrar la sesión local');
+    });
+
+    test('no cierra la sesión cuando el fallo no es un rechazo del servicio', () async {
+      int avisos = 0;
+
+      final ApiCliente sinRed = ApiCliente(
+        cliente: MockClient(
+          (http.Request peticion) async => throw http.ClientException('sin red'),
+        ),
+        obtenerToken: () async => 'token-de-prueba',
+        baseUrl: 'https://api.ejemplo.test',
+        espera: const Duration(seconds: 2),
+        alExpirarLaSesion: () => avisos++,
+      );
+      await expectLater(
+        sinRed.obtenerLista('/api/v1/lecturas'),
+        throwsA(isA<ErrorConexion>()),
+      );
+
+      final ApiCliente sinTokenLocal = ApiCliente(
+        cliente: MockClient((http.Request peticion) async => _json(<dynamic>[])),
+        obtenerToken: () async => null,
+        baseUrl: 'https://api.ejemplo.test',
+        espera: const Duration(seconds: 2),
+        alExpirarLaSesion: () => avisos++,
+      );
+      await expectLater(
+        sinTokenLocal.obtenerLista('/api/v1/lecturas'),
+        throwsA(isA<ErrorApi>()),
+      );
+
+      expect(
+        avisos,
+        0,
+        reason: 'Sólo el 401 del servicio cierra la sesión: al arrancar, la sesión '
+            'todavía se está restaurando y cerrarla dejaría al usuario afuera',
+      );
+    });
+  });
+
+  group('AuthService', () {
+    test('el aviso de sesión vencida se consume una sola vez', () {
+      AuthService.aviso.value = null;
+
+      expect(AuthService.consumirAviso(), isNull);
+
+      AuthService.aviso.value = 'Tu sesión venció. Volvé a iniciar sesión.';
+      expect(AuthService.consumirAviso(), contains('venció'));
+      expect(AuthService.consumirAviso(), isNull,
+          reason: 'El aviso no debe reaparecer en cada visita a la pantalla');
     });
   });
 }

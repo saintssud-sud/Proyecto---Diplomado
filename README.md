@@ -92,7 +92,9 @@ El sistema cuenta además con un **servicio backend** (FastAPI sobre Python 3.13
 - Código y documentación del servicio: [`backend/README.md`](backend/README.md)
 - Ejecución local en modo de demostración, sin credenciales: desde `backend/`, con `USAR_REPOSITORIO_EN_MEMORIA=true`, ejecutar `uvicorn app.main:app --reload`
 - Contrato navegable del servicio (OpenAPI): `http://localhost:8011/docs` en local, y el publicado en https://sigvach-api.onrender.com/docs
-- Pruebas automatizadas del backend: `python -m pytest` desde `backend/` (**90 casos**, sin credenciales ni conexión)
+- Pruebas automatizadas del backend: `python -m pytest` desde `backend/` (**106 casos**, sin credenciales ni conexión)
+- Pruebas automatizadas de la aplicación: `flutter test` desde la raíz (**96 casos**)
+- Los informes de las dos baterías quedan versionados en [`evidencia/`](evidencia/LEEME.md), con la fecha en el nombre del archivo
 - **Simulador del módulo de adquisición** (envía lecturas como lo hará el ESP32, con la clave de dispositivo):
 
 ```bash
