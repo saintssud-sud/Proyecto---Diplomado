@@ -1,0 +1,83 @@
+EVIDENCIA — Reglas de Firestore: la escalada de privilegios quedó cerrada
+=======================================================================
+
+Qué se arregló
+--------------
+El alta de un perfil admitía el rol de administrador para un correo concreto
+(`admin@sigvach.com`). Cualquiera que consiguiera registrarse con ese correo
+obtenía las atribuciones de administración sin que nadie se las concediera.
+
+Se retiró esa excepción en los dos lugares donde estaba:
+
+    · firestore.rules  -> el alta solo admite `rol == 'operador'`
+    · lib/repositories/usuario_repository.dart -> el perfil nace con el rol de operación
+
+El rol de administrador se concede después, desde el panel o desde el servicio,
+y queda registrado quién lo hizo.
+
+    Fecha    : 29 de septiembre de 2026
+    Proyecto : sigvach26-bd
+    Reglas   : projects/sigvach26-bd/releases/cloud.firestore
+               conjunto 62149b76-7add-436c-9fc7-1168e0b12053
+
+
+Cómo se reproduce
+-----------------
+    # 1. Comparar el conjunto publicado con el archivo del repositorio
+    Proyecto SIGVACH\.venv\Scripts\python.exe verificar_reglas_firestore.py
+
+    # 2. Publicar los cambios de las reglas
+    firebase deploy --only firestore:rules --project sigvach26-bd
+
+    # 3. Probar el efecto con el token de la cuenta de operador (ver el apartado 2)
+
+
+1) El conjunto publicado, comparado con el del repositorio
+---------------------------------------------------------
+    === 1) versiones publicadas del servicio de reglas ===
+      projects/sigvach26-bd/releases/cloud.firestore
+         actualizado: 2026-09-30T03:00:44.468823Z
+         conjunto de reglas: projects/sigvach26-bd/rulesets/62149b76-7add-436c-9fc7-1168e0b12053
+
+    === 2) contenido activo comparado con el archivo del repositorio ===
+      archivos en el conjunto publicado: 1
+      caracteres publicados: 6243 | en el repositorio: 6243
+      el contenido coincide con el repositorio: SI
+
+    === 3) controles presentes en las reglas activas ===
+      cierra las colecciones del dominio                  SI
+      deniega por defecto                                 SI
+      valida el alta del perfil (rol de operador)         SI
+      impide la escalada de privilegios                   SI
+      el alta no exceptua a ningun correo                 SI
+
+    CONCLUSION: las reglas activas son las del repositorio (verificado).
+
+
+2) Prueba de efecto: el propio usuario intenta ascenderse a administrador
+------------------------------------------------------------------------
+Se usó el token de la cuenta `operador@proyecto.test` (cuenta ficticia de
+prueba, creada para esto) contra la API REST de Firestore, que aplica las mismas
+reglas que la aplicación:
+
+    Petición  : PATCH /v1/projects/sigvach26-bd/databases/(default)/documents/usuarios/<uid propio>
+                con updateMask.fieldPaths=rol  y  {"fields":{"rol":{"stringValue":"administrador"}}}
+    Respuesta : HTTP 403
+                {"error":{"code":403,
+                          "message":"Missing or insufficient permissions.",
+                          "status":"PERMISSION_DENIED"}}
+
+El rechazo es de las reglas, no de la aplicación: aunque un cliente manipulara
+el código, la base no acepta el cambio de rol.
+
+
+Conclusión
+----------
+    · Las reglas publicadas son exactamente las del repositorio.
+    · El alta de un perfil solo admite el rol de operación, es decir, el de menor privilegio.
+    · El propio usuario no puede cambiarse el rol: el intento responde 403 PERMISSION_DENIED.
+
+La escalada de privilegios por correo quedó cerrada, y las dos cuentas de prueba
+(`administrador@proyecto.test` y `operador@proyecto.test`) demuestran en vivo que
+la misma ruta responde 403 al operador y 200 al administrador
+(ver `cuentas-de-prueba-2026-09-29.txt`).

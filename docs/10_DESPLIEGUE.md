@@ -260,5 +260,5 @@ personales de terceros:** usar las cuentas de prueba.
   `.env`. Están en `.gitignore`, pero conviene verificar antes de cada confirmación.
 - No pegar claves en el documento de la monografía ni en las capturas.
 - No usar en la demostración datos personales reales de terceros: las cuentas de prueba son
-  `admin@sigvach.com` y `operador@sigvach.com`.
+  `administrador@proyecto.test` y `operador@proyecto.test`, del dominio reservado `.test`.
 - No ejecutar `flutter pub upgrade`: puede romper las versiones verificadas del proyecto.

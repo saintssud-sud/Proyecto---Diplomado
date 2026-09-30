@@ -1,8 +1,2 @@
-
-┌─────────────────────────────────────────────────────────┐
-│ A new version of Flutter is available!                  │
-│                                                         │
-│ To update to the latest version, run "flutter upgrade". │
-└─────────────────────────────────────────────────────────┘
 Analyzing Proyecto SIGVACH...                                   
-No issues found! (ran in 11.3s)
+No issues found! (ran in 6.9s)

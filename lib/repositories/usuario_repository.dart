@@ -19,12 +19,6 @@ class UsuarioRepository {
   /// FirebaseAuth subyacente (para escuchar cambios de sesión).
   FirebaseAuth get auth => _auth;
 
-  /// Correo que, al registrarse, recibe el rol `admin` automáticamente.
-  static const String correoAdmin = 'admin@sigvach.com';
-
-  /// Correo del usuario autenticado (público y de solo lectura).
-  String? get currentEmail => _auth.currentUser?.email;
-
   /// Colección `usuarios`.
   CollectionReference<Map<String, dynamic>> get _usuarios =>
       _db.collection('usuarios');
@@ -34,8 +28,13 @@ class UsuarioRepository {
 
   /// Crea (o sobrescribe) el perfil del usuario al registrarse.
   ///
-  /// El rol se asigna automáticamente: `admin` si el correo es
-  /// [correoAdmin], en cualquier otro caso `usuario`.
+  /// **El rol que se asigna es siempre el de operación.** Antes existía una
+  /// excepción: si el correo era `admin@sigvach.com`, el perfil nacía como
+  /// administrador. Se retiró porque cualquiera que consiguiera registrarse con
+  /// ese correo obtenía las atribuciones de administración sin que nadie se las
+  /// concediera, lo que contradice el principio de menor privilegio. El rol de
+  /// administrador se concede **después**, desde el panel o desde el servicio,
+  /// y queda registrado quién lo hizo.
   Future<void> crearPerfilInicial({
     required String uid,
     required String email,
@@ -43,28 +42,18 @@ class UsuarioRepository {
     String telefono = '',
     String cargo = '',
   }) async {
-    final rol = _rolPara(email);
     final perfil = UsuarioPerfil(
       uid: uid,
       email: email,
       nombre: nombre,
       telefono: telefono,
       cargo: cargo,
-      rol: rol,
+      rol: Roles.porDefecto,
       activo: true,
       creadoEn: DateTime.now(),
     );
     await _doc(uid).set(perfil.toMap());
   }
-
-  /// Determina el rol según el correo (opción 2 de diseño).
-  ///
-  /// El rol de administración se asigna por correo; cualquier otra cuenta nace
-  /// con el rol de menor privilegio, conforme al principio de menor privilegio.
-  String _rolPara(String email) =>
-      email.trim().toLowerCase() == correoAdmin.toLowerCase()
-      ? Roles.administrador
-      : Roles.porDefecto;
 
   /// Lee el perfil de un usuario por su uid. Devuelve null si no existe.
   Future<UsuarioPerfil?> obtenerPorUid(String uid) async {

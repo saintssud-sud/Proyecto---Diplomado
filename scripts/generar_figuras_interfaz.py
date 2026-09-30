@@ -370,9 +370,9 @@ def dibujar_usuarios(dibujo):
     )
     y += 40
     for titulo, detalle in [
-        ("Administrador", "admin@sigvach.com · rol administrador · activo"),
-        ("Operador", "operador@sigvach.com · rol operador · activo"),
-        ("Usuario dado de baja", "baja@sigvach.com · rol operador · inactivo"),
+        ("Administrador", "administrador@proyecto.test · rol administrador · activo"),
+        ("Operador", "operador@proyecto.test · rol operador · activo"),
+        ("Usuario dado de baja", "baja@proyecto.test · rol operador · inactivo"),
     ]:
         fila_lista(dibujo, MARGEN, y, ANCHO - 2 * MARGEN, titulo, detalle)
         y += 120

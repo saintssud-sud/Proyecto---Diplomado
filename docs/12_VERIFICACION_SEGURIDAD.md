@@ -79,8 +79,12 @@ accede a las colecciones del dominio:
 
 - La aplicación solo usa la colección `usuarios` (perfil propio y, para el
   administrador, el resto de los perfiles), que las reglas permiten.
-- El correo del administrador declarado en las reglas (`admin@sigvach.com`)
-  coincide con el que asigna la aplicación al crear el perfil.
+- **El alta de un perfil no admite el rol de administrador**: la regla solo
+  acepta `rol == 'operador'`, de modo que ninguna cuenta puede concederse
+  atribuciones al registrarse. El rol de administrador se concede después, desde
+  el panel o desde el servicio, y queda registrado quién lo hizo. Antes existía
+  una excepción para el correo `admin@sigvach.com`, y se retiró el 29 de
+  septiembre de 2026 por ser una escalada de privilegios al alcance de cualquiera.
 - Las colecciones heredadas del proyecto del aula (`registros` y `firestore_demo`)
   corresponden a código sin uso, de modo que cerrarlas no afecta ninguna pantalla.
 
