@@ -186,3 +186,51 @@ con 5 minutos son 1 440 escrituras por día (7,2 % del plan gratuito); con 1 min
 | Revisión del remojo del electrodo | A las 24 horas del lunes 19:52, y decisión a las 48 horas: recuperar o comprar |
 | Termorretráctil | Comprar en una tienda de eléctricos y reemplazar la cinta aislante de las uniones |
 | Entrega E3 | Apartados 2.1, 2.7 y 2.8, informe de pruebas y correcciones pendientes |
+
+---
+
+## 8. La tutoría del martes 29
+
+### 8.1 Cómo salió
+
+La sesión fue **corta**: alcanzó para mostrar el sistema funcionando y para consultar algunas cosas,
+pero **no hubo tiempo para las observaciones pendientes**. El docente indicó que el trabajo está
+bien y no planteó dudas nuevas.
+
+### 8.2 Lo que preguntó el docente
+
+> «¿Cómo está conectado el módulo ESP32 con Firestore?»
+
+La respuesta que se le dio: **a través del servicio**. Conviene dejarla escrita con precisión,
+porque es la respuesta que sostiene el diseño de seguridad del proyecto:
+
+| Quién | Qué hace | Qué credenciales tiene |
+|---|---|---|
+| El módulo ESP32 | Publica las lecturas por HTTPS al servicio | Su clave de dispositivo, y nada más |
+| El servicio | Valida el dato, autoriza y **escribe** en Firestore | Credenciales de servicio de Firebase |
+| La aplicación | Lee y escribe **a través del servicio** | El token de identidad del usuario |
+| Firestore | Guarda los datos | Reglas de seguridad que cierran el acceso directo |
+
+**El módulo no conoce la base ni tiene credenciales de ella.** Ese es el punto: si alguien captura la
+clave del dispositivo, no puede leer ni borrar la base, solo publicar lecturas.
+
+### 8.3 Lo que quedó sin responder, y cómo se recupera
+
+Las cuatro consultas que bloqueaban el trabajo quedaron **sin respuesta**: las observaciones
+**A-11 y A-12**, el cierre de la **A-4** y el **número de detecciones tardías** del ensayo previo.
+
+Como la próxima tutoría puede volver a quedarse corta, se pasa la consulta **por escrito**, en un
+solo mensaje al docente, con las cuatro preguntas numeradas. Lo que se pide:
+
+1. Qué pedían las observaciones **A-11 y A-12** de la bitácora del 22 de septiembre.
+2. Si la **A-4** queda cerrada con la maqueta y el nombre del módulo piloto.
+3. El **número de detecciones tardías** del ensayo previo.
+4. **Día y hora de la próxima tutoría**, y si hay alguna fecha antes del sábado.
+
+Además conviene **revisar el documento devuelto del T3**: si las observaciones A-11 y A-12 quedaron
+como comentarios en el archivo, están ahí y no hace falta esperar la respuesta.
+
+> **Lo que sí quedó claro:** el docente mira el flujo del dato, no la electrónica. La pregunta fue
+> por el camino entre el módulo y la base. Por eso el apartado **2.7 (Seguridad)** y el guion de la
+> demostración tienen que explicar ese camino con este mismo cuadro.
+

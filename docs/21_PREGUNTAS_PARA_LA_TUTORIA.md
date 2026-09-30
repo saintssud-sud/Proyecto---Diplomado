@@ -148,3 +148,22 @@ Se leen en voz alta **antes de salir** y se confirman. Después se registran en 
 |  |  |  |  |
 
 **Firma de conformidad del tutor sobre los acuerdos:** ______________________________
+
+---
+
+## Después de la sesión (martes 29, 21:30)
+
+La tutoría fue **corta**: alcanzó para mostrar el sistema y para unas pocas consultas. El docente
+dijo que el trabajo **está bien** y no planteó dudas nuevas. La única pregunta que hizo fue:
+
+> **«¿Cómo está conectado el módulo ESP32 con Firestore?»** → *A través del servicio: el módulo
+> publica por HTTPS con su clave de dispositivo, el servicio valida y escribe en la base, y nadie
+> toca Firestore directamente.*
+
+**Quedaron sin responder las cuatro del primer bloque:** A-11, A-12, A-4 y el número de detecciones
+tardías. Como la próxima tutoría puede volver a quedarse corta, se pasan **por escrito**, en un solo
+mensaje, y se agrega la pregunta por el **día y hora de la próxima sesión**.
+
+Antes de eso, conviene **revisar el documento devuelto del T3**: si A-11 y A-12 quedaron como
+comentarios dentro del archivo, están ahí y no hay que esperar respuesta.
+
