@@ -1,0 +1,103 @@
+EVIDENCIA — Divisor ÷2 del pH: armado y verificación
+====================================================
+
+Para qué sirve este archivo
+---------------------------
+Deja registrado el armado del divisor de tensión que necesita la sonda de pH, con las
+mediciones que lo verifican. Es la evidencia del requisito **RF-04** (medición de pH) y
+del apartado **2.8 (Pruebas)** del E3: el montaje no se da por bueno porque se vea bien,
+sino porque el multímetro lo confirma.
+
+    Fecha   : miércoles 30 de septiembre de 2026
+    Placa   : PH-4502C (módulo acondicionador de pH) con electrodo BNC
+    Módulo  : ESP32, pin SVP · GPIO 36
+    Piezas  : dos resistencias de 4,7 kΩ
+
+
+Por qué hace falta el divisor
+-----------------------------
+La placa PH-4502C se alimenta a **5 V** y su salida `Po` puede acercarse a esa tensión,
+mientras el ESP32 tolera **3,3 V** en sus entradas. Entre `Po` y el pin `SVP` se intercala
+un divisor con dos resistencias iguales, que deja la tensión a la mitad:
+
+    Po ──[ 4,7 kΩ ]──●── SVP · GPIO 36
+                     │
+                  [ 4,7 kΩ ]
+                     │
+                    GND
+
+El punto del medio es el **nudo**: ahí se juntan la primera resistencia, la segunda y el
+cable que va al ESP32.
+
+**Un detalle de montaje que importa:** el cable amarillo se **corta**, porque la primera
+resistencia va *en serie*, en el medio del camino. Si en cambio se pelara una ventana y se
+soldara ahí la pata, el cable puentearía la resistencia y el divisor no dividiría nada.
+Al cable negro, en cambio, no se le corta nada: se le pela una ventana, porque la segunda
+resistencia sólo tiene que llegar a la masa.
+
+
+Cómo se reproduce
+-----------------
+    1. Cortar el cable amarillo a unos 10 cm del conector del `Po`.
+    2. Soldar la primera resistencia entre los dos pedazos: una pata al que viene de la
+       placa y la otra —el nudo— del lado que va al ESP32.
+    3. En el nudo soldar, juntos: la segunda resistencia y el cable que irá al `SVP`.
+    4. Soldar la otra pata de la segunda resistencia a una ventana pelada del cable negro.
+    5. Medir con el multímetro, en escala de ohmios, y después en tensión continua.
+
+Las láminas del procedimiento están en `Figuras/26-secuencia-del-divisor.png` y
+`Figuras/27-como-medir-el-divisor.png`.
+
+
+Mediciones, en el orden en que se hicieron
+------------------------------------------
+    Multímetro: UNI-T UT33D+
+
+    a) Resistencia entre las dos puntas del cable amarillo
+       (comprueba que la primera resistencia quedó EN SERIE) ......... 4,73 kΩ   ✓
+
+    b) Resistencia entre el nudo y el cable negro
+       (comprueba que la segunda resistencia llegó a la masa) ........ 4,64 kΩ   ✓
+
+    c) Tensión en el pin Po, con la placa alimentada
+       (rojo al 5 V, negro al GND, electrodo en la solución patrón) .. 1,85 V    ✓
+
+    d) Tensión en el nudo ........................................... 0,96 V    ✓
+
+    Relación medida:  0,96 / 1,85 = 0,519
+
+    La relación esperada con dos resistencias iguales es 0,500. La diferencia de dos
+    centésimas se explica por la tolerancia de las resistencias (4,73 kΩ y 4,64 kΩ no son
+    exactamente iguales) y por la impedancia de entrada del multímetro.
+
+
+Lectura de los resultados
+-------------------------
+1. **El divisor divide.** La tensión del nudo es la mitad de la del `Po`, que es
+   exactamente lo que tenía que pasar. La entrada del ESP32 recibe 0,96 V en lugar de
+   1,85 V: dentro de lo que tolera, con margen.
+
+2. **La ubicación de la primera resistencia es la correcta.** Era el error que se quería
+   evitar: si hubiera quedado del lado del ESP32, el nudo habría dado casi lo mismo que
+   `Po`, y el microcontrolador habría recibido la tensión completa.
+
+3. **La comprobación que decide se hizo antes de conectar el `SVP`.** El cable del nudo se
+   conectó al pin `SVP · GPIO 36` **después** de que la medición diera bien. Ese orden es
+   deliberado: es lo que evita exponer la entrada del ESP32 a una tensión fuera de rango
+   en caso de error de montaje.
+
+4. **Un tropiezo del instrumento, anotado.** El multímetro tuvo que ponerse en la escala de
+   tensión continua (`V⎓ 20`) y con la punta roja en el enchufe `VΩmA`, no en el de 10 A:
+   en ese enchufe el aparato no mide tensiones. Son dos detalles que hicieron perder tiempo
+   y conviene tener escritos.
+
+
+Conclusión
+----------
+El divisor del pH quedó armado y verificado: divide a la mitad, la primera resistencia está
+en el camino correcto y la segunda llega a la masa. El cable del nudo quedó conectado al
+pin `SVP · GPIO 36`, de modo que el módulo ya recibe la señal de la sonda de pH.
+
+Lo que queda pendiente no es el montaje sino la **calibración**: medir la tensión del nudo
+en los patrones de 4,01 y 6,86 para obtener la recta de conversión, y recién entonces
+publicar la variable pH. Hasta que eso ocurra, la variable sigue declarada como pendiente.
