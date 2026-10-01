@@ -1,0 +1,83 @@
+EVIDENCIA — El módulo ya lee la sonda de pH
+===========================================
+
+Para qué sirve este archivo
+---------------------------
+Registra el momento en que la señal de la sonda de pH llegó por primera vez al ESP32 a
+través del divisor. Antes de esto, el pin leía una entrada al aire; después, lee la tensión
+del nudo del divisor, que es la salida de la placa acondicionadora dividida a la mitad.
+
+Es la evidencia del requisito **RF-04** (medición de pH) en su parte de adquisición: todavía
+no hay conversión a unidades de pH, pero la señal ya entra al módulo y se lee de forma
+estable.
+
+    Fecha   : miércoles 30 de septiembre de 2026, 20:44
+    Módulo  : ESP32, pin SVP · GPIO 36 · 115200 baudios
+    Cadena  : electrodo → placa PH-4502C → divisor ÷2 → GPIO 36
+
+
+Cómo se reproduce
+-----------------
+    pwsh -File "Modulo ESP32\Diagnostico\esperar_y_escuchar.ps1" -Puerto COM6 -Segundos 380
+
+El programa espera a que aparezca el puerto y después escucha: cubre más de un ciclo
+completo, porque en modo servicio el firmware publica cada 300 segundos. Se omiten las
+líneas de inicialización del WiFi y la traza del driver (`ssn:5, winSize:64`), que son
+ruido, y el nombre de la red se reemplaza por `<red>`.
+
+
+Antes y después
+---------------
+    Antes (29 y 30/09, sin el divisor conectado):
+        I (5394) SIGVACH: SVP GPIO 36   pH               142 mV          0  senal estable
+        I (15174) SIGVACH: pH  ->    142 mV (0.14 V) crudo    0  dispersion    0  senal estable
+
+    Después (30/09, con el divisor armado y conectado):
+        I (5394) SIGVACH: SVP GPIO 36   pH              1106 mV         52  algo ruidosa
+        I (13694) SIGVACH: pH  ->   1040 mV (1.04 V) crudo 1094  dispersion   39  senal estable
+
+La diferencia entre 142 mV y 1040 mV es el divisor: la entrada del ESP32 recibe la tensión
+del nudo, no la de la salida `Po` de la placa.
+
+
+Ciclo completo, publicado
+-------------------------
+    I (12864) SIGVACH: Ambiente -> 24.00 C   49.60 % HR
+    I (13684) SIGVACH: Solucion -> 21.88 C
+
+    I (16804) SIGVACH:   temp_ambiental       24.00 C      ->  almacenada
+    I (19974) SIGVACH:   humedad              49.60 %      ->  almacenada
+    I (24994) SIGVACH:   temp_solucion        21.88 C      ->  almacenada
+    I (28274) SIGVACH:   tds                 288.86 ppm    ->  almacenada
+    I (32984) SIGVACH:   ec                    0.58 mS/cm   ->  almacenada
+
+Las cinco variables publicadas siguen llegando al servicio, cada una con la validación del
+certificado. **El pH no se publica todavía**, y es lo correcto: falta la conversión de
+tensión a unidades de pH, que se obtiene con los patrones de 4,01 y 6,86.
+
+
+Un aviso del registro: la señal inalámbrica
+-------------------------------------------
+    I (5644) wifi:state: assoc -> init (0x4a0)
+    W (5654) SIGVACH: WiFi caido: se reintenta la conexion
+    W (8064) SIGVACH: WiFi caido: se reintenta la conexion
+    I (8234) wifi:connected with <red>, aid = 9, channel 4, BW20, rssi = -76
+
+El módulo perdió la conexión dos veces seguidas al arrancar y volvió solo. El motivo se ve en
+la última línea: **rssi de -74 a -76 dBm**, que es una señal débil. El firmware lo maneja
+bien —reintenta y recupera— y ninguna lectura se perdió, pero conviene tenerlo anotado:
+**en la maqueta, el módulo debería quedar más cerca del punto de acceso**, o con la antena
+despejada, para que la publicación no dependa de reintentos.
+
+
+Conclusión
+----------
+La cadena de medición del pH quedó completa y verificada en su parte de adquisición:
+
+    · el divisor entrega la mitad de la salida de la placa, comprobado con el multímetro;
+    · el ESP32 lee esa tensión de forma estable (1040 mV, dispersión 39);
+    · las otras cinco variables se siguen publicando sin interrupción.
+
+Lo que falta es la **calibración**: medir la tensión del nudo en los patrones de 4,01 y 6,86
+para obtener la recta de conversión. Hasta entonces, el pH sigue declarado como pendiente en
+el documento, tal como se informó.
