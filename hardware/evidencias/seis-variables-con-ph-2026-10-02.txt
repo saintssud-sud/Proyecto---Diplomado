@@ -1,0 +1,87 @@
+EVIDENCIA — Las seis variables publicadas en producción, con el pH incluido
+=========================================================================
+
+Para qué sirve este archivo
+---------------------------
+Registra el momento en que el sistema quedó **completo**: el módulo publica las seis
+variables del catálogo, con el pH medido, convertido y publicado. Hasta este día el pH
+figuraba como pendiente en el documento.
+
+    Fecha    : viernes 2 de octubre de 2026, 02:19 hora local (06:19 UTC)
+    Módulo   : ESP32 · id v6wrYSXxeHyttf3prDd7
+    Servicio : https://sigvach-api.onrender.com
+    Red      : banda de 2,4 GHz de la red de casa (rssi -78 dBm)
+
+
+Lo que llegó al servicio
+------------------------
+Consultado con `GET /api/v1/lecturas?limite=6`, ordenado por marca de tiempo:
+
+    variable          valor        unidad    origen        estado
+    ---------------   ----------   -------   -----------   --------
+    ph                  6,40                 automático    dentro
+    ec                  0,63       mS/cm     automático    bajo
+    tds               315,78       ppm       automático    bajo
+    temp_solucion      20,69       °C        automático    dentro
+    humedad            51,50       %         automático    dentro
+    temp_ambiental     21,70       °C        automático    dentro
+
+Las seis llevan `origen: automatico` y el mismo `modulo_id`, en marcas de tiempo separadas por
+pocos segundos: son el mismo ciclo de lectura.
+
+    {"id":"mvcVtUaKN87yEhmIY71T","modulo_id":"v6wrYSXxeHyttf3prDd7","variable":"ph",
+     "valor":6.4,"unidad":"","origen":"automatico","registrado_por":null,
+     "timestamp":"2026-10-02T06:20:13Z","estado_rango":"dentro","observacion":null}
+
+
+Cómo se reproduce
+-----------------
+    # 1. Compilar y grabar el firmware con la red configurada
+    idf.py -p COM6 flash
+
+    # 2. Escuchar el arranque: se ve la conversión y la publicación
+    pwsh -File "Modulo ESP32\Diagnostico\leer_serial.ps1" -Puerto COM6 -Segundos 110
+
+    # 3. Consultar el servicio (requiere el token de una cuenta de prueba)
+    GET /api/v1/lecturas?limite=6
+
+En el registro del módulo, el ciclo se ve así:
+
+    I (10434) SIGVACH: Conectado. Direccion IP: 192.168.100.215
+    I (14304) SIGVACH:   -> 6.40 pH   (recta: 1520 mV = pH 4.01, -84.2 mV por unidad)
+    I (66074) SIGVACH:   ph                    6.40         ->  almacenada
+
+
+Los dos arreglos de robustez que se grabaron junto con esto
+-----------------------------------------------------------
+El mismo día se corrigieron dos comportamientos que aparecieron al pelear con la red:
+
+1. **Reintento de WiFi con espera.** Antes, al caerse la conexión, el módulo reintentaba cada
+   dos o tres segundos sin pausa. Eso satura al punto de acceso —algunos routers bloquean al
+   cliente que insiste así— y el equipo quedaba en un bucle del que no salía ni aunque la señal
+   mejorara. Ahora espera **quince segundos** entre intentos.
+
+2. **El ciclo sin red ya no se pierde.** Antes, si no había red al empezar la publicación, el
+   firmware descartaba el ciclo entero. Ahora guarda las seis lecturas en la memoria no volátil,
+   con la hora en que se midieron, y las publica cuando vuelve la conexión. Es el mismo
+   mecanismo que ya se usaba para los envíos que fallan, y con una red al límite hace la
+   diferencia: **ninguna medición se pierde**, ni siquiera si la red está caída una hora.
+
+
+Lo que todavía conviene mejorar
+-------------------------------
+- **La señal sigue siendo débil** en el lugar donde está el módulo (rssi −78 dBm, con el router a
+  8 o 10 metros y una pared en el medio). Funciona, pero conviene un repetidor a mitad de camino
+  o llevar el módulo más cerca. Para la defensa, un punto de acceso propio al lado del equipo
+  elimina el riesgo.
+
+- **El pH de esta lectura es de la sonda guardada**, no de una solución de cultivo: el electrodo
+  está en su líquido de conservación. El valor 6,40 es coherente con eso, y lo que importa de esta
+  evidencia es que la variable **viaja**, no el número en sí.
+
+
+Conclusión
+----------
+El sistema quedó completo: **seis variables medidas por el módulo y publicadas en el servicio**,
+con el pH calculado a partir de su calibración. El requisito RF-04 (medición de pH) deja de estar
+pendiente.

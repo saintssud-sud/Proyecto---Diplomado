@@ -347,6 +347,33 @@ static void marcaDeTiempoISO(char *destino, size_t tamano)
     strftime(destino, tamano, "%Y-%m-%dT%H:%M:%SZ", &partes);
 }
 
+/* Guarda una lectura en la cola para publicarla más tarde.
+ *
+ * Se usa cuando no hay red: en vez de descartar el ciclo, las lecturas quedan
+ * en memoria no volátil con la hora en que se midieron y se publican cuando
+ * vuelva la conexión. Es el mismo mecanismo que usa un envío fallido. */
+static void guardarParaDespues(const char *variable, float valor, const char *unidad)
+{
+#if PUBLICAR_EN_SERVICIO
+    if (isnan(valor)) {
+        return;
+    }
+    char momento[24];
+    publicacion_marca_de_tiempo(momento, sizeof(momento));
+    if (cola_guardar(variable, valor, unidad, momento) != ESP_OK) {
+        ESP_LOGW(ETIQUETA, "  %-15s no se pudo guardar en la cola", variable);
+    }
+#endif
+}
+
+/* Espera antes de reintentar la conexión inalámbrica.
+ *
+ * Reintentar sin pausa satura al punto de acceso y al propio módulo: algunos
+ * routers bloquean al cliente que insiste cada dos segundos, y entonces el
+ * equipo queda en un bucle del que no sale ni aunque la señal mejore. Con una
+ * espera corta el reintento es amable y el router no se defiende. */
+#define ESPERA_REINTENTO_S  15
+
 static void manejadorRed(void *argumento, esp_event_base_t base, int32_t id, void *datos)
 {
     if (base == WIFI_EVENT && id == WIFI_EVENT_STA_START) {
@@ -354,7 +381,8 @@ static void manejadorRed(void *argumento, esp_event_base_t base, int32_t id, voi
 
     } else if (base == WIFI_EVENT && id == WIFI_EVENT_STA_DISCONNECTED) {
         xEventGroupClearBits(grupoRed, RED_CONECTADA);
-        ESP_LOGW(ETIQUETA, "WiFi caido: se reintenta la conexion");
+        ESP_LOGW(ETIQUETA, "WiFi caido: se reintenta en %d segundos", ESPERA_REINTENTO_S);
+        vTaskDelay(pdMS_TO_TICKS(ESPERA_REINTENTO_S * 1000));
         esp_wifi_connect();
 
     } else if (base == IP_EVENT && id == IP_EVENT_STA_GOT_IP) {
@@ -644,7 +672,18 @@ static void cicloDeLectura(void)
     /* --- Publicación en el servicio --------------------------------------- */
 #if PUBLICAR_EN_SERVICIO
     if (!hayRed()) {
-        ESP_LOGW(ETIQUETA, "Sin red: este ciclo no se publica");
+        /* Sin red no se puede publicar, pero tampoco hay que perder el ciclo:
+         * las lecturas se guardan en la misma cola que usa un envío fallido y
+         * se publican cuando vuelva la conexión. Antes se descartaba el ciclo
+         * entero, y con una red al límite eso significaba perder mediciones. */
+        ESP_LOGW(ETIQUETA, "Sin red: las lecturas del ciclo se guardan para despues");
+        guardarParaDespues("temp_ambiental", temperaturaAmbiente, "°C");
+        guardarParaDespues("humedad",        humedadAmbiente,     "%");
+        guardarParaDespues("temp_solucion",  temperaturaSolucion, "°C");
+        guardarParaDespues("tds",            ppm,                 "ppm");
+        guardarParaDespues("ec",             sensores_ppm_a_conductividad(ppm), "mS/cm");
+        guardarParaDespues("ph",             phValido ? ph : NAN, "");
+        ESP_LOGI(ETIQUETA, "En la cola hay %d lectura(s) esperando red", cola_cuantas());
         return;
     }
 #endif
