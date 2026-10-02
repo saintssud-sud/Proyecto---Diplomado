@@ -125,23 +125,37 @@ comprobar **uno por uno** que funcionan en la URL pública, y dejar la evidencia
 
 ## 4. Lo que necesito de ti
 
-1. **La contraseña de la cuenta Operador** (`tecnico@gmail.com`). Sin ella no se puede verificar el
-   **403**, que es un requisito explícito: el docente pide **un usuario de prueba por rol**.
+1. ~~**La contraseña de la cuenta Operador**.~~ **Resuelto:** las dos cuentas de prueba existen con
+   contraseña propia y el **403** quedó medido contra el servicio publicado (el operador recibe 403
+   en una ruta de administración y 200 en las que le corresponden).
 2. **La decisión sobre el `DELETE` de lecturas**: ¿se quita el endpoint, o se convierte en
-   anulación con motivo?
+   anulación con motivo? Del documento ya se quitó la fila del contrato.
 
 ---
 
 ## 5. Los datos que hay que poner en el campo de texto de la tarea
 
+El texto listo para pegar está en **`Campo de texto de la tarea - E3.txt`**, en la raíz del
+proyecto. Lleva las dos cuentas de prueba —una por rol, del dominio `.test`—, las direcciones
+públicas, el repositorio y las dos órdenes de pruebas con el archivo de su reporte. Las cuentas
+**no** van en el documento, solo aquí y en el README.
+
 ```
 Frontend (URL pública): https://sigvach26-bd.web.app
 API (ruta de salud): https://sigvach-api.onrender.com/api/v1/salud
 Repositorio: https://github.com/saintssud-sud/Proyecto---Diplomado
-Usuario de prueba · rol 1 (administrador): mateosantos@yahoo.es / 654321
-Usuario de prueba · rol 2 (operador): tecnico@gmail.com / (por confirmar)
-Pruebas automatizadas: (comando) — reporte en (ruta del repositorio)
+Usuario de prueba · rol administrador: administrador@proyecto.test / SIGVACH.Adm.2026
+Usuario de prueba · rol operador: operador@proyecto.test / SIGVACH.Ope.2026
+Pruebas del servicio: python -m pytest (desde backend/) — 106 casos; reporte en
+  evidencia/pytest-2026-09-29.txt
+Pruebas de la aplicación: flutter test (desde la raíz) — 96 casos; reporte en
+  evidencia/flutter-test-2026-09-29.txt
 ```
+
+> Las cuentas que figuraban en el borrador anterior (`mateosantos@yahoo.es` y `tecnico@gmail.com`)
+> eran cuentas personales reales y no deben usarse para la evaluación: la rúbrica pide una cuenta
+> de prueba por rol, y publicar un correo personal en el campo de la tarea expone un dato de
+> terceros.
 
 ---
 
