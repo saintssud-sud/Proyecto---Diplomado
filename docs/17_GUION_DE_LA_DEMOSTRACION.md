@@ -57,7 +57,7 @@ El E2 pide una **vertical funcional desplegada**:
 | **2** | Entrar con la cuenta declarada | El panel con las variables del módulo | *"El servicio valida el token en el servidor y resuelve el rol; no es la aplicación la que decide."* |
 | **3** | Señalar el **Monitor Serie** | Las lecturas entrando solas | *"Estas lecturas no las escribió nadie a mano: las publica el módulo por HTTPS cada cinco minutos, autenticándose con su clave de dispositivo."* |
 | **4** | **Refrescar el panel** | Los valores y la hora de la última lectura actualizados | *"El dato nació en el sensor, viajó por el módulo, cruzó el servicio y llegó acá."* |
-| **5** | Registrar una **lectura manual** (el pH es el caso natural) | El valor aparece en el panel, marcado como manual | *"El sistema distingue el origen: esta la ingresó una persona y queda registrado quién. El pH entra a mano mientras se recupera el electrodo, que es lo que el documento declara como pendiente."* |
+| **5** | Registrar una **lectura manual** | El valor aparece en el panel, marcado como manual | *"El sistema distingue el origen: esta la ingresó una persona y queda registrado quién. Es el camino para lo que se mide a mano, por ejemplo una lectura de pH tomada con el medidor portátil."* |
 | **6** | Registrar un **valor fuera de rango** | Aparece la **alerta** | *"El servicio evaluó el valor contra el rango del perfil del cultivo y generó la alerta. Ni la aplicación ni la base deciden eso."* |
 | **7** | Abrir el **historial** de esa variable | La serie con el valor desviado | *"El historial conserva la serie completa, que es lo que el antecedente local no registraba."* |
 | **8** | **Marcar la alerta como atendida** | Sale de las activas y queda en el historial | *"Atender una alerta no la borra: deja constancia."* |
@@ -77,8 +77,8 @@ no una versión local.
 | **0–1** | El problema en una frase | *"Quien monitorea un cultivo hidropónico a mano no tiene historial organizado ni aviso oportuno cuando una variable sale de rango."* |
 | **1–4** | **Demostración** con el módulo | Los ocho pasos del apartado 3, condensados |
 | **4–5** | **Arquitectura**, en una frase por pieza | *"La aplicación presenta y recoge; el servicio decide, valida y autoriza; la base guarda el estado y nadie la toca sin pasar por el servicio."* |
-| **5–6** | **El módulo**: lo que aporta | *"Mide cinco variables de forma automática; guarda las lecturas en memoria no volátil si el servicio no responde, y las publica con la hora en que se midieron."* |
-| **6–7** | **Riesgos y límites** | El arranque en frío de la capa gratuita, la variable de pH pendiente de calibración |
+| **5–6** | **El módulo**: lo que aporta | *"Mide las seis variables de forma automática; guarda las lecturas en memoria no volátil si el servicio no responde, y las publica con la hora en que se midieron."* |
+| **6–7** | **Riesgos y límites** | El arranque en frío de la capa gratuita, y la calibración del TDS —que todavía usa el factor de fábrica— a la espera del patrón de 1413 µS/cm |
 
 ---
 
@@ -127,9 +127,9 @@ El detalle completo está en `docs/16_SIMULADOR_DEL_DISPOSITIVO.md`.
 | **¿De dónde salen estos datos?** | Del módulo ESP32, que los publica por HTTPS con su clave de dispositivo. **Se ve en el Monitor Serie** |
 | **¿Qué pasa si se corta la luz?** | Las lecturas pendientes están en **memoria no volátil**: sobreviven al reinicio y se publican con la hora en que se midieron. **Se probó**: diez lecturas sobrevivieron a dos reinicios |
 | **¿Por qué el servicio y no la base directamente?** | *"Nadie toca la base sin pasar por el servicio."* La validación y la autorización no pueden depender del cliente. Las reglas de Firestore cierran el acceso directo |
-| **¿Cómo se que un sensor mide bien?** | Con **ensayos propios** documentados: el DS18B20 se contrastó contra el AM2302 y coincidieron en 0,01 °C; el TDS se probó alterando la concentración de la solución. Los registros están en el repositorio |
-| **¿Qué queda fuera del alcance?** | El **control de actuadores** —el módulo mide y publica, no acciona la bomba—, y la **variable de pH**, que espera la recuperación del electrodo y su calibración |
-| **¿Ese pH del panel lo mide el módulo?** | No, y conviene decirlo antes de que lo pregunten: el módulo publica **cinco** variables. Las lecturas de pH del historial son **manuales y de prueba**; la variable espera la recuperación del electrodo y su calibración, como declara el documento |
+| **¿Cómo se que un sensor mide bien?** | Con **ensayos propios** documentados: el DS18B20 se contrastó contra el AM2302 y coincidieron en 0,01 °C; el TDS se probó alterando la concentración de la solución; y el pH se calibró con los **patrones de 4,01 y 6,86**, que dieron 1520 mV y 1280 mV, o sea 84,2 mV por unidad de pH. Los registros están en el repositorio |
+| **¿Qué queda fuera del alcance?** | El **control de actuadores** —el módulo mide y publica, no acciona la bomba— y la variable de **nivel de agua**, que se retiró del alcance al analizar el montaje |
+| **¿Ese pH del panel lo mide el módulo?** | **Sí**, desde el 1 de octubre: el electrodo se recuperó con el remojo, se instaló el divisor ÷2 y se calibró con los dos patrones. En el historial también hay lecturas de pH **manuales y de prueba**, anteriores a esa fecha, y el panel las distingue por su origen |
 | **¿Cuánto cuesta operarlo?** | La capa gratuita del servicio y de la base; a cinco minutos por ciclo se usa el **10 % de la cuota diaria** de escrituras |
 | **¿Qué error les costó más?** | Decirlo con honestidad: el asentamiento del convertidor analógico, que hacía que la **primera lectura publicada tras encender fuera falsa** y con apariencia normal |
 

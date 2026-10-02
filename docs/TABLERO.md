@@ -80,6 +80,30 @@
 
 ---
 
+## 📊 Estado del sistema al 2 de octubre de 2026
+
+| Elemento | Estado |
+|---|---|
+| **Contrato de la API** | 32 operaciones |
+| **Pruebas automatizadas** | **202** — 106 del servicio y 96 de la aplicación |
+| **Confirmaciones** | **161**, repartidas en 17 días distintos |
+| **Aplicación publicada** | `https://sigvach26-bd.web.app` |
+| **Servicio publicado** | `https://sigvach-api.onrender.com` |
+| **Módulo de adquisición** | Midiendo y publicando **las seis variables** en producción, con el pH ya calibrado |
+
+**Lo que cambió desde el 27 de septiembre.** El electrodo de pH volvió a medir tras el remojo, se
+montó el **divisor ÷2** entre la salida `Po` del módulo PH-4502C y el GPIO 36, y se calibró con los
+patrones de 4,01 y 6,86 —1520 mV y 1280 mV, o sea −84,2 mV por unidad de pH—. El módulo publica ya
+la **sexta variable**, y el valor se comprobó contra el servicio: la lectura de 1206 mV en agua de
+caño llegó al panel como pH 7,74, dentro de lo esperable para esa agua. El recorrido de la alerta
+quedó verificado de punta a punta: el servicio la genera, el operador la atiende desde la interfaz
+y reaparece en el historial conservando su lectura de origen.
+
+**Lo que sigue pendiente.** La calibración del TDS con el patrón de 1413 µS/cm (T-32), cuyo pedido
+está en camino, y la verificación de adaptabilidad en tres anchos de pantalla (T-19).
+
+---
+
 ## 📊 Estado del sistema al 27 de septiembre de 2026
 
 | Elemento | Estado |

@@ -22,7 +22,7 @@
 |---|---|---|
 | La API verifica el rol **en cada ruta** | ✓ Se resuelve en `backend/app/seguridad.py`, con dependencias por ruta: `requiere_administracion`, `requiere_operacion` y `requiere_consulta`. No depende de la interfaz | Documentarlo en 2.7 |
 | Las cuentas nuevas nacen con el **menor privilegio** | ✓ Doble garantía: la aplicación registra con `Roles.porDefecto = operador`, y el servicio, si el perfil no trae rol, asigna `rol_operador` | Documentarlo en 2.7 |
-| **403 con el rol equivocado** | La lógica está ✓, pero **no se ha probado** | Probar con el token del **Operador** (falta su contraseña) |
+| **403 con el rol equivocado** | ✓ **Probado el 29/09**: con la sesión del Operador, `GET /api/v1/usuarios` responde **403**, y con la del Administrador responde **200**. La medición quedó en `evidencia/cuentas-de-prueba-2026-09-29.txt` | Falta la captura desde la interfaz |
 
 ### Validación doble
 
@@ -47,8 +47,8 @@ comprobar **uno por uno** que funcionan en la URL pública, y dejar la evidencia
 
 | Lo que pide | Estado | Qué falta |
 |---|---|---|
-| Al menos una **suite automatizada con su reporte en el repositorio** | ✓ Existen **199 pruebas** (106 del servicio y 93 de la aplicación) | **Correrlas y versionar los reportes** |
-| Tabla del **2.8** con camino feliz y error de cada Must, más 401 y 403 | ✗ | **Construirla** |
+| Al menos una **suite automatizada con su reporte en el repositorio** | ✓ **202 pruebas** (106 del servicio y 96 de la aplicación), ejecutadas el 29/09 con sus reportes versionados | — |
+| Tabla del **2.8** con camino feliz y error de cada Must, más 401 y 403 | ✗ | **Construirla**, ya con las **31 capturas fechadas** de `evidencia/capturas-2026-09-30/` |
 
 ### Documento
 
@@ -60,9 +60,9 @@ comprobar **uno por uno** que funcionan en la URL pública, y dejar la evidencia
 
 | Lo que pide | Estado | Qué falta |
 |---|---|---|
-| Commits en días distintos | ✓ 14 días | — |
-| Pruebas y reportes versionados | ✗ | Subirlos con el documento |
-| README al día | Casi ✓ | Dice **90 casos** cuando hay **106**, y **no documenta el comando de `flutter test`** |
+| Commits en días distintos | ✓ **161 confirmaciones en 17 días distintos** | — |
+| Pruebas y reportes versionados | ✓ `evidencia/pytest-2026-09-29.txt` y `evidencia/flutter-test-2026-09-29.txt` | — |
+| README al día | ✓ Documenta las dos órdenes de pruebas y el conteo real: **106 del servicio y 96 de la aplicación** | — |
 
 ---
 
@@ -71,16 +71,24 @@ comprobar **uno por uno** que funcionan en la URL pública, y dejar la evidencia
 | Verificación | Estado |
 |---|---|
 | Sin token, una ruta protegida responde **401** | ✓ Comprobado contra el servicio publicado |
-| Con el rol equivocado, responde **403** | ✗ Falta probarlo: necesitamos el token del Operador |
+| Con el rol equivocado, responde **403** | ✓ Comprobado con la sesión del Operador contra el servicio publicado: `GET /api/v1/usuarios` responde 403, y 200 con la del Administrador |
 | Un dato inválido responde **400 o 422** con el formato de la API | ✓ Comprobado (rechaza la variable desconocida con el detalle del campo) |
 | Todos los Must funcionan **en línea** | ✓ Verificado en los recursos; falta el recorrido uno por uno con evidencia |
-| Las pruebas automatizadas **corren** con el comando del campo de texto | Falta documentar el comando de la aplicación |
-| Cada fila de la tabla **2.8** tiene evidencia | ✗ Por construir |
+| Las pruebas automatizadas **corren** con el comando del campo de texto | ✓ El README documenta las dos: `python -m pytest` desde `backend/` (106) y `flutter test` desde la raíz (96) |
+| Cada fila de la tabla **2.8** tiene evidencia | ✗ Por construir; las capturas fechadas ya están reunidas |
 | **No hay secretos** en el repositorio | ✓ Verificado con `scripts/verificar_sin_secretos.py` |
 
 ---
 
 ## 3. El plan, día por día
+
+> **Estado al viernes 2 de octubre.** Los tres primeros días se cumplieron. El electrodo revivió con
+> el remojo y quedó **calibrado** con los patrones de 4,01 y 6,86 —1520 mV y 1280 mV—, el firmware
+> ya publica el **pH** y el módulo está midiendo **las seis variables** en producción. Las pruebas se
+> corrieron el 29/09 (**202**, sin fallos) y sus reportes están versionados, el README quedó al día y
+> el recorrido del nivel funcional quedó capturado en **31 capturas fechadas** en
+> `evidencia/capturas-2026-09-30/`. Lo que resta es trabajo de documento: los apartados **2.7**,
+> **2.8** y **2.1**, la regeneración del `.docx` y el **PDF**.
 
 ### Martes 29 (hoy)
 
@@ -105,7 +113,7 @@ comprobar **uno por uno** que funcionan en la URL pública, y dejar la evidencia
 
 - Cerrar **2.7 y 2.8**, y añadir el **2.1** que falta.
 - **Verificar los siete Must en línea**, uno por uno, con su evidencia.
-- Actualizar el **README**: las dos órdenes de pruebas y el conteo real.
+- ~~Actualizar el README: las dos órdenes de pruebas y el conteo real.~~ **Hecho.**
 - Generar el **PDF** y revisar el documento completo.
 
 ### Sábado 3

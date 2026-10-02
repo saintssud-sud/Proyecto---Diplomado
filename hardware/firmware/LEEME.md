@@ -1,7 +1,8 @@
 # Firmware del módulo de adquisición — guía paso a paso (ESP-IDF)
 
-**Proyecto:** SI.G.VA.C.H. · **Módulo:** ESP32 con sensores de temperatura, humedad
-y sólidos disueltos (el pH se suma cuando el electrodo esté recuperado)
+**Proyecto:** SI.G.VA.C.H. · **Módulo:** ESP32 con los sensores de temperatura ambiental
+y humedad (AM2302), temperatura de la solución (DS18B20), sólidos disueltos (TDS) y **pH**
+(con su divisor ÷2), las **seis variables** del sistema
 
 **Versión del firmware:** ESP-IDF v5.5.3 · **Placa:** ESP32 de 38 pines sobre placa
 de expansión · **Puerto:** COM6
@@ -48,13 +49,13 @@ Los cuatro sensores del montaje actual están **verificados con ensayos propios*
 | AM2302 (el de cable) | ✅ **verificado en P33** |
 | DS18B20 sumergible | ✅ **verificado en P32** |
 | TDS Meter V1.0 + sonda | ✅ **verificado en SVN** |
-| PH-4502C + electrodo BNC | ⏸️ electrodo en recuperación (24–48 h en KCl) |
+| PH-4502C + electrodo BNC | ✅ **verificado en SVP**, con el divisor ÷2 y calibrado el 1/10 |
 | Sonda NTC de suelo (Thermoreg) | ⏸️ fuera: mide sustrato, que no es una variable |
 | Protoboard, cables dupont, multímetro | ✅ |
 | **Resistencia de 4,7 kΩ** | ⚠️ **necesaria para el DS18B20** (véase 3.3) |
-| Resistencias de 10 kΩ (×2) | Para el divisor del pH (cuando llegue el electrodo) |
+| Resistencias de 4,7 kΩ (×2) | ✅ **instaladas**: forman el divisor ÷2 del pH |
 | Depósito con tapa · solución nutritiva A/B/C | ❌ Falta |
-| Solución de conservación (KCl) y patrones de pH | ❌ Falta |
+| Patrones de pH y solución de conservación | ✅ los **patrones 4,01 y 6,86** se usaron en la calibración del 1/10; el electrodo se guarda húmedo, en su funda |
 
 ---
 
@@ -210,9 +211,9 @@ Para salir del monitor: **Ctrl + ]**
 | Prueba | Configuración | Qué se espera ver |
 |---|---|---|
 | **1. Conexionado** | `PUBLICAR_EN_SERVICIO = 0` | El barrido de entradas y las cuatro lecturas por el Monitor Serie |
-| **2. Publicación** | `PUBLICAR_EN_SERVICIO = 1` con el WiFi cargado | `... -> almacenada` en las cinco variables |
+| **2. Publicación** | `PUBLICAR_EN_SERVICIO = 1` con el WiFi cargado | `... -> almacenada` en las **seis** variables, el pH incluido |
 | **3. Cola de pendientes** | Apuntar `HOST_API` a una dirección inválida | `guardada en memoria no volatil (quedan N)`; al restaurar, `recuperada: ...` |
-| **4. pH** | Calibrar el electrodo | La sexta variable se publica |
+| **4. pH** | Calibrar el electrodo | ✅ **hecho el 1/10**: los patrones 4,01 y 6,86 dieron 1520 mV y 1280 mV, y la sexta variable se publica |
 
 ### Cómo reconocer que cada sensor responde
 
@@ -400,8 +401,8 @@ original (`medida el 2026-09-23T20:58:40Z`).
 
 ## 9. Qué sigue
 
-1. **Calibrar** el TDS con el patrón de 707 ppm y el pH con los patrones 4,00 y 6,86.
-2. **Recuperar y calibrar el electrodo de pH** (24–48 h en KCl) e instalar su divisor ÷2.
+1. **Calibrar** el TDS con el patrón de 1413 µS/cm (707 ppm). El **pH ya quedó calibrado** el 1 de octubre con los patrones 4,01 y 6,86.
+2. ~~Recuperar y calibrar el electrodo de pH e instalar su divisor ÷2.~~ **Hecho**: el electrodo volvió a medir con el remojo y el divisor ÷2 quedó instalado en el GPIO 36.
 3. **Medir la geometría** del depósito para el nivel manual.
 4. **Registrar** los valores de calibración: son evidencia directa para el Capítulo 2.
 5. **Instalar** los sensores en el depósito, con la electrónica fuera del agua.

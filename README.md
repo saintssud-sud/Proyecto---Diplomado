@@ -8,7 +8,7 @@
 
 ## 1. Nombre y descripción del proyecto
 
-**SIGVACH** es una aplicación desarrollada con **Flutter** —para Android y web— que permite monitorear y gestionar las **seis variables** de un cultivo hidropónico: **pH, sólidos disueltos totales, conductividad eléctrica, temperatura de la solución, temperatura ambiental, humedad relativa y nivel de agua**. Las mediciones se evalúan contra los **rangos de referencia del cultivo** que se siembra en cada módulo, y el sistema genera una alerta cuando un valor sale de rango.
+**SIGVACH** es una aplicación desarrollada con **Flutter** —para Android y web— que permite monitorear y gestionar las **seis variables** de un cultivo hidropónico: **pH, sólidos disueltos totales, conductividad eléctrica, temperatura de la solución, temperatura ambiental y humedad relativa**. Las mediciones se evalúan contra los **rangos de referencia del cultivo** que se siembra en cada módulo, y el sistema genera una alerta cuando un valor sale de rango. Las seis las publica en producción el **módulo de adquisición** (ESP32, apartado 8), sin intervención manual.
 
 Se compone de dos piezas: la **aplicación Flutter** y el **servicio backend** que expone la API y concentra la validación, la autorización y las reglas de negocio (apartado 5).
 
@@ -221,6 +221,9 @@ lib/
 └── widgets/                 # context_card, max_width_box, mode_banner
 
 backend/                     # servicio de la API (FastAPI): app/ y pruebas/
+hardware/                    # módulo de adquisición ESP32 (firmware ESP-IDF, guías y evidencias)
+test/                        # pruebas automatizadas de la aplicación (flutter test)
+evidencia/                   # evidencia fechada: pruebas, despliegue, rendimiento y capturas
 assets/images/               # logo e iconos de la app
 scripts/                     # scripts de preparación y menú (Windows / Linux)
 docs/                        # documentación e hilo conductor del proyecto

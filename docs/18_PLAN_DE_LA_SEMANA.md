@@ -14,6 +14,14 @@ adaptabilidad con capturas en tres anchos).
 
 ## 1. Punto de partida
 
+> **Cómo terminó la semana (viernes 2 de octubre).** Los cuatro puntos de la cadena se cerraron: el
+> electrodo volvió a medir con el remojo, se montó el **divisor ÷2**, se **calibró** con los patrones
+> de 4,01 y 6,86 —1520 mV y 1280 mV— y el firmware **ya publica el pH**. El módulo publica, por
+> tanto, **las seis variables** en producción. Queda para la semana siguiente la **calibración del
+> TDS** con el patrón de 1413 µS/cm (T-32), cuyo pedido está en camino, y la verificación de
+> adaptabilidad en tres anchos (T-19). Lo que sigue en este apartado describe el punto de partida
+> del lunes 28, tal como estaba.
+
 **Lo que ya funciona.** El firmware sobre ESP-IDF lee el sensor de ambiente (P33 · GPIO 33),
 el DS18B20 de la solución (P32 · GPIO 32) y el TDS (SVN · GPIO 39, sin divisor). Publica
 cinco variables en producción: `temp_ambiental`, `humedad`, `temp_solucion`, `tds` y `ec`.

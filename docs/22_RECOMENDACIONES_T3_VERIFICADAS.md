@@ -10,7 +10,7 @@
 
 El docente considera esta entrega **«la más sólida del grupo»**, y destaca tres cosas que van más
 allá de lo pedido: el ESP32 publicando lecturas reales por HTTPS con clave propia, la evaluación
-contra el rango vigente con generación de alertas, y las 199 pruebas automatizadas. También valora
+contra el rango vigente con generación de alertas, y las 202 pruebas automatizadas. También valora
 que el apartado 2.6 cuente **dificultades verdaderas** con su resolución.
 
 Sus observaciones son **de ajuste**, no de fondo. Eso es importante: no hay que rehacer nada, hay
@@ -30,9 +30,9 @@ que afinar.
 | 6 | Estimar el consumo diario de Firestore y anotarlo en 2.6 o 2.9 | **No está en el documento** ✗ | Añadirlo (ver el cálculo abajo) |
 | 7 | **Ámbito:** nombrar el módulo piloto y su ubicación en el objetivo general y la Tabla 1 | **Pendiente** — es la observación **A-4** | Se cierra con la **maqueta física** que se monta esta semana |
 | 8 | **Tabla 3** con números del piloto | **Parcial**: la primera fila ya dice «tres veces al día» | Completar con **mediciones por semana (21)**, **días entre renovaciones (15)** y **detecciones tardías** (dato a confirmar con el tutor) |
-| 9 | **Verificación en vivo en T3:** salud, login de los dos roles, una lectura fuera de rango que dispare la alerta, y el operador **sin permiso** para editar rangos | La salud, el login y la alerta están probados ✓. **El operador sin permiso NO se ha probado** ✗ | Necesitamos las **credenciales de la cuenta Operador** para verificarlo antes de la tutoría |
+| 9 | **Verificación en vivo en T3:** salud, login de los dos roles, una lectura fuera de rango que dispare la alerta, y el operador **sin permiso** para editar rangos | ✓ **Todo probado.** El operador quedó comprobado el 29/09: contra el servicio publicado, `GET /api/v1/usuarios` responde **403** con su sesión y **200** con la del administrador (`evidencia/cuentas-de-prueba-2026-09-29.txt`) | Falta la captura del rechazo desde la interfaz |
 | 10 | Confirmar que el firmware **reintenta y guarda** las lecturas no enviadas durante el arranque | La cola existe ✓ (el arranque informa «COLA: Memoria de pendientes lista») | Demostrarlo en vivo: apagar el WiFi, dejar que se acumulen lecturas y devolverlo |
-| 11 | **E3:** llevar las pruebas al **2.8** con la tabla de casos (feliz y error por cada Must, 401 y 403) y los reportes de `pytest` y `flutter test` versionados | Las **199 pruebas ya existen** ✓; falta la evidencia ordenada en el documento | Es la tarea principal del E3 |
+| 11 | **E3:** llevar las pruebas al **2.8** con la tabla de casos (feliz y error por cada Must, 401 y 403) y los reportes de `pytest` y `flutter test` versionados | Las **202 pruebas ya existen y sus reportes están versionados** ✓; falta la evidencia ordenada en el documento | Es la tarea principal del E3 |
 
 ### El cálculo del consumo de Firestore (para el punto 6)
 

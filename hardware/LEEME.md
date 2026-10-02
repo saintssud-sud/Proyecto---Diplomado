@@ -105,7 +105,7 @@ registros están en `evidencias/`:
 | `prueba-sal-tds.txt` | Respuesta del sensor de TDS al alterar la concentración de la solución | **155 mV → 2 415 mV** (×173 en cuentas crudas) |
 | `contraste-temperatura.txt` | Contraste del DS18B20 contra el AM2302 | Sonda mojada: **3,3 °C por debajo** del aire (enfriamiento por evaporación) |
 | `contraste-reposo.csv` · `contraste-reposo-parte2.csv` | Convergencia de los dos termómetros en reposo | Coinciden dentro de **0,01 °C** |
-| `arranque-y-ciclo-2026-09-27.txt` | Registro del arranque y de un ciclo de lectura, con el fallo del sensor de ambiente y su causa | El sensor **respondía al arrancar y fallaba después**: era un **contacto flojo** en el cable de datos. Al reencajarlo, el módulo pasó a publicar las cinco variables |
+| `arranque-y-ciclo-2026-09-27.txt` | Registro del arranque y de un ciclo de lectura, con el fallo del sensor de ambiente y su causa | El sensor **respondía al arrancar y fallaba después**: era un **contacto flojo** en el cable de datos. Al reencajarlo, el módulo pasó a publicar las cinco variables que publicaba entonces (hoy publica seis, con el pH) |
 
 **Sobre el fallo del sensor de ambiente.** El registro del Monitor Serie conserva el
 error `dht: Initialization error, problem in phase 'B'` y las advertencias

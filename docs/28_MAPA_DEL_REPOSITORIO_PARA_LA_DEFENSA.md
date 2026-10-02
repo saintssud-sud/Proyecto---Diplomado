@@ -148,7 +148,7 @@ flutter test
 
 | Pendiente | Estado |
 |---|---|
-| El **pH** | Declarado como pendiente: la variable se lee pero no se publica, porque falta la calibración con los tres patrones |
+| La **calibración del TDS** | El módulo publica el TDS, pero todavía con el factor de fábrica: falta contrastarlo con el patrón de 1413 µS/cm, que está pedido y en camino. El **pH sí quedó calibrado** el 1 de octubre, con los patrones de 4,01 y 6,86 |
 | El **monitoreo y el respaldo** de la base | Del E4 |
 | El punto `DELETE /api/v1/lecturas/{id}` | Quitado de la tabla de requisitos; queda decidir si se elimina del servicio o se convierte en anulación con motivo |
 | El **rendimiento con respuestas grandes** | Medido: cumple con el tamaño que usa el panel (536 ms de percentil 95) y no cumple con 200 registros (1042 ms). La optimización, con su número antes y después, es del E4 |
@@ -176,7 +176,7 @@ Pueden pedir un texto, una validación o un campo. Conviene saber dónde se toca
 |---|---|
 | Pruebas automatizadas | **202** (106 del servicio + 96 de la aplicación) |
 | Rutas protegidas por rol | **28** |
-| Variables publicadas | **5** (el pH, declarado pendiente) |
+| Variables publicadas | **6**: temperatura ambiental, humedad, temperatura de la solución, sólidos disueltos totales, conductividad eléctrica y pH |
 | Colecciones de la base | **6** |
 | Cuentas de prueba | **2**, una por rol, del dominio `.test` |
 | Confirmaciones en el repositorio | **161**, en **17 días distintos** |
