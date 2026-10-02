@@ -66,4 +66,13 @@ serviceAccountKey.json
 hardware/firmware/main/configuracion.h
 configuracion.h
 
-evidad/_tmp/
+evidencia/_tmp/
+
+# ==================== Evidencia ====================
+# La toma sin tapar de la pantalla de usuarios conserva nombres, correos y
+# telefonos de personas reales. Se queda en el disco como respaldo de trabajo,
+# pero no entra al repositorio, que es lo que revisa el docente. La version
+# anonimizada (30-usuarios-lista-con-roles.jpg) SI se versiona.
+evidencia/capturas-2026-09-30/_descartadas/30-usuarios-con-datos-sin-tapar-NO-USAR.jpg
+
+~\$*.docx
