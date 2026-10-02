@@ -64,6 +64,37 @@ static const char *ETIQUETA = "SIGVACH";
 #define CANAL_PH   ADC_CHANNEL_0   /* SVP · GPIO 36 · salida Po del PH-4502C */
 #define CANAL_TDS  ADC_CHANNEL_3   /* SVN · GPIO 39 · salida AOUT del TDS V1.0 */
 
+/* ---------------------------------------------------------------------------
+ *  Calibración de la sonda de pH
+ *
+ *  Recta obtenida el 1 de octubre de 2026 con dos soluciones patrón, midiendo
+ *  la tensión del NUDO del divisor ÷2, que es el punto que llega a este pin:
+ *
+ *      pH 4,01  ->  1520 mV
+ *      pH 6,86  ->  1280 mV
+ *      pendiente = -240 mV / 2,85 unidades = -84,2 mV por unidad de pH
+ *
+ *  El signo es el esperado: a mayor acidez, mayor tensión. El valor absoluto
+ *  depende del ajuste de ganancia de la placa, así que **si alguien mueve los
+ *  potenciómetros, esta recta deja de valer y hay que recalibrar**.
+ *
+ *  Se mide en el nudo y no en la salida `Po` de la placa a propósito: así la
+ *  recta queda expresada en la misma tensión que lee el convertidor, sin tener
+ *  que dividir por dos después (lo que arrastraría el error del divisor a la
+ *  calibración).
+ *
+ *  Evidencia y detalles: `hardware/evidencias/calibracion-del-ph-2026-10-01.txt`.
+ *
+ *  Ojo al recalibrar: la sonda tiene que estar hidratada y la lectura asentada
+ *  (tres minutos en cada patrón) antes de anotar el valor.
+ * ------------------------------------------------------------------------- */
+#define PH_MV_PATRON     1520.0f   /* tensión del nudo en el patrón de pH 4,01   */
+#define PH_VALOR_PATRON     4.01f  /* valor de ese patrón                        */
+#define PH_MV_POR_UNIDAD  -84.2f   /* milivoltios por unidad de pH (negativo)    */
+#define PH_LIMITE_MINIMO    0.0f   /* rango del catálogo del servicio            */
+#define PH_LIMITE_MAXIMO   14.0f
+
+
 /* Pines del ADC1 que la placa de expansión expone como entradas analógicas.
  *
  * Sirven para el diagnóstico de conexionado: el programa mide la dispersión de
@@ -591,6 +622,25 @@ static void cicloDeLectura(void)
                  hayTemperatura ? "la temperatura de la solucion" : "25.0 C por defecto");
     }
 
+    /* Conversión a pH con la recta de calibración. Si el valor se sale del
+     * rango del catálogo, no se publica: casi siempre significa que la sonda
+     * está desconectada o fuera del líquido, y publicar ese número dispararía
+     * una alerta falsa. */
+    float ph = PH_VALOR_PATRON + ((float)mvPH - PH_MV_PATRON) / PH_MV_POR_UNIDAD;
+    bool phValido = (ph >= PH_LIMITE_MINIMO) && (ph <= PH_LIMITE_MAXIMO);
+    if (phValido) {
+        char textoPh[16];
+        formatear2(textoPh, sizeof(textoPh), ph);
+        /* La recta se imprime leyendo las constantes, para que el mensaje no
+         * quede desactualizado si alguien recalibra. */
+        ESP_LOGI(ETIQUETA, "  -> %s pH   (recta: %.0f mV = pH %.2f, %.1f mV por unidad)",
+                 textoPh, PH_MV_PATRON, PH_VALOR_PATRON, PH_MV_POR_UNIDAD);
+    } else {
+        ESP_LOGW(ETIQUETA,
+                 "  -> pH fuera de rango (%d mV): la sonda puede estar desconectada",
+                 mvPH);
+    }
+
     /* --- Publicación en el servicio --------------------------------------- */
 #if PUBLICAR_EN_SERVICIO
     if (!hayRed()) {
@@ -610,6 +660,11 @@ static void cicloDeLectura(void)
     publicar("temp_solucion",  temperaturaSolucion, "°C");
     publicar("tds",            ppm,                 "ppm");
     publicar("ec",             sensores_ppm_a_conductividad(ppm), "mS/cm");
+
+    /* El pH va sin unidad: es la que declara el catálogo del servicio para esta
+     * variable ("ph" -> unidad vacía). Si se mandara "pH" como unidad, el
+     * servicio rechazaría la lectura con 422. */
+    publicar("ph",             phValido ? ph : NAN, "");
 }
 
 /* ---------------------------------------------------------------------------

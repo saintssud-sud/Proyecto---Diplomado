@@ -1,0 +1,94 @@
+EVIDENCIA — Calibración de la sonda de pH
+========================================
+
+Para qué sirve este archivo
+---------------------------
+Deja registrada la calibración de la sonda de pH, que es la recta que convierte la tensión
+medida en unidades de pH. Es la evidencia de la calibración para el apartado 2.8 del E3: la
+recta no se supone, se obtiene de dos soluciones patrón de valor conocido.
+
+    Fecha    : jueves 1 de octubre de 2026
+    Sonda    : E-201-C, conector BNC
+    Placa    : PH-4502C con el divisor ÷2 en la salida
+    Módulo   : ESP32, pin SVP · GPIO 36
+    Patrones : pH 4,01 y pH 6,86 (sobres de polvo disueltos en agua desionizada)
+
+
+Mediciones definitivas
+----------------------
+    Multímetro: UNI-T UT33D+ · punta negra en el pin `G`, punta roja en el nudo del divisor.
+    Tres minutos de espera en cada patrón, para que la lectura se asiente.
+
+    Patrón      Tensión en el nudo     Tensión en Po (referencia)
+    ---------   -------------------    --------------------------
+    pH 4,01     1520 mV                3,05 V
+    pH 6,86     1280 mV                2,58 V
+
+    Diferencia   240 mV entre 2,85 unidades de pH
+
+    Relación nudo / Po:  1,52 / 3,05 = 0,498  → el divisor entrega la mitad, como debe.
+
+
+La recta
+--------
+    pendiente = -240 mV / 2,85 pH = **-84,2 mV por unidad de pH**
+
+    pH = 4,01 + (tensión del nudo en mV - 1520) / (-84,2)
+
+Comprobación: con 1280 mV, la fórmula da 4,01 + (-240)/(-84,2) = 4,01 + 2,85 = **6,86**, que es
+el valor declarado del segundo patrón.
+
+**El signo es el esperado:** a mayor acidez, mayor tensión. El valor absoluto de la pendiente
+depende del ajuste de ganancia de la placa, y por eso la recta se obtiene midiendo, no
+aplicando el valor teórico de 59 mV por unidad de pH.
+
+**Verificación en el módulo.** Con el firmware ya grabado, el módulo leyó 1309 mV y calculó
+**6,52 pH**, y en otra lectura 1298 mV → **6,65 pH**. La conversión aplicada en el ESP32
+coincide con la que da la fórmula, que es lo que se quería comprobar.
+
+
+Cómo llegamos hasta acá (lo que costó, y por qué)
+-------------------------------------------------
+Vale la pena dejarlo escrito, porque explica por qué el pH quedó declarado como pendiente
+durante tanto tiempo:
+
+1. **La sonda llegó seca.** La botella de conservación venía sin líquido, así que el electrodo
+   se comportaba de forma errática. Se rehidrató en patrón de 4,01 y después en KCl.
+2. **La placa estaba saturada.** Su salida estaba pegada al tope (3,27 V, el máximo que
+   entrega con 5 V de alimentación), y con la salida recortada ninguna medición sirve. Se
+   corrigió bajando el desplazamiento y, al final, usando la segunda placa del kit.
+3. **Un potenciómetro quedó barrido.** Al llevarlo al tope de su recorrido, el ajuste dejó de
+   responder. Queda anotado como advertencia: **se gira despacio y se para al sentir
+   resistencia**, nunca insistiendo hasta el final. La placa vieja queda guardada, con esa
+   novedad, como repuesto.
+4. **La señal inalámbrica es débil** en el lugar de trabajo (rssi de -74 a -76 dBm): el módulo
+   pierde la conexión y la recupera. No afecta las lecturas, pero demora la publicación, y
+   cuando el ciclo coincide con una caída de red el firmware no lo publica.
+
+
+Advertencias para la próxima calibración
+----------------------------------------
+1. **Si alguien mueve los potenciómetros, esta recta deja de valer.** El desplazamiento y la
+   ganancia definen la recta entera. Conviene marcar los tornillos con una gota de esmalte o
+   un pedazo de cinta, y anotar su posición.
+
+2. **La sonda tiene que estar hidratada.** Se guarda en KCl (o en patrón de 4,01 como
+   emergencia), con el bulbo cubierto y el recipiente tapado. Una sonda seca deriva y no
+   responde, como pasó con la primera.
+
+3. **Un patrón es viejo.** El 4,01 es el que se usó como remojo del electrodo anterior durante
+   dos días. Para la próxima calibración conviene preparar un 4,01 nuevo.
+
+4. **La temperatura influye** y esta placa no compensa. Las mediciones se hicieron a
+   temperatura ambiente, la misma a la que trabaja la maqueta.
+
+5. **El rango medible queda con margen.** Con esta pendiente, el recorrido de 0 a 3,1 V del
+   convertidor cubre todo el rango de 0 a 14 unidades de pH, y la solución de la maqueta
+   (entre 5,5 y 6,5) queda bien adentro.
+
+
+Conclusión
+----------
+La sonda está calibrada y la conversión funciona en el módulo: dos patrones, dos lecturas y una
+recta que las une, aplicada por el firmware y verificada contra el cálculo. Con esto la sexta
+variable queda lista para publicarse, y el pH deja de estar pendiente.
