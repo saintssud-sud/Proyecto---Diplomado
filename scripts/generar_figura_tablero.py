@@ -264,7 +264,28 @@ def tarjeta(dibujo, x, y, ancho, lineas, detalles, tamano, color_borde, alto_lin
 
 
 def figura_tablero(tablero: Tablero) -> Path:
-    imagen = Image.new("RGB", (ANCHO, ALTO), BLANCO)
+    # El alto de la figura se calcula a partir de lo que hay que dibujar: con el
+    # lienzo fijo original, al sumar las tarjetas de la semana 4 la columna de
+    # terminadas no las contenia y el programa se detenia. Asi la figura crece
+    # sola en cada entrega y nunca deja tareas afuera.
+    alto_subtitulo = 26
+    separacion_tarjeta = 3
+    alto_tarjeta = 20
+    tope = Y_COLUMNAS + ALTO_ENCABEZADO + 16
+    alto_hecho = (
+        alto_subtitulo * len(tablero.hecho)
+        + (alto_tarjeta + separacion_tarjeta) * tablero.total_hecho
+        + 20
+    )
+    # La columna reserva, entre el encabezado y el borde inferior, ALTO_ENCABEZADO
+    # + 28 px que no son para tarjetas: de ahi el margen que se suma.
+    alto_columna = max(ALTO_COLUMNA, alto_hecho + ALTO_ENCABEZADO + 28)
+    # El nombre lleva «lienzo» porque mas abajo los bucles de tarjetas usan
+    # `alto` para la altura de cada tarjeta: si se llamara igual, el pie
+    # terminaria dibujado sobre el titulo.
+    alto_lienzo = Y_COLUMNAS + alto_columna + 90
+
+    imagen = Image.new("RGB", (ANCHO, alto_lienzo), BLANCO)
     dibujo = ImageDraw.Draw(imagen)
 
     texto_centrado(dibujo, "Tablero de tareas SIGVACH — Kanban", 0, 26, ANCHO, 26, TEXTO, True)
@@ -286,7 +307,7 @@ def figura_tablero(tablero: Tablero) -> Path:
     for indice, (titulo, ancho_columna, relleno, borde) in enumerate(columnas):
         x = MARGEN + sum(c[1] for c in columnas[:indice]) + indice * SEPARACION
         limites.append((x, ancho_columna, borde))
-        caja(dibujo, x, Y_COLUMNAS, ancho_columna, ALTO_COLUMNA, GRIS_CAJA, GRIS_BORDE, radio=14, grosor=2)
+        caja(dibujo, x, Y_COLUMNAS, ancho_columna, alto_columna, GRIS_CAJA, GRIS_BORDE, radio=14, grosor=2)
         caja(dibujo, x, Y_COLUMNAS, ancho_columna, ALTO_ENCABEZADO, relleno, borde, radio=14, grosor=2)
         tamano_titulo = 19 if ancho_texto(dibujo, titulo, 19, True) <= ancho_columna - 24 else 16
         texto_centrado(dibujo, titulo, x, Y_COLUMNAS + 16, ancho_columna, tamano_titulo, TEXTO, True)
@@ -295,7 +316,7 @@ def figura_tablero(tablero: Tablero) -> Path:
                    x + ancho_columna + 20, Y_COLUMNAS + ALTO_COLUMNA / 2)
 
     tope = Y_COLUMNAS + ALTO_ENCABEZADO + 16
-    fondo = Y_COLUMNAS + ALTO_COLUMNA - 12
+    fondo = Y_COLUMNAS + alto_columna - 12
 
     # --- Backlog: caben pocas tarjetas, con el titulo completo y su prioridad ---
     x, ancho_columna, borde = limites[0]
@@ -317,18 +338,10 @@ def figura_tablero(tablero: Tablero) -> Path:
 
     # --- Hecho: una tarjeta compacta por tarea, agrupadas por semana ---
     x, ancho_columna, borde = limites[2]
-    alto_subtitulo = 26
-    separacion_tarjeta = 3
-    disponible = fondo - tope - alto_subtitulo * len(tablero.hecho)
-    total_tarjetas = tablero.total_hecho
-    alto_tarjeta = min(
-        22,
-        int((disponible - separacion_tarjeta * max(0, total_tarjetas - 1)) / max(1, total_tarjetas)),
-    )
-    if alto_tarjeta < 15:
+    if tope + alto_hecho > fondo + 12:
         raise SystemExit(
-            "No caben %d tarjetas terminadas en la columna: habria que acortar la lista "
-            "o agrupar las semanas anteriores." % total_tarjetas
+            "La columna de terminadas necesita %d px y el lienzo reserva %d."
+            % (alto_hecho, fondo - tope)
         )
 
     y = tope
@@ -349,12 +362,12 @@ def figura_tablero(tablero: Tablero) -> Path:
         dibujo,
         "Estado al cierre de la %s (%s): %d tareas terminadas · %d en curso · %d en el backlog."
         % (tablero.semana_cierre, tablero.fecha_cierre, terminadas, en_curso, backlog),
-        0, 958, ANCHO, 18, GRIS,
+        0, alto_lienzo - 62, ANCHO, 18, GRIS,
     )
     texto_centrado(
         dibujo,
         "Fuente: docs/TABLERO.md del repositorio del proyecto. La figura se regenera desde el tablero en cada entrega.",
-        0, 986, ANCHO, 16, GRIS,
+        0, alto_lienzo - 34, ANCHO, 16, GRIS,
     )
 
     SALIDA.mkdir(exist_ok=True)

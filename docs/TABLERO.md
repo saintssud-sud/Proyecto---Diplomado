@@ -10,10 +10,8 @@
 
 | ID | Tarea | Requisito | Prioridad |
 |---|---|---|---|
-| T-30 | Recuperar el electrodo de pH (24 a 48 h en KCl) e instalar su divisor ÷2 | RF-04 | Must |
-| T-31 | Calibrar el sensor de pH con las soluciones patrón 4,00 y 6,86 | 2.8 · calibración | Must |
 | T-32 | Calibrar el sensor de TDS con el patrón de 707 ppm | 2.8 · calibración | Must |
-| T-19 | Verificación de adaptabilidad con capturas en tres anchos (320, 768 y 1920 px) | RNF-04 · RNF-06 | Should |
+| T-19 | Verificación de adaptabilidad con capturas en tres anchos (320, 768 y 1920 px) | RNF-06 · Requisito mínimo 4 | Should |
 
 ---
 
@@ -77,6 +75,14 @@
 | ID | Tarea | Requisito | Fecha |
 |---|---|---|---|
 | T-29 | **Entregable E2:** vertical funcional desplegada, documento y evidencias, subidos al aula virtual | Entregable E2 | 26/09 |
+| T-38 | Verificación medida del control de acceso: **401** sin token, **403** con el rol equivocado y **200** con el administrador, sobre el servicio publicado | RNF-02 · 2.7 | 29/09 |
+| T-39 | **Escalada de privilegios cerrada:** el alta de perfil admitía el rol de administrador para un correo concreto; se retiró de las reglas de Firestore y del repositorio | RNF-03 · 2.7 | 29/09 |
+| T-41 | Informe de rendimiento del servicio contra el objetivo del RNF-01, con páginas de 5, 50 y 200 registros | RNF-01 · 2.8 | 30/09 |
+| T-30 | Recuperar el electrodo de pH (remojo en solución de conservación) e instalar su **divisor ÷2** en la entrada analógica | RF-04 | 01/10 |
+| T-31 | Calibrar el sensor de pH con los patrones de 4,01 y 6,86: **1520 mV** y **1280 mV** | 2.8 · calibración | 01/10 |
+| T-37 | Conversión de milivoltios a pH en el firmware y publicación de la **sexta variable** | RF-04 · RF-05 | 01/10 |
+| T-40 | Recorrido funcional del flujo completo en producción, con **treinta y una capturas fechadas** | 2.8 · Requisito mínimo 1 | 02/10 |
+| T-42 | Apartados **2.7 Seguridad** y **2.8 Pruebas** del documento, con la tabla de casos y su evidencia | Entregable E3 | 02/10 |
 
 ---
 
@@ -91,6 +97,8 @@
 | **Servicio publicado** | `https://sigvach-api.onrender.com` |
 | **Módulo de adquisición** | Midiendo y publicando **las seis variables** en producción, con el pH ya calibrado |
 
+**Estado al cierre de la Semana 4:** 39 tareas terminadas · 1 en curso · 2 en el backlog.
+
 **Lo que cambió desde el 27 de septiembre.** El electrodo de pH volvió a medir tras el remojo, se
 montó el **divisor ÷2** entre la salida `Po` del módulo PH-4502C y el GPIO 36, y se calibró con los
 patrones de 4,01 y 6,86 —1520 mV y 1280 mV, o sea −84,2 mV por unidad de pH—. El módulo publica ya
@@ -101,21 +109,6 @@ y reaparece en el historial conservando su lectura de origen.
 
 **Lo que sigue pendiente.** La calibración del TDS con el patrón de 1413 µS/cm (T-32), cuyo pedido
 está en camino, y la verificación de adaptabilidad en tres anchos de pantalla (T-19).
-
----
-
-## 📊 Estado del sistema al 27 de septiembre de 2026
-
-| Elemento | Estado |
-|---|---|
-| **Contrato de la API** | 32 operaciones |
-| **Pruebas automatizadas** | **199** — 106 del servicio y 93 de la aplicación |
-| **Confirmaciones** | **más de 125**, repartidas en 14 días distintos |
-| **Aplicación publicada** | `https://sigvach26-bd.web.app` |
-| **Servicio publicado** | `https://sigvach-api.onrender.com` |
-| **Módulo de adquisición** | Midiendo y publicando cinco variables en producción |
-
-**Estado al 27 de septiembre de 2026:** 31 tareas terminadas · 1 en curso · 4 en el backlog.
 
 > **Sobre la tarea T-29.** El entregable E2 se subió al aula virtual el sábado 26 de
 > septiembre: el documento en PDF, con las figuras ajustadas al ancho de la página, y
