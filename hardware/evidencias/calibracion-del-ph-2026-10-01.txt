@@ -55,12 +55,18 @@ durante tanto tiempo:
 1. **La sonda llegó seca.** La botella de conservación venía sin líquido, así que el electrodo
    se comportaba de forma errática. Se rehidrató en patrón de 4,01 y después en KCl.
 2. **La placa estaba saturada.** Su salida estaba pegada al tope (3,27 V, el máximo que
-   entrega con 5 V de alimentación), y con la salida recortada ninguna medición sirve. Se
-   corrigió bajando el desplazamiento y, al final, usando la segunda placa del kit.
+   entrega con 5 V de alimentación), y con la salida recortada ninguna medición sirve: por eso
+   la sonda parecía muerta. Se intentó corregir bajando el desplazamiento, y se logró bajar de
+   3,27 a 3,04 V, pero no lo suficiente para que el patrón de 4,01 entrara en el recorrido.
 3. **Un potenciómetro quedó barrido.** Al llevarlo al tope de su recorrido, el ajuste dejó de
-   responder. Queda anotado como advertencia: **se gira despacio y se para al sentir
-   resistencia**, nunca insistiendo hasta el final. La placa vieja queda guardada, con esa
-   novedad, como repuesto.
+   responder: giraba sin cambiar la salida. Fue la causa de que la primera placa quedara
+   inutilizable para calibrar. Queda anotado como advertencia: **se gira despacio y se para al
+   sentir resistencia**, nunca insistiendo hasta el final.
+
+   **La solución fue cambiar la placa completa** por la segunda que trae el kit: con esa, la
+   salida se dejó llevar al punto medio, el patrón de 4,01 entró sin recortarse y la sonda
+   respondió. La placa vieja queda guardada como repuesto, con la novedad de su
+   potenciómetro barrido.
 4. **La señal inalámbrica es débil** en el lugar de trabajo (rssi de -74 a -76 dBm): el módulo
    pierde la conexión y la recupera. No afecta las lecturas, pero demora la publicación, y
    cuando el ciclo coincide con una caída de red el firmware no lo publica.
