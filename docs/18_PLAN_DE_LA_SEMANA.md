@@ -388,5 +388,6 @@ el de 280 Bs dice «consulta stock», así que la disponibilidad decide.
 - El módulo publica **seis** variables en producción y la aplicación las muestra.
 - La maqueta está montada, ordenada y con las sondas dentro de la solución.
 - Hay evidencias fotográficas del montaje y del proceso de calibración.
-- Las tarjetas T-28, T-30, T-31 y T-32 están en «Hecho» y T-19 también.
+- Las tarjetas T-30, T-31 y T-19 quedaron en «Hecho»; **T-28 sigue en curso** y **T-32 en el
+  backlog**, a la espera del patrón de conductividad. El detalle está en `docs/TABLERO.md`.
 - La clave del dispositivo y la red WiFi siguen fuera del repositorio.

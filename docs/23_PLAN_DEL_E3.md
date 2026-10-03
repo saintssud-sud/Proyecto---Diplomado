@@ -12,9 +12,9 @@
 
 | Lo que pide | Estado | Qué falta |
 |---|---|---|
-| Login con contraseñas en **hash** | ✓ Las gestiona **Firebase Authentication**: el servicio nunca ve ni almacena la contraseña | Explicarlo en **2.7** |
-| Sesión o token **que vence** | ✓ El token de identidad de Firebase caduca cada hora | Explicarlo en 2.7 |
-| Un **401 que devuelve al login** | ✗ **Encontrado: la aplicación define `esNoAutenticado` pero no lo usa en ninguna parte.** Ante un 401 muestra un error, no devuelve al login | **Implementarlo** (cambio de código) |
+| Login con contraseñas en **hash** | ✓ Las gestiona **Firebase Authentication**, con **scrypt** y sal por cuenta: el servicio nunca ve ni almacena la contraseña | Documentado en **2.7** |
+| Sesión o token **que vence** | ✓ El token de identidad de Firebase **vence una hora** después de emitido | Documentado en 2.7 |
+| Un **401 que devuelve al login** | ✓ **Implementado el 29/09 y publicado**: ante un 401 del servicio la aplicación cierra la sesión y vuelve al inicio de sesión, sin confundirlo con un fallo de conexión ni con un rechazo por permisos. Cubierto por tres pruebas automatizadas de la aplicación | Documentarlo en 2.7 — **hecho el 02/10** |
 
 ### Autorización por rol
 
@@ -48,13 +48,13 @@ comprobar **uno por uno** que funcionan en la URL pública, y dejar la evidencia
 | Lo que pide | Estado | Qué falta |
 |---|---|---|
 | Al menos una **suite automatizada con su reporte en el repositorio** | ✓ **202 pruebas** (106 del servicio y 96 de la aplicación), ejecutadas el 29/09 con sus reportes versionados | — |
-| Tabla del **2.8** con camino feliz y error de cada Must, más 401 y 403 | ✗ | **Construirla**, ya con las **31 capturas fechadas** de `evidencia/capturas-2026-09-30/` |
+| Tabla del **2.8** con camino feliz y error de cada Must, más 401 y 403 | ✓ Construida con **24 casos** y con las **34 capturas fechadas** de `evidencia/capturas-2026-09-30/` como evidencia | — |
 
 ### Documento
 
 | Lo que pide | Estado |
 |---|---|
-| Capítulos 1 y 2, apartados **2.1 a 2.8** completos en borrador | Tenemos **2.2 a 2.6** ✓. Faltan **2.1** (está en la monografía), **2.7 Seguridad** y **2.8 Pruebas** |
+| Capítulos 1 y 2, apartados **2.1 a 2.8** completos en borrador | ✓ Completos en el mismo archivo, con **2.1**, **2.7 Seguridad** y **2.8 Pruebas** agregados | — |
 
 ### Repositorio
 
@@ -73,9 +73,9 @@ comprobar **uno por uno** que funcionan en la URL pública, y dejar la evidencia
 | Sin token, una ruta protegida responde **401** | ✓ Comprobado contra el servicio publicado |
 | Con el rol equivocado, responde **403** | ✓ Comprobado con la sesión del Operador contra el servicio publicado: `GET /api/v1/usuarios` responde 403, y 200 con la del Administrador |
 | Un dato inválido responde **400 o 422** con el formato de la API | ✓ Comprobado (rechaza la variable desconocida con el detalle del campo) |
-| Todos los Must funcionan **en línea** | ✓ Verificado en los recursos; falta el recorrido uno por uno con evidencia |
+| Todos los Must funcionan **en línea** | ✓ Verificado, con el recorrido uno por uno y las capturas fechadas que cita la tabla del 2.8 | — |
 | Las pruebas automatizadas **corren** con el comando del campo de texto | ✓ El README documenta las dos: `python -m pytest` desde `backend/` (106) y `flutter test` desde la raíz (96) |
-| Cada fila de la tabla **2.8** tiene evidencia | ✗ Por construir; las capturas fechadas ya están reunidas |
+| Cada fila de la tabla **2.8** tiene evidencia | ✓ Cada fila cita sus capturas, sus pruebas automatizadas o su medición | — |
 | **No hay secretos** en el repositorio | ✓ Verificado con `scripts/verificar_sin_secretos.py` |
 
 ---

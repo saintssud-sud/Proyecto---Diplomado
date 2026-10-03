@@ -11,7 +11,6 @@
 | ID | Tarea | Requisito | Prioridad |
 |---|---|---|---|
 | T-32 | Calibrar el sensor de TDS con el patrón de 707 ppm | 2.8 · calibración | Must |
-| T-19 | Verificación de adaptabilidad con capturas en tres anchos (320, 768 y 1920 px) | RNF-06 · Requisito mínimo 4 | Should |
 
 ---
 
@@ -82,6 +81,7 @@
 | T-31 | Calibrar el sensor de pH con los patrones de 4,01 y 6,86: **1520 mV** y **1280 mV** | 2.8 · calibración | 01/10 |
 | T-37 | Conversión de milivoltios a pH en el firmware y publicación de la **sexta variable** | RF-04 · RF-05 | 01/10 |
 | T-40 | Recorrido funcional del flujo completo en producción, con **treinta y una capturas fechadas** | 2.8 · Requisito mínimo 1 | 02/10 |
+| T-19 | **Verificación de adaptabilidad con capturas en tres anchos:** la aplicación en el teléfono, la ventana del navegador en **768 px** y en **1920 px** | RNF-06 · Requisito mínimo 4 | 02/10 |
 | T-42 | Apartados **2.7 Seguridad** y **2.8 Pruebas** del documento, con la tabla de casos y su evidencia | Entregable E3 | 02/10 |
 
 ---
@@ -97,7 +97,7 @@
 | **Servicio publicado** | `https://sigvach-api.onrender.com` |
 | **Módulo de adquisición** | Midiendo y publicando **las seis variables** en producción, con el pH ya calibrado |
 
-**Estado al cierre de la Semana 4:** 39 tareas terminadas · 1 en curso · 2 en el backlog.
+**Estado al cierre de la Semana 4:** 40 tareas terminadas · 1 en curso · 1 en el backlog.
 
 **Lo que cambió desde el 27 de septiembre.** El electrodo de pH volvió a medir tras el remojo, se
 montó el **divisor ÷2** entre la salida `Po` del módulo PH-4502C y el GPIO 36, y se calibró con los
@@ -108,7 +108,8 @@ quedó verificado de punta a punta: el servicio la genera, el operador la atiend
 y reaparece en el historial conservando su lectura de origen.
 
 **Lo que sigue pendiente.** La calibración del TDS con el patrón de 1413 µS/cm (T-32), cuyo pedido
-está en camino, y la verificación de adaptabilidad en tres anchos de pantalla (T-19).
+está en camino. La verificación de adaptabilidad en tres anchos (T-19) se cerró el 2 de octubre con
+las capturas del teléfono, de la tableta y del escritorio.
 
 > **Sobre la tarea T-29.** El entregable E2 se subió al aula virtual el sábado 26 de
 > septiembre: el documento en PDF, con las figuras ajustadas al ancho de la página, y

@@ -59,6 +59,16 @@ detalle de la alerta y del historial de alertas; el resto se revisó con una hoj
 | `29-ajustes-administrador.jpg` | 02/10 17:49 | **Ajustes con la sesión del administrador**: la misma pantalla de `25`, ahora **con** «Usuarios (admin)». Es la pareja que demuestra la diferencia entre roles |
 | `30-usuarios-lista-con-roles.jpg` | 02/10 17:49 | La pantalla **Usuarios**: las dos cuentas de prueba, cada una con su correo y su **rol**, «Su cuenta» en la propia, y los iconos de editar, desactivar y eliminar de cada fila. Las tres cuentas restantes aparecen **anonimizadas** |
 | `31-perfil-administrador.jpg` | 02/10 17:51 | **Perfil del administrador**: «Administrador de prueba», `administrador@proyecto.test`, distintivo **Administrador**, «Cuenta activa» e identificador `ricOhA6gQ1gneNA6HAXvmCO6liA2` |
+| `32-adaptabilidad-telefono.jpg` | 02/10 20:02 | El **panel en el teléfono**, con la aplicación instalada: la barra de estado marca las 20:02, se ven el aviso «Sistema con alertas», el módulo y las seis variables en **dos columnas**. Imagen de 720 px de ancho (unos 360 px lógicos): es el extremo angosto del rango del requisito |
+| `33-adaptabilidad-tableta.jpg` | 02/10 20:09 | El **mismo panel con la ventana del navegador en 768 px**: la barra de herramientas del navegador muestra `Responsive 768 × 875`, así que el ancho medido queda a la vista. No aparece desplazamiento horizontal |
+| `34-adaptabilidad-escritorio.jpg` | 02/10 19:57 | El **mismo panel a pantalla completa en 1920 px**, sin herramientas abiertas: es el extremo ancho del rango |
+
+Las tres capturas de adaptabilidad (`32`, `33` y `34`) son del **mismo recorrido del 2 de octubre**,
+tomadas con minutos de diferencia sobre la dirección publicada y con el mismo módulo. En la captura
+de tableta se ve, en el panel de herramientas, un listado de errores en rojo; **no son de la
+aplicación**: el propio mensaje los identifica como un módulo que no se pudo resolver en
+`<anonymous>:1:1`, es decir, un script inyectado por una extensión del navegador, sin archivo del
+proyecto en la traza.
 
 En `_descartadas/` quedaron cuatro archivos que no sirven como evidencia: dos capturas que sólo
 muestran la pantalla de carga («Cargando…»), una del 2 de octubre a las 17:48 en la que el
@@ -80,11 +90,12 @@ Sirve para citarlas en el apartado 2.8 y en el Anexo F sin volver a interpretarl
 | CP-15 | **Transición de activa a atendida** | `21` (activa) → `22` (acción) → `23` (en el historial) |
 | CP-17 | Aviso del sistema con parámetros fuera de rango | `04`, `18`, `20`, `24` |
 | CP-19 | Exportación del historial | **falta** la descarga del CSV |
-| CP-23 | Adaptabilidad en tres anchos | **falta** (tarea T-19 del tablero) |
+| CP-23 | **Adaptabilidad en tres anchos** (requisito mínimo 4) | `32` (teléfono), `33` (tableta, 768 px) y `34` (escritorio, 1920 px) |
 
 Con `21`, `22` y `23` queda cerrado el caso parcial **CP-15**, que era uno de los siete que la
 Tabla 8 declaraba incompletos: la alerta se ve activa, se atiende desde la interfaz y reaparece en
-el historial conservando su lectura de origen. Con `29` y `30` se cierra **CP-04**.
+el historial conservando su lectura de origen. Con `29` y `30` se cierra **CP-04**, y con `32`, `33`
+y `34` se cierra **CP-23**, que era el último requisito mínimo sin verificar.
 
 ## La diferencia entre roles, en una secuencia
 
