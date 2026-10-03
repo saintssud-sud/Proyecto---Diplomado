@@ -1,0 +1,31 @@
+INFORME DE PRUEBAS — SERVICIO (carpeta backend/)
+Fecha    : 2026-10-02 22:54
+Comando  : python -m pytest        (ejecutado desde la carpeta backend/)
+Entorno  : Python 3.13.12 · pytest 9.1.1
+Nota     : no requiere credenciales ni conexión. El servicio sustituye Cloud Firestore por
+           un repositorio en memoria y el verificador de identidad por uno simulado, así
+           que el conjunto puede repetirse íntegramente durante la defensa.
+
+........................................................................ [ 67%]
+..................................                                       [100%]
+============================== warnings summary ===============================
+..\.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\SIGVACH-Monograf\Proyecto SIGVACH\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+..\.venv\Lib\site-packages\starlette\testclient.py:53
+  D:\SIGVACH-Monograf\Proyecto SIGVACH\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+pruebas/test_api_lecturas.py::test_el_cliente_no_puede_declarar_quien_registro_la_lectura
+pruebas/test_api_usuarios.py::test_no_se_puede_cambiar_el_rol_desde_el_perfil_propio
+pruebas/test_api_usuarios.py::test_no_se_puede_cambiar_el_estado_de_activacion_propio
+pruebas/test_api_usuarios.py::test_el_nombre_demasiado_corto_se_rechaza
+pruebas/test_validacion.py::test_la_api_responde_422_con_el_detalle_del_campo
+pruebas/test_validacion.py::test_la_api_rechaza_una_variable_desconocida
+pruebas/test_validacion.py::test_la_api_rechaza_un_campo_ajeno_al_contrato
+  D:\SIGVACH-Monograf\Proyecto SIGVACH\.venv\Lib\site-packages\starlette\_exception_handler.py:59: StarletteDeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    response = await handler(conn, exc)  # type: ignore[arg-type]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+106 passed, 9 warnings in 5.34s

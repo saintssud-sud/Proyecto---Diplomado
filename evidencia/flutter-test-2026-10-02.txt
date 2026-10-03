@@ -1,0 +1,110 @@
+INFORME DE PRUEBAS — APLICACIÓN (raíz del proyecto)
+Fecha    : 2026-10-02 23:04
+Comando  : flutter test            (ejecutado desde la raíz del proyecto)
+Entorno  : Flutter 3.44.8 · Dart 3.12.2
+Nota     : no requiere credenciales ni conexión: la aplicación emplea un servicio simulado.
+
+
+┌─────────────────────────────────────────────────────────┐
+│ A new version of Flutter is available!                  │
+│                                                         │
+│ To update to the latest version, run "flutter upgrade". │
+└─────────────────────────────────────────────────────────┘
+00:00 +0: loading D:/SIGVACH-Monograf/Proyecto SIGVACH/test/api_cliente_test.dart
+00:00 +0: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/api_cliente_test.dart: ApiConfig arma las rutas con el prefijo de versión del contrato
+00:00 +1: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/api_cliente_test.dart: ApiCliente adjunta el token de identidad en cada petición
+00:00 +2: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/api_cliente_test.dart: ApiCliente sin sesión iniciada falla antes de salir a la red
+00:00 +3: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/api_cliente_test.dart: ApiCliente reconoce el 401 del servicio como sesión no válida
+00:00 +4: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/api_cliente_test.dart: ApiCliente traduce el 422 e informa el campo rechazado
+00:00 +5: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/api_cliente_test.dart: ApiCliente reconoce el 403 como falta de permiso
+00:00 +6: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/api_cliente_test.dart: ApiCliente un fallo de conexión se informa como ErrorConexion y no como rechazo
+00:00 +7: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/api_cliente_test.dart: ApiCliente un tiempo de espera agotado se informa como ErrorConexion
+00:00 +8: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/api_cliente_test.dart: ApiCliente decodifica los acentos en UTF-8 aunque el servicio no declare el juego de caracteres
+00:00 +9: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/api_cliente_test.dart: ApiCliente arma la consulta con los filtros indicados y omite los vacíos
+00:00 +10: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/api_cliente_test.dart: ApiCliente crear envía el cuerpo en JSON
+00:00 +11: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/api_cliente_test.dart: ApiCliente eliminar tolera una respuesta sin cuerpo
+00:00 +12: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/api_cliente_test.dart: ApiCliente obtenerBytes devuelve el archivo de exportación
+00:00 +13: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/api_cliente_test.dart: ApiCliente una respuesta de error que no es JSON no rompe la interpretación
+00:00 +14: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/api_cliente_test.dart: ApiCliente si el proveedor de identidad falla, se informa como fallo de conexión
+00:00 +15: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/api_cliente_test.dart: ApiCliente una respuesta con forma inesperada se informa con claridad
+00:00 +16: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/api_cliente_test.dart: ApiCliente avisa que la sesión venció cuando el servicio responde 401
+00:00 +17: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/api_cliente_test.dart: ApiCliente no cierra la sesión cuando el fallo no es un rechazo del servicio
+00:00 +18: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/api_cliente_test.dart: AuthService el aviso de sesión vencida se consume una sola vez
+00:00 +19: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/encabezado_del_menu_test.dart: Encabezado del menú lateral saluda con el nombre de la cuenta y muestra su rol
+00:01 +20: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/lecturas_controller_test.dart: LecturasController · estados de la vista pasa por carga y termina con datos
+00:01 +21: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/encabezado_del_menu_test.dart: Encabezado del menú lateral presenta el rol de operación tal como llega del catálogo
+00:02 +22: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/encabezado_del_menu_test.dart: Encabezado del menú lateral presenta el rol de operación tal como llega del catálogo
+00:02 +23: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/encabezado_del_menu_test.dart: Encabezado del menú lateral presenta el rol de operación tal como llega del catálogo
+00:02 +24: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/encabezado_del_menu_test.dart: Encabezado del menú lateral presenta el rol de operación tal como llega del catálogo
+00:02 +25: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/encabezado_del_menu_test.dart: Encabezado del menú lateral presenta el rol de operación tal como llega del catálogo
+00:02 +26: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/encabezado_del_menu_test.dart: Encabezado del menú lateral presenta el rol de operación tal como llega del catálogo
+00:02 +27: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/lecturas_controller_test.dart: LecturasController · estados de la vista los filtros vigentes se conservan al reintentar y se pueden limpiar
+00:02 +28: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/encabezado_del_menu_test.dart: Encabezado del menú lateral mientras el rol no se conoce no supone ninguno
+00:02 +29: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/encabezado_del_menu_test.dart: Encabezado del menú lateral mientras el rol no se conoce no supone ninguno
+00:02 +30: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/encabezado_del_menu_test.dart: Encabezado del menú lateral mientras el rol no se conoce no supone ninguno
+00:02 +31: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/encabezado_del_menu_test.dart: Encabezado del menú lateral mientras el rol no se conoce no supone ninguno
+00:02 +32: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/encabezado_del_menu_test.dart: Encabezado del menú lateral mientras el rol no se conoce no supone ninguno
+00:02 +33: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/lecturas_controller_test.dart: La pantalla ante una caída de la conexión muestra el estado de error con el mensaje propio y ofrece reintentar
+00:03 +34: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/lecturas_controller_test.dart: La pantalla ante una caída de la conexión muestra el estado de error con el mensaje propio y ofrece reintentar
+00:03 +35: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/lecturas_controller_test.dart: La pantalla ante una caída de la conexión muestra el estado de error con el mensaje propio y ofrece reintentar
+00:03 +36: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/lecturas_controller_test.dart: La pantalla ante una caída de la conexión muestra el estado de error con el mensaje propio y ofrece reintentar
+00:03 +37: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/lecturas_controller_test.dart: La pantalla ante una caída de la conexión muestra el estado de error con el mensaje propio y ofrece reintentar
+00:03 +38: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/lecturas_controller_test.dart: La pantalla ante una caída de la conexión muestra el estado de error con el mensaje propio y ofrece reintentar
+00:03 +39: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/lecturas_controller_test.dart: La pantalla ante una caída de la conexión muestra el estado de error con el mensaje propio y ofrece reintentar
+00:03 +40: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/lecturas_controller_test.dart: La pantalla ante una caída de la conexión muestra el estado de error con el mensaje propio y ofrece reintentar
+00:03 +41: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/lecturas_controller_test.dart: La pantalla ante una caída de la conexión muestra el estado de error con el mensaje propio y ofrece reintentar
+00:03 +42: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/lecturas_controller_test.dart: La pantalla ante una caída de la conexión muestra el estado de error con el mensaje propio y ofrece reintentar
+00:03 +43: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/lecturas_controller_test.dart: La pantalla ante una caída de la conexión muestra el estado de error con el mensaje propio y ofrece reintentar
+00:03 +44: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/lecturas_controller_test.dart: La pantalla ante una caída de la conexión muestra el estado de error con el mensaje propio y ofrece reintentar
+00:03 +45: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/lecturas_controller_test.dart: La pantalla ante una caída de la conexión muestra el estado de error con el mensaje propio y ofrece reintentar
+00:03 +46: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/lecturas_controller_test.dart: La pantalla ante una caída de la conexión muestra el estado de error con el mensaje propio y ofrece reintentar
+00:03 +47: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/panel_controller_test.dart: PanelController · registro de una medición sin módulo seleccionado no se intenta registrar
+00:03 +48: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/panel_controller_test.dart: PanelController · registro de una medición sin valores no se intenta registrar
+00:03 +49: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/panel_controller_test.dart: PanelController · selección de módulo permite cambiar entre los módulos disponibles
+00:05 +50: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: ModulosApiRepository lista los módulos y los convierte en modelos
+00:05 +51: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: ModulosApiRepository el filtro por estado viaja como parámetro de consulta
+00:05 +52: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: ModulosApiRepository al crear envía los nombres de campo del contrato
+00:05 +53: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: ModulosApiRepository al modificar envía únicamente los campos indicados
+00:05 +54: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: ModulosApiRepository sin campos para modificar no se consulta al servicio
+00:05 +55: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: ModulosApiRepository eliminar usa el método DELETE sobre el recurso
+00:05 +56: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: ModulosApiRepository el conflicto al eliminar un módulo con lecturas llega como ErrorApi
+00:05 +57: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: LecturasApiRepository convierte la lectura, incluida su marca de tiempo y su estado
+00:05 +58: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: LecturasApiRepository los filtros de consulta se arman solo con lo indicado
+00:05 +59: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: LecturasApiRepository el registro manual no declara el origen: lo fija el servidor
+00:05 +60: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: LecturasApiRepository el resumen devuelve promedio, máximo y mínimo
+00:05 +61: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: LecturasApiRepository la exportación viaja al recurso de exportaciones y devuelve el archivo
+00:05 +62: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: LecturasApiRepository el rechazo por validación llega con el campo señalado
+00:05 +63: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: RangosApiRepository crea el rango con los nombres de campo del contrato
+00:05 +64: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: RangosApiRepository sin límites que modificar no se consulta al servicio
+00:05 +65: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: RangosApiRepository el rango duplicado en el perfil se informa como conflicto
+00:05 +66: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: AlertasApiRepository convierte la alerta con la referencia a su lectura
+00:05 +67: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: AlertasApiRepository atender una alerta envía el estado y la observación
+00:05 +68: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: PerfilesApiRepository lista y convierte los perfiles de cultivo
+00:05 +69: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: Modelos del contrato reconoce los estados fuera de rango
+00:05 +70: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: Modelos del contrato traduce los códigos de variable a nombres presentables
+00:05 +71: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: Modelos del contrato un valor no numérico se informa como error de contrato
+00:05 +72: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: Modelos del contrato una marca de tiempo inválida se informa como error de contrato
+00:05 +73: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: Formato de fechas presenta la fecha y la hora en el formato de la interfaz
+00:05 +74: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/repositorios_api_test.dart: Formato de fechas no agrega decimales innecesarios a los valores
+00:05 +75: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/roles_test.dart: Roles reconoce el rol de administración con el nombre del servicio
+00:05 +76: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/roles_test.dart: Roles trata un rol nulo o vacío como el de menor privilegio
+00:05 +77: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/roles_test.dart: Roles normaliza también los nombres anteriores del vocabulario
+00:05 +78: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/roles_test.dart: Roles normaliza sin distinguir mayúsculas ni espacios
+00:05 +79: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/roles_test.dart: Roles traduce los roles a texto presentable
+00:05 +80: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/roles_test.dart: Roles alterna entre administración y operación
+00:05 +81: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/roles_test.dart: UsuarioPerfil reconoce al administrador del servicio
+00:05 +82: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/roles_test.dart: UsuarioPerfil no reconoce como administrador al operador
+00:05 +83: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/roles_test.dart: UsuarioPerfil normaliza el rol al construir desde un mapa
+00:05 +84: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/roles_test.dart: UsuarioPerfil un mapa sin rol resuelve al de menor privilegio
+00:06 +85: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/vista_con_estados_test.dart: Estado de carga informa que la información está en camino
+00:07 +86: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/vista_con_estados_test.dart: Estado de carga informa que la información está en camino
+00:08 +87: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/vista_con_estados_test.dart: Estado con datos presenta el contenido con los datos recibidos
+00:08 +88: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/vista_con_estados_test.dart: Estado con datos si el estado dice con datos pero no llegaron, lo informa en lugar de fallar
+00:08 +89: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/vista_con_estados_test.dart: Estado vacío explica qué hacer para que haya información
+00:08 +90: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/vista_con_estados_test.dart: Estado vacío con acción de reintento ofrece actualizar
+00:08 +91: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/vista_con_estados_test.dart: Estado vacío sin acción de reintento no ofrece botón
+00:08 +92: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/vista_con_estados_test.dart: Estado de error un fallo de conexión se presenta como tal e indica revisar la conexión
+00:08 +93: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/vista_con_estados_test.dart: Estado de error un rechazo del servidor se presenta distinto: no se le pide revisar la conexión
+00:08 +94: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/vista_con_estados_test.dart: Estado de error al reintentar se vuelve a intentar la operación
+00:08 +95: D:/SIGVACH-Monograf/Proyecto SIGVACH/test/vista_con_estados_test.dart: Estado de error sin mensaje del servicio usa uno según el tipo de fallo
+00:08 +96: All tests passed!
