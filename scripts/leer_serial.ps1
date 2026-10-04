@@ -67,6 +67,7 @@ $buffer = New-Object byte[] 4096
 $pendiente = ""
 $lineas = 0
 $ocultas = 0
+$basura = 0
 $repetidas = 0
 $anterior = $null
 $veces = 0
@@ -148,6 +149,13 @@ while ((Get-Date) -lt $fin) {
                 $ocultas++
                 continue
             }
+            # Una racha de caracteres de reemplazo es un tramo de bytes que no eran
+            # texto —una interferencia del puerto, no algo que el modulo haya
+            # informado—. Se descarta y se cuenta, para no ensuciar el registro.
+            if ([regex]::Matches($linea, "\uFFFD").Count -gt 5) {
+                $basura++
+                continue
+            }
             if ($linea -eq $anterior) {
                 $veces++
                 continue
@@ -164,6 +172,9 @@ while ((Get-Date) -lt $fin) {
 Cerrar-Bloque
 try { $serial.Close(); $serial.Dispose() } catch { }
 Write-Host ("--- fin del escucha: {0} linea(s) util(es) distinta(s), {1} repetida(s) y {2} descartada(s) por el filtro ---" -f $lineas, $repetidas, $ocultas)
+if ($basura -gt 0) {
+    Write-Host ("--- se descartaron {0} linea(s) con caracteres invalidos: eran interferencia del puerto, no texto del modulo ---" -f $basura)
+}
 if ($reintentos -gt 0) {
     Write-Host ("--- el puerto se destrabo {0} vez/veces durante el escucha; el contenido descartado no se cuenta ---" -f $reintentos)
 }

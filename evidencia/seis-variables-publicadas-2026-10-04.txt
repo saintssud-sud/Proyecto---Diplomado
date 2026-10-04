@@ -1,14 +1,36 @@
 EVIDENCIA - Las seis variables publicadas en produccion y confirmadas por el servicio
-Fecha    : 2026-10-04 11:40
+Fecha    : 2026-10-04 11:48
 Puerto   : COM6 a 115200 baudios
 Comando  : pwsh -File Modulo ESP32\Diagnostico\leer_serial.ps1 -Puerto COM6 -Segundos 400
 Modulo   : v6wrYSXxeHyttf3prDd7   |   Servicio: sigvach-api.onrender.com
 
-Que muestra: el ciclo completo de medicion del modulo y, por cada una de las seis
-variables, la confirmacion del servicio (-> almacenada). Es la prueba de nivel
-funcional del modulo de adquisicion: mide, publica con su clave de dispositivo y
-el servidor guarda la lectura con su marca de tiempo.
+Que muestra: un ciclo completo de medicion del modulo y, por cada una de las seis
+variables, la confirmacion del servicio (-> almacenada), precedida de la validacion
+del certificado del servidor. Es la prueba de nivel funcional del modulo de
+adquisicion: mide, publica por HTTPS con su clave de dispositivo y el servidor
+guarda la lectura con su marca de tiempo.
 
-Las lineas de depuracion del controlador de WiFi se descartan y el numero se informa
-al final del registro.
+Las lineas de depuracion del controlador de WiFi se descartan, y tambien los tramos
+de bytes invalidos; el numero de lineas descartadas se informa al final.
 
+Escuchando COM6 a 115200 baudios durante 400 segundos. Pulsa RESET en la placa.
+I (1957664) SIGVACH: Solucion -> 21.69 C
+I (1957674) SIGVACH: pH  ->   1140 mV (1.14 V) crudo 1216  dispersion   93  algo ruidosa
+I (1957674) SIGVACH: TDS ->    295 mV (0.29 V) crudo  186  dispersion   26  senal estable
+I (1957684) SIGVACH:   -> 124.77 ppm   0.25 mS/cm   (compensado con la temperatura de la solucion)
+I (1957694) SIGVACH:   -> 8.52 pH   (recta: 1520 mV = pH 4.01, -84.2 mV por unidad)
+I (1959304) esp-x509-crt-bundle: Certificate validated
+I (1962704) SIGVACH:   temp_ambiental       23.10 °C     ->  almacenada
+I (1964284) esp-x509-crt-bundle: Certificate validated
+I (1965984) SIGVACH:   humedad              51.20 %       ->  almacenada
+I (1967554) esp-x509-crt-bundle: Certificate validated
+I (1969254) SIGVACH:   temp_solucion        21.69 °C     ->  almacenada
+I (1970824) esp-x509-crt-bundle: Certificate validated
+I (1972634) SIGVACH:   tds                 124.77 ppm     ->  almacenada
+I (1974204) esp-x509-crt-bundle: Certificate validated
+I (1976014) SIGVACH:   ec                    0.25 mS/cm   ->  almacenada
+I (1977584) esp-x509-crt-bundle: Certificate validated
+I (1979394) SIGVACH:   ph                    8.52         ->  almacenada
+
+(La captura se cerro al desconectar el modulo para continuar con el montaje. Alcanzo a
+registrar un ciclo completo: las seis variables confirmadas por el servicio.)
