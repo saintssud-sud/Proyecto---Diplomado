@@ -1,0 +1,14 @@
+EVIDENCIA - Las seis variables publicadas en produccion y confirmadas por el servicio
+Fecha    : 2026-10-04 11:40
+Puerto   : COM6 a 115200 baudios
+Comando  : pwsh -File Modulo ESP32\Diagnostico\leer_serial.ps1 -Puerto COM6 -Segundos 400
+Modulo   : v6wrYSXxeHyttf3prDd7   |   Servicio: sigvach-api.onrender.com
+
+Que muestra: el ciclo completo de medicion del modulo y, por cada una de las seis
+variables, la confirmacion del servicio (-> almacenada). Es la prueba de nivel
+funcional del modulo de adquisicion: mide, publica con su clave de dispositivo y
+el servidor guarda la lectura con su marca de tiempo.
+
+Las lineas de depuracion del controlador de WiFi se descartan y el numero se informa
+al final del registro.
+
