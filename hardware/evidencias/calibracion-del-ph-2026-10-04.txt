@@ -58,18 +58,36 @@ leyeron las lecturas que el módulo publicó al servicio. No se usó el puerto s
 porque ese día el búfer del controlador quedó trabado devolviendo un fragmento
 repetido a una velocidad imposible para el cable (ver más abajo).
 
+    ph   3,96   publicada 19:48:10
     ph   4,02   publicada 19:42:43
     ph   4,13   publicada 19:42:21
     ph   4,51   publicada 19:41:58
     ph   4,07   publicada 19:41:35
 
-    media 4,18 · mínimo 4,02 · máximo 4,51 · error medio +0,17 unidades
+    media 4,14 · mínimo 3,96 · máximo 4,51 · error medio +0,13 unidades
 
-Son cuatro ciclos consecutivos con el electrodo quieto en el patrón. El valor
-correcto es 4,01 y el sistema informa en torno a 4,2: la diferencia queda dentro
-de la dispersión del propio instrumento, porque una dispersión de 13 a 20
-cuentas de ADC equivale a ±0,15–0,25 unidades de pH (la pendiente es de 83,9 mV
-por unidad).
+Son cinco lecturas consecutivas con el electrodo quieto en el patrón. El valor
+correcto es 4,01 y el sistema informa entre 3,96 y 4,51: la mejor lectura se
+desvía 0,05 unidades y el conjunto queda dentro de la dispersión del propio
+instrumento, porque una dispersión de 13 a 20 cuentas de ADC equivale a
+±0,15–0,25 unidades de pH (la pendiente es de 83,9 mV por unidad).
+
+La serie completa, con lo que había antes en el vaso, muestra el cambio de un
+líquido a otro sin ninguna duda:
+
+    antes   19:17:26   pH 6,97     (electrodo en el líquido anterior)
+            19:22:53   pH 7,01
+    después 19:28:16   pH 4,07     (electrodo pasado al patrón de 4,01)
+            19:41:35   pH 4,07
+            19:41:58   pH 4,51
+            19:42:21   pH 4,13
+            19:42:43   pH 4,02
+            19:48:10   pH 3,96
+
+Las cuatro lecturas de 19:41 y 19:42 son la cola de almacenamiento que el módulo
+envió al recuperar la conexión, y la de 19:48:10 es el ciclo normal siguiente:
+entre 19:42:43 y 19:48:10 hay 5 minutos y 27 segundos, que es la cadencia de
+publicación declarada.
 
 Interpretación: el calibrado quedó confirmado de punta a punta —del electrodo a
 la base de datos— porque el número del panel es la tensión medida con el

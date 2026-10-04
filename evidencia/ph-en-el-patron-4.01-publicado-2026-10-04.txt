@@ -62,3 +62,32 @@ Que demuestra esta captura
 
 La consulta es repetible con las mismas credenciales de un usuario real, que
 es la misma lectura que muestra el panel.
+
+Segunda captura, minutos despues (misma sesion de trabajo)
+----------------------------------------------------------
+Se repitio la consulta y el servicio devolvio, para el pH, la serie completa del
+cambio de liquido. Es la prueba mas clara de que el numero que se ve en el panel
+sigue al electrodo:
+
+    antes   19:17:26   pH 6,97     (electrodo en el liquido anterior)
+            19:22:53   pH 7,01
+    despues 19:28:16   pH 4,07     (electrodo pasado al patron de 4,01)
+            19:41:35   pH 4,07
+            19:41:58   pH 4,51
+            19:42:21   pH 4,13
+            19:42:43   pH 4,02
+            19:48:10   pH 3,96     (error 0,05 unidades respecto del patron)
+
+    media de las cinco ultimas : 4,14
+    error medio respecto de 4,01 : +0,13 unidades
+
+Las cuatro lecturas de 19:41 y 19:42 son la cola de almacenamiento que el modulo
+envio al recuperar la conexion, y la de 19:48:10 es el ciclo normal siguiente:
+entre 19:42:43 y 19:48:10 hay 5 minutos y 27 segundos, que es la cadencia de
+publicacion declarada.
+
+    GET https://sigvach-api.onrender.com/api/v1/lecturas?modulo_id=v6wrYSXxeHyttf3prDd7&variable=ph&limite=12
+
+El visor de escritorio que se entrega con el proyecto (scripts/ver_lecturas_publicadas.py)
+muestra estas mismas lecturas en la PC, refrescando la tabla cada 15 segundos y
+marcando lo que queda fuera del rango configurado en el sistema.
