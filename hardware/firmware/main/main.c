@@ -67,30 +67,37 @@ static const char *ETIQUETA = "SIGVACH";
 /* ---------------------------------------------------------------------------
  *  Calibración de la sonda de pH
  *
- *  Recta obtenida el 1 de octubre de 2026 con dos soluciones patrón, midiendo
- *  la tensión del NUDO del divisor ÷2, que es el punto que llega a este pin:
+ *  Recta vigente, obtenida el 4 de octubre de 2026 con dos soluciones patrón,
+ *  midiendo la tensión del NUDO del divisor ÷2, que es el punto que llega a
+ *  este pin:
  *
- *      pH 4,01  ->  1520 mV
- *      pH 6,86  ->  1280 mV
- *      pendiente = -240 mV / 2,85 unidades = -84,2 mV por unidad de pH
+ *      pH 4,01  ->  1553 mV
+ *      pH 6,86  ->  1314 mV
+ *      pendiente = -239 mV / 2,85 unidades = -83,9 mV por unidad de pH
  *
  *  El signo es el esperado: a mayor acidez, mayor tensión. El valor absoluto
  *  depende del ajuste de ganancia de la placa, así que **si alguien mueve los
  *  potenciómetros, esta recta deja de valer y hay que recalibrar**.
+ *
+ *  Calibración anterior (1 de octubre): 1520 y 1280 mV, con -84,2 mV por unidad.
+ *  La pendiente se mantuvo —la sensibilidad del electrodo está intacta— y lo que
+ *  se corrió fue el cero, 33 mV. Es lo esperable en un electrodo que estuvo seco
+ *  mucho tiempo y se está terminando de estabilizar.
  *
  *  Se mide en el nudo y no en la salida `Po` de la placa a propósito: así la
  *  recta queda expresada en la misma tensión que lee el convertidor, sin tener
  *  que dividir por dos después (lo que arrastraría el error del divisor a la
  *  calibración).
  *
- *  Evidencia y detalles: `hardware/evidencias/calibracion-del-ph-2026-10-01.txt`.
+ *  Evidencia y detalles: `hardware/evidencias/calibracion-del-ph-2026-10-04.txt`
+ *  y, para la anterior, `hardware/evidencias/calibracion-del-ph-2026-10-01.txt`.
  *
  *  Ojo al recalibrar: la sonda tiene que estar hidratada y la lectura asentada
  *  (tres minutos en cada patrón) antes de anotar el valor.
  * ------------------------------------------------------------------------- */
-#define PH_MV_PATRON     1520.0f   /* tensión del nudo en el patrón de pH 4,01   */
+#define PH_MV_PATRON     1553.0f   /* tensión del nudo en el patrón de pH 4,01   */
 #define PH_VALOR_PATRON     4.01f  /* valor de ese patrón                        */
-#define PH_MV_POR_UNIDAD  -84.2f   /* milivoltios por unidad de pH (negativo)    */
+#define PH_MV_POR_UNIDAD  -83.9f   /* milivoltios por unidad de pH (negativo)    */
 #define PH_LIMITE_MINIMO    0.0f   /* rango del catálogo del servicio            */
 #define PH_LIMITE_MAXIMO   14.0f
 

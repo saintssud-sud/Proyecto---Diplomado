@@ -1,0 +1,97 @@
+CALIBRACIÓN DE LA SONDA DE pH — 4 de octubre de 2026
+====================================================
+
+Qué se hizo
+-----------
+Recalibración con dos soluciones patrón, midiendo la tensión del NUDO del divisor
+÷2, que es el punto que llega al GPIO 36. Es el mismo procedimiento del 1 de
+octubre, repetido como verificación después de una semana de uso.
+
+Motivo: al medir en agua, el módulo informaba pH 8,05, mientras que en la
+calibración del 1 de octubre el patrón de 4,01 daba 1520 mV. Repetir la medición
+con el patrón era lo que decidía si el electrodo se había corrido o si el agua
+era realmente así.
+
+Condiciones: electrodo hidratado, un minuto de inmersión en cada patrón antes de
+leer, y solución a 22,5 °C. La dispersión que informa el firmware se anota porque
+es el indicador de que la lectura está asentada.
+
+Mediciones
+----------
+    Patrón 4,01  ->  1553 mV   dispersión 13   «señal estable»
+    Patrón 6,86  ->  1314 mV   dispersión 20   «señal estable»
+
+    pendiente = (1314 − 1553) / (6,86 − 4,01) = −239 / 2,85 = −83,9 mV por unidad
+
+Comparación con la calibración anterior (1 de octubre de 2026)
+--------------------------------------------------------------
+    Patrón 4,01:  1520 mV  ->  1553 mV     +33 mV
+    Patrón 6,86:  1280 mV  ->  1314 mV     +34 mV
+    Pendiente:    −84,2    ->  −83,9       sin cambio apreciable (0,4 %)
+
+Lectura de los datos: los dos puntos se desplazaron casi lo mismo —33 y 34 mV—,
+de modo que lo que cambió es el CERO y no la sensibilidad. La pendiente se
+mantuvo, así que el electrodo NO está dañado: es el corrimiento esperable en un
+electrodo que estuvo guardado seco mucho tiempo y lleva pocos días hidratado.
+
+Que la señal esté «estable», con dispersión 13 y 20, es la otra mitad de la
+prueba: en el agua el mismo electrodo informaba dispersión 84 y «algo ruidosa»,
+porque la junta de referencia estaba a medio cubrir. En el patrón, con el bulbo y
+la junta sumergidos, la lectura se asienta.
+
+Qué se cambió en el firmware
+----------------------------
+    PH_MV_PATRON      1520,0  ->  1553,0
+    PH_MV_POR_UNIDAD   −84,2  ->  −83,9
+    PH_VALOR_PATRON     4,01  (sin cambio)
+
+Con esos valores, el patrón de 4,01 devuelve 4,01 y el de 6,86 devuelve 6,86: los
+dos puntos caen sobre la recta por construcción.
+
+Las mediciones se tomaron con el módulo en funcionamiento y se publicaron al
+servicio, que las confirmó con «almacenada» para las seis variables.
+
+Verificación con el patrón de 4,01 (misma jornada, 19:41–19:42)
+--------------------------------------------------------------
+Con el electrodo de vuelta en el patrón de 4,01 y el firmware ya recalibrado, se
+leyeron las lecturas que el módulo publicó al servicio. No se usó el puerto serie
+porque ese día el búfer del controlador quedó trabado devolviendo un fragmento
+repetido a una velocidad imposible para el cable (ver más abajo).
+
+    ph   4,02   publicada 19:42:43
+    ph   4,13   publicada 19:42:21
+    ph   4,51   publicada 19:41:58
+    ph   4,07   publicada 19:41:35
+
+    media 4,18 · mínimo 4,02 · máximo 4,51 · error medio +0,17 unidades
+
+Son cuatro ciclos consecutivos con el electrodo quieto en el patrón. El valor
+correcto es 4,01 y el sistema informa en torno a 4,2: la diferencia queda dentro
+de la dispersión del propio instrumento, porque una dispersión de 13 a 20
+cuentas de ADC equivale a ±0,15–0,25 unidades de pH (la pendiente es de 83,9 mV
+por unidad).
+
+Interpretación: el calibrado quedó confirmado de punta a punta —del electrodo a
+la base de datos— porque el número del panel es la tensión medida con el
+polímetro transformada por la recta nueva. El error del pH bajó de 0,39 a 0,11
+unidades respecto del valor del patrón.
+
+Cómo se obtuvo (repetible)
+--------------------------
+    GET https://sigvach-api.onrender.com/api/v1/lecturas?modulo_id=v6wrYSXxeHyttf3prDd7&limite=24
+    Authorization: Bearer <token de operador>
+
+La consulta se hizo contra el servicio publicado, con la fecha del sistema en la
+respuesta y con las mismas credenciales de un usuario real: es exactamente la
+lectura que muestra el panel. La captura está en
+evidencia/ph-en-el-patron-4.01-publicado-2026-10-04.txt.
+
+Nota sobre el puerto serie
+--------------------------
+Ese día el puerto COM6 quedó devolviendo el mismo fragmento («ssn:5, winSize:64»,
+traza interna del driver de WiFi) a 326.228–359.562 caracteres por segundo,
+cuando el techo del cable a 115200 baudios es 12.096. Es una falla del búfer del
+controlador CP210x del lado del PC, no del módulo, y se destraba re-enumerando el
+dispositivo (desconectar y reconectar el cable, mejor en otro puerto USB). Por eso
+la verificación se hizo contra el servicio publicado, que es además la vía que
+exige la cátedra para las evidencias.

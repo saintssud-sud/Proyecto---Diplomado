@@ -1,0 +1,64 @@
+LECTURA DEL pH EN EL PATRON DE 4,01 PUBLICADA POR EL MODULO
+===========================================================
+
+Fecha y hora de la captura : 2026-10-04 19:48:00 (hora local, UTC-4)
+Servicio                  : https://sigvach-api.onrender.com
+Consulta                  : GET /api/v1/lecturas?modulo_id=v6wrYSXxeHyttf3prDd7&limite=24
+Autenticacion             : token de operador (operador@proyecto.test)
+Modulo                    : SIGVACH - v6wrYSXxeHyttf3prDd7
+
+Estado del servicio en la misma captura
+---------------------------------------
+GET /api/v1/salud ->
+{"estado":"ok","version_api":"v1","entorno":"produccion","base_de_datos":"conectada"}
+
+Ultimas 24 lecturas publicadas (la mas reciente primero)
+--------------------------------------------------------
+VARIABLE            VALOR UNIDAD  ORIGEN      PUBLICADA
+temp_solucion       22,31 °C      automatico  2026-10-04 19:47:57
+humedad             52,50 %       automatico  2026-10-04 19:47:51
+temp_ambiental      23,70 °C      automatico  2026-10-04 19:47:48
+ph                   4,02         automatico  2026-10-04 19:42:43
+ec                   0,18 mS/cm   automatico  2026-10-04 19:42:40
+tds                 90,37 ppm     automatico  2026-10-04 19:42:36
+temp_solucion       22,31 °C      automatico  2026-10-04 19:42:33
+humedad             52,50 %       automatico  2026-10-04 19:42:29
+temp_ambiental      23,70 °C      automatico  2026-10-04 19:42:25
+ph                   4,13         automatico  2026-10-04 19:42:21
+ec                   0,18 mS/cm   automatico  2026-10-04 19:42:16
+tds                 90,78 ppm     automatico  2026-10-04 19:42:12
+temp_solucion       22,31 °C      automatico  2026-10-04 19:42:09
+humedad             52,40 %       automatico  2026-10-04 19:42:05
+temp_ambiental      23,70 °C      automatico  2026-10-04 19:42:02
+ph                   4,51         automatico  2026-10-04 19:41:58
+ec                   0,18 mS/cm   automatico  2026-10-04 19:41:55
+tds                 90,66 ppm     automatico  2026-10-04 19:41:51
+temp_solucion       22,38 °C      automatico  2026-10-04 19:41:48
+humedad             52,50 %       automatico  2026-10-04 19:41:44
+temp_ambiental      23,70 °C      automatico  2026-10-04 19:41:40
+ph                   4,07         automatico  2026-10-04 19:41:35
+ec                   0,18 mS/cm   automatico  2026-10-04 19:41:32
+tds                 90,55 ppm     automatico  2026-10-04 19:41:28
+
+Verificacion del pH contra el patron de 4,01
+--------------------------------------------
+  ph  4,02   publicada 19:42:43
+  ph  4,13   publicada 19:42:21
+  ph  4,51   publicada 19:41:58
+  ph  4,07   publicada 19:41:35
+  media 4,18   error medio respecto de 4,01: +0,17 unidades
+
+Respuesta cruda del servicio (recorte, para que se vea el formato real)
+----------------------------------------------------------------------
+[{"id":"GyHWyi5vtOjLu3dwDVd4","modulo_id":"v6wrYSXxeHyttf3prDd7","variable":"temp_solucion","valor":22.31,"unidad":"°C","origen":"automatico","registrado_por":null,"timestamp":"2026-10-04T23:47:57.141830Z","estado_rango":"dentro","observacion":null},{"id":"dOulvpulxQmMFlS9INa1","modulo_id":"v6wrYSXxeHyttf3prDd7","variable":"humedad","valor":52.5,"unidad":"%","origen":"automatico","registrado_por":null,"timestamp":"2026-10-04T23:47:51.393858Z","estado_rango":"dentro","observacion":null},{"id":"vvRdtaWtnKUOKHlIDjuG","modulo_id":"v6wrYSXxeHyttf3prDd7","variable":"temp_ambiental","valor":23.7,"unidad":"°C","origen":"automatico","registrado_por":null,"timestamp":"2026-10-04T23:47:48.136118Z","estado_rango":"dentro","observacion":null},{"id":"h7dSmjyJv2c9Vp71zLUn","modulo_id":"v6wrYSXxeHyttf3prDd7","variable":"ph","valor":4.02,"unidad":"","origen":"automatico","registrado_por":null,"timestamp":"2026-10-04T23:42:43.663802Z","estado_rango":"bajo","observacion":null},{"id":"LtCZyeiN5UEhnxoW7dRm","modulo_id":"v6wrYSXxeHyttf3prDd7","variable":"ec","valor":0.18,"unidad":"mS/cm","origen":"automatico","registrado_por":null,"timestamp":"2026-10-04T23:42:40.106113Z","estado_rango":"bajo","observacion":null},{"id":"tFE7dFcSkFSFkmfSR76B","modulo_id":"v6wrYSXxeHyttf3prDd7","variable":"tds","valor":90.37,"unidad":"ppm","origen":"automatico","registrado_por":null,"timestamp":"2026-10-04T23:42:36.43
+
+Que demuestra esta captura
+--------------------------
+  1. Que el modulo esta en linea y publicado las seis variables con origen
+     'automatico', es decir que vienen del equipo y no de una carga manual.
+  2. Que con el electrodo en el patron de 4,01 el sistema informa en torno a pH 4.
+  3. Que la fecha y la hora las pone el propio sistema: la consulta se hizo
+     contra la URL publica, no contra una copia local.
+
+La consulta es repetible con las mismas credenciales de un usuario real, que
+es la misma lectura que muestra el panel.
