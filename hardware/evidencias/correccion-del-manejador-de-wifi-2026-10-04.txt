@@ -66,6 +66,20 @@ Verificación
     Antes:   17 minutos sin publicar
     Después: el primer ciclo posterior al reinicio
 
+Las mediciones de esos 17 minutos no se perdieron
+-------------------------------------------------
+Mientras el módulo estaba mudo siguió midiendo y guardando cada ciclo en la cola
+de memoria no volátil. Al corregirse el problema, la cola se descargó contra el
+servicio y se ven dos ciclos publicados con segundos de diferencia:
+
+    20:11:07 a 20:11:35   ciclo completo (las seis variables)
+    20:17:35 a 20:17:52   ciclo completo
+    20:17:56 a 20:18:13   ciclo completo, inmediatamente después del anterior
+
+Los dos ciclos seguidos de 20:17 no son un error de cadencia: son las lecturas
+que estaban esperando en la cola. Es la comprobación de que el mecanismo de
+guardar-y-reenviar funciona ante una falla real y no sólo en el papel.
+
 Conclusión
 ----------
 El error no estaba en la lógica de medición ni en el servicio: estaba en el lugar
