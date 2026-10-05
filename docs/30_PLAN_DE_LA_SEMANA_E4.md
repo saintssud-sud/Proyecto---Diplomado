@@ -18,6 +18,18 @@ tutoría se aprovecha a ciegas; si se sube antes, la reunión sirve para corregi
 tutor ya puede mirar. El sábado 10 a las 23:59 sigue siendo el cierre oficial y funciona como
 colchón, pero no hay que planificar trabajo para ese día: los sábados no están disponibles.
 
+**Canal de entrega del docente: una carpeta de SharePoint.** El docente compartió una carpeta de
+SharePoint para las monografías del módulo y pidió que cada uno cargue sus trabajos **al menos un día
+antes de su tutoría**. Con la tutoría el viernes 9, eso pone la carga del E4 el **jueves 8**. El
+repositorio de GitHub sigue siendo el del proyecto y la evidencia técnica; la carpeta de SharePoint es
+el canal de entrega de documentos, y ahí también se lleva el E3 con la Tabla 3 corregida.
+
+**Las correcciones del docente son sobre lo que está cargado en la plataforma.** Dicho por él: no
+puede corregir lo que no se subió. Consecuencia directa, y es la razón por la que este plan insiste en
+el jueves: **el E4 tiene que estar cargado el jueves 8**, porque es lo que se va a corregir. El E3 con
+la Tabla 3 corregida se lleva en la misma carga, junto con su nota, para que el cambio quede a la
+vista; la devolución formal de ese documento llegará después, cuando el docente corrija la entrega.
+
 **Según la programación de la cátedra, la T4 incluye además el ensayo de la defensa.** Eso adelanta
 la preparación del guion de 7 minutos al jueves, para poder ensayarlo en la reunión del viernes. No
 se puede dejar para el fin de semana.
@@ -27,8 +39,8 @@ se puede dejar para el fin de semana.
 | **Lun 5** | Trabajo de documento | Recorte de extensión y estructura del E4 |
 | **Mar 6** | Sin clase: día completo de trabajo | Capítulo 3 y apartado 2.9 |
 | **Mié 7** | Trabajo de documento | Anexos, figuras y referencias cruzadas |
-| **Jue 8** | Revisión final | Documento cerrado y verificado; preparación de la tutoría |
-| **Vie 9, mañana** | **Subida del E4** | Documento en editable y PDF, con la evidencia ya dentro |
+| **Jue 8** | Revisión final y **carga en la carpeta del docente** | Documento cerrado, verificado y subido; preparación de la tutoría |
+| **Vie 9, mañana** | Subida a Moodle | El mismo archivo, para el cierre interno; el de SharePoint ya está desde el jueves |
 | **Vie 9, 17:00** | **Tutoría 4 (Grupo 3)** | Preguntas y correcciones sobre lo ya subido |
 | Vie 9, 23:59 | Cierre interno de E4 | — |
 | Sáb 10, 23:59 | Cierre oficial de E4 (colchón) y cuestionario Q4 | — |
@@ -185,17 +197,18 @@ La medición ya está hecha (ver 2.1.1 y 2.1.2), así que el lunes no se mide: s
 3. Regenerar el documento y **volver a medir la extensión**.
 4. Rehacer la figura del tablero con el estado real de la semana.
 
-### Jueves 8 — revisión final y preparación de la tutoría
+### Jueves 8 — revisión final, carga en la carpeta del docente y preparación de la tutoría
 
 1. **Revisión de extremo a extremo** contra la lista de `27_LO_QUE_PIDE_LA_PLENARIA_P4.md` y la auditoría de `11_AUDITORIA_CUMPLIMIENTO.md`.
 2. **Exportar a PDF** y comprobar el índice, la numeración romana y la arábiga.
-3. **Preparar el guion de la defensa**, porque la tutoría del viernes incluye el ensayo: los 7 minutos de demostración del sistema desplegado, cronometrados, con la maqueta y el panel en vivo.
-4. **Preparar la tutoría**: las preguntas pendientes (colocación del epígrafe de las figuras, alcance del E4, qué espera del sistema en la defensa) y la explicación de la corrección de la Tabla 3 del E3.
+3. **Cargar en la carpeta de SharePoint del docente**: el E4 completo (editable y PDF) y, junto con él, el **E3 con la Tabla 3 corregida** y su nota. El docente pidió un día de anticipación, así que este paso es del jueves y no se puede correr al viernes.
+4. **Preparar el guion de la defensa**, porque la tutoría del viernes incluye el ensayo: los 7 minutos de demostración del sistema desplegado, cronometrados, con la maqueta y el panel en vivo.
+5. **Preparar la tutoría**: las preguntas pendientes (colocación del epígrafe de las figuras, alcance del E4, qué espera del sistema en la defensa) y la explicación de la corrección de la Tabla 3 del E3.
 
-### Viernes 9 — subir y después la tutoría
+### Viernes 9 — la tutoría
 
-1. **Por la mañana: subir el E4** (editable y PDF) y responder el cuestionario si ya está disponible.
-2. **17:00 · Tutoría 4**: llegar con el documento subido, con el guion de la defensa listo para ensayar y con las preguntas escritas. Anotar cada observación del tutor con la hora.
+1. **Por la mañana: subir el mismo archivo a Moodle** para el cierre interno, y responder el cuestionario si ya está disponible. Lo de SharePoint ya está desde el jueves.
+2. **17:00 · Tutoría 4**: llegar con el documento cargado desde el día anterior, con el guion de la defensa listo para ensayar y con las preguntas escritas. Anotar cada observación del tutor con la hora.
 3. Cerrar el cierre interno a las 23:59 solo si hubo correcciones que valga la pena subir.
 
 ### Sábado 10 — colchón (sin trabajo previsto)
