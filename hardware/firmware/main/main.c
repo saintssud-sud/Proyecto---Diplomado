@@ -33,6 +33,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
+#include "freertos/timers.h"
 
 #include "esp_log.h"
 #include "esp_err.h"
@@ -378,8 +379,44 @@ static void guardarParaDespues(const char *variable, float valor, const char *un
  * Reintentar sin pausa satura al punto de acceso y al propio módulo: algunos
  * routers bloquean al cliente que insiste cada dos segundos, y entonces el
  * equipo queda en un bucle del que no sale ni aunque la señal mejore. Con una
- * espera corta el reintento es amable y el router no se defiende. */
+ * espera corta el reintento es amable y el router no se defiende.
+ *
+ * La espera NO se hace dentro del manejador de eventos: ese manejador corre en
+ * la tarea del bucle de eventos del sistema, y dejarlo dormido quince segundos
+ * equivale a dejar sorda a la placa durante ese rato —no se atendería ni el
+ * aviso de que la red ya volvió—. Se usa un temporizador de una sola vuelta:
+ * la espera transcurre sola y el reintento se dispara cuando vence. */
 #define ESPERA_REINTENTO_S  15
+
+static TimerHandle_t temporizadorReintento = NULL;
+static int caidasDeRed = 0;
+
+static void reintentarConexion(TimerHandle_t temporizador)
+{
+    (void)temporizador;
+    ESP_LOGI(ETIQUETA, "Reintentando la conexion inalambrica");
+    esp_wifi_connect();
+}
+
+/* Motivo de la caída en palabras.
+ *
+ * El código numérico no dice nada al leer el registro, y la diferencia importa:
+ * que la clave sea rechazada no es lo mismo que haberse quedado sin señal, ni
+ * que el punto de acceso haya expulsado al cliente. */
+static const char *motivoDeLaCaida(uint8_t motivo)
+{
+    switch (motivo) {
+        case WIFI_REASON_AUTH_EXPIRE:            return "la autenticacion expiro";
+        case WIFI_REASON_AUTH_FAIL:              return "la clave fue rechazada";
+        case WIFI_REASON_NO_AP_FOUND:            return "no se encontro la red";
+        case WIFI_REASON_ASSOC_FAIL:             return "el punto de acceso rechazo la asociacion";
+        case WIFI_REASON_HANDSHAKE_TIMEOUT:      return "el intercambio de claves no termino";
+        case WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT: return "el saludo de cuatro vias no termino";
+        case WIFI_REASON_BEACON_TIMEOUT:         return "se perdio la senal del punto de acceso";
+        case WIFI_REASON_CONNECTION_FAIL:        return "no se pudo establecer la conexion";
+        default:                                 return "motivo no clasificado";
+    }
+}
 
 static void manejadorRed(void *argumento, esp_event_base_t base, int32_t id, void *datos)
 {
@@ -387,10 +424,16 @@ static void manejadorRed(void *argumento, esp_event_base_t base, int32_t id, voi
         esp_wifi_connect();
 
     } else if (base == WIFI_EVENT && id == WIFI_EVENT_STA_DISCONNECTED) {
+        wifi_event_sta_disconnected_t *evento = (wifi_event_sta_disconnected_t *)datos;
         xEventGroupClearBits(grupoRed, RED_CONECTADA);
-        ESP_LOGW(ETIQUETA, "WiFi caido: se reintenta en %d segundos", ESPERA_REINTENTO_S);
-        vTaskDelay(pdMS_TO_TICKS(ESPERA_REINTENTO_S * 1000));
-        esp_wifi_connect();
+        caidasDeRed++;
+        ESP_LOGW(ETIQUETA, "WiFi caido (motivo %d: %s). Caida numero %d; se reintenta en %d segundos",
+                 evento->reason, motivoDeLaCaida(evento->reason), caidasDeRed, ESPERA_REINTENTO_S);
+        if (temporizadorReintento != NULL) {
+            xTimerStart(temporizadorReintento, 0);
+        } else {
+            esp_wifi_connect();
+        }
 
     } else if (base == IP_EVENT && id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t *evento = (ip_event_got_ip_t *)datos;
@@ -409,6 +452,16 @@ static void iniciarRed(void)
 
     wifi_init_config_t configuracion = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&configuracion));
+
+    /* El reintento se programa desde el manejador de eventos, pero la espera la
+     * lleva este temporizador para no bloquear el bucle de eventos (ver arriba). */
+    temporizadorReintento = xTimerCreate("reintento_wifi",
+                                         pdMS_TO_TICKS(ESPERA_REINTENTO_S * 1000),
+                                         pdFALSE, NULL, reintentarConexion);
+    if (temporizadorReintento == NULL) {
+        ESP_LOGW(ETIQUETA, "No se pudo crear el temporizador de reintento; "
+                           "se reintentara sin espera");
+    }
 
     ESP_ERROR_CHECK(esp_event_handler_instance_register(
         WIFI_EVENT, ESP_EVENT_ANY_ID, &manejadorRed, NULL, NULL));
@@ -440,6 +493,36 @@ static bool esperarRed(int segundos)
 static bool hayRed(void)
 {
     return (xEventGroupGetBits(grupoRed) & RED_CONECTADA) != 0;
+}
+
+/* Informa cómo quedó el enlace: dirección, red, señal y canal.
+ *
+ * Se hace desde la tarea principal y NO desde el manejador de eventos. Ese
+ * manejador corre en la tarea del bucle de eventos, y consultar la API de WiFi
+ * desde ahí puede quedar esperando un cerrojo que la propia tarea de WiFi
+ * necesita. El síntoma es silencioso y engañoso: la placa se conecta, entra al
+ * manejador y no vuelve, de modo que la marca de «hay red» nunca se pone y el
+ * módulo guarda los ciclos en la cola sin publicarlos, como si no hubiera red.
+ * Por eso la consulta se hace acá, en contexto de tarea, después de confirmar
+ * la conexión. */
+static void informarEnlace(void)
+{
+    esp_netif_t *interfaz = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
+    esp_netif_ip_info_t direccion = { 0 };
+    if (interfaz != NULL && esp_netif_get_ip_info(interfaz, &direccion) == ESP_OK
+        && direccion.ip.addr != 0) {
+        ESP_LOGI(ETIQUETA, "Direccion IP: " IPSTR, IP2STR(&direccion.ip));
+    }
+
+    /* La señal y el canal son el dato que dice si el enlace quedó holgado o al
+     * límite; sin ellos, una caída se lee como una sorpresa. */
+    wifi_ap_record_t punto = { 0 };
+    if (esp_wifi_sta_get_ap_info(&punto) == ESP_OK) {
+        ESP_LOGI(ETIQUETA, "Red %s: senal %d dBm, canal %d",
+                 (const char *)punto.ssid, punto.rssi, punto.primary);
+    }
+
+    ESP_LOGI(ETIQUETA, "Caidas de red desde el arranque: %d", caidasDeRed);
 }
 
 /** Pone la hora por Internet (SNTP). */
@@ -752,6 +835,7 @@ void app_main(void)
     iniciarRed();
     if (esperarRed(30)) {
         iniciarHora();
+        informarEnlace();
         ESP_LOGI(ETIQUETA, "Modulo: %s | Servicio: %s", MODULO_ID, HOST_API);
     } else {
         ESP_LOGW(ETIQUETA, "Sin red por ahora: se reintenta en el proximo ciclo");

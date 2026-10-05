@@ -1,0 +1,78 @@
+CORRECCIÓN DEL MANEJADOR DE EVENTOS DE WiFi — 4 de octubre de 2026
+==================================================================
+
+Qué se buscaba
+--------------
+Dejar el enlace inalámbrico mejor instrumentado para la maqueta: que el registro
+dijera POR QUÉ se cae la conexión, con cuánta señal quedó el enlace, y sin dejar
+el bucle de eventos bloqueado durante la espera entre reintentos.
+
+Qué se cambió en la primera versión (la que falló)
+--------------------------------------------------
+    1. registrar el motivo de la caída (evento->reason) traducido a palabras;
+    2. reemplazar la espera de 15 s dentro del manejador por un temporizador;
+    3. informar al conectarse la señal, el canal y las caídas acumuladas;
+    4. declarar la protección de tramas de gestión (PMF) como admitida; y
+    5. desactivar el ahorro de energía del WiFi.
+
+El error
+--------
+El punto 3 se implementó DENTRO del manejador de eventos, llamando a
+esp_wifi_sta_get_ap_info() desde ahí. Ese manejador corre en la tarea del bucle
+de eventos del sistema, y consultar la API de WiFi desde esa tarea puede quedar
+esperando un cerrojo que la propia tarea de WiFi necesita para terminar.
+
+Síntoma observado: 17 minutos sin publicar
+------------------------------------------
+    Última publicación antes de grabar : 19:53:32
+    Grabación del firmware             : alrededor de 19:57
+    Publicaciones siguientes           : NINGUNA durante 17 minutos
+
+El detalle que engaña: el módulo NO se colgaba. Seguía encendido, seguía midiendo
+y seguía guardando los ciclos en la cola de memoria no volátil; lo que no hacía
+era publicar. La causa está en el orden de las instrucciones del manejador: la
+marca de «hay red» se pone DESPUÉS de la consulta, así que si la consulta no
+vuelve, la marca nunca se pone, el programa principal cree que no hay red y
+guarda todo para después, como si el WiFi estuviera caído.
+
+Cómo se notó
+------------
+No por el puerto serie —en ese momento estaba trabado devolviendo un fragmento
+repetido a 322.300 caracteres por segundo, cuando el techo del cable a 115200
+baudios es 12.096—, sino por el servicio: la tabla del visor mostraba una última
+publicación cada vez más vieja, mientras la ficha del módulo seguía diciendo
+«activo». La conclusión práctica: el puerto serie es un canal de diagnóstico que
+también falla, y por eso conviene tener siempre una segunda vía de observación.
+
+La corrección
+-------------
+    1. La consulta de la API de WiFi SALE del manejador de eventos. En el
+       manejador solo queda leer el dato que trae el evento (evento->reason), que
+       no llama a ninguna API, y poner la marca de «hay red» sin nada en el medio.
+    2. El informe del enlace —dirección, red, señal, canal y caídas acumuladas—
+       se hace en una función aparte, llamada desde la tarea principal DESPUÉS de
+       confirmar la conexión.
+    3. Se retiraron los cambios 4 y 5, que alteraban el comportamiento y no
+       aportaban nada al problema. Primero se arregla; después se mejora. Volver
+       al comportamiento conocido es lo que permite afirmar que el resto quedó
+       igual.
+
+Verificación
+------------
+    Grabación corregida : terminada con «Hash of data verified» y «Done»
+    Primera publicación : 20:11:35, en el primer ciclo posterior al reinicio
+    Ciclo siguiente     : 20:12 en adelante, las seis variables publicadas
+
+    Antes:   17 minutos sin publicar
+    Después: el primer ciclo posterior al reinicio
+
+Conclusión
+----------
+El error no estaba en la lógica de medición ni en el servicio: estaba en el lugar
+donde se pedía la información. Consultar la API de WiFi desde el manejador de
+eventos no es lo mismo que consultarla desde una tarea, y el síntoma —«no hay
+red»— señalaba a un culpable equivocado, que habría sido el router.
+
+Queda registrado a propósito: es el tipo de falla que una tabla donde todo
+«pasa» nunca muestra, y el que se descubre en el peor momento —durante una
+demostración— si no está documentado.
