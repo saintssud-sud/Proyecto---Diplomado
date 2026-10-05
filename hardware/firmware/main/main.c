@@ -402,19 +402,30 @@ static void reintentarConexion(TimerHandle_t temporizador)
  *
  * El código numérico no dice nada al leer el registro, y la diferencia importa:
  * que la clave sea rechazada no es lo mismo que haberse quedado sin señal, ni
- * que el punto de acceso haya expulsado al cliente. */
+ * que el punto de acceso haya expulsado al cliente. Los códigos son los del
+ * estándar 802.11 y los de la propia pila de Espressif; se cubren los que este
+ * equipo produce de verdad, y lo que no esté en la lista se informa con su
+ * número para poder buscarlo. */
 static const char *motivoDeLaCaida(uint8_t motivo)
 {
     switch (motivo) {
+        case WIFI_REASON_UNSPECIFIED:            return "motivo sin especificar";
         case WIFI_REASON_AUTH_EXPIRE:            return "la autenticacion expiro";
-        case WIFI_REASON_AUTH_FAIL:              return "la clave fue rechazada";
+        case WIFI_REASON_AUTH_LEAVE:             return "el equipo se despidio de la red";
+        case WIFI_REASON_ASSOC_EXPIRE:           return "la asociacion expiro: el punto de acceso no respondio a tiempo";
+        case WIFI_REASON_ASSOC_TOOMANY:          return "el punto de acceso no admite mas clientes";
+        case WIFI_REASON_NOT_AUTHED:             return "el punto de acceso exige autenticarse primero";
+        case WIFI_REASON_NOT_ASSOCED:            return "no estaba asociado";
+        case WIFI_REASON_ASSOC_LEAVE:            return "el equipo dejo la red";
+        case WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT: return "el saludo de cuatro vias no termino";
+        case WIFI_REASON_GROUP_KEY_UPDATE_TIMEOUT: return "la clave de grupo no se actualizo a tiempo";
+        case WIFI_REASON_BEACON_TIMEOUT:         return "se perdio la senal del punto de acceso";
         case WIFI_REASON_NO_AP_FOUND:            return "no se encontro la red";
+        case WIFI_REASON_AUTH_FAIL:              return "la clave fue rechazada";
         case WIFI_REASON_ASSOC_FAIL:             return "el punto de acceso rechazo la asociacion";
         case WIFI_REASON_HANDSHAKE_TIMEOUT:      return "el intercambio de claves no termino";
-        case WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT: return "el saludo de cuatro vias no termino";
-        case WIFI_REASON_BEACON_TIMEOUT:         return "se perdio la senal del punto de acceso";
         case WIFI_REASON_CONNECTION_FAIL:        return "no se pudo establecer la conexion";
-        default:                                 return "motivo no clasificado";
+        default:                                 return "codigo no previsto en esta lista";
     }
 }
 
@@ -437,6 +448,12 @@ static void manejadorRed(void *argumento, esp_event_base_t base, int32_t id, voi
 
     } else if (base == IP_EVENT && id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t *evento = (ip_event_got_ip_t *)datos;
+        /* Si la conexión se restableció sola antes de que venciera la espera, el
+         * reintento programado ya no hace falta: se cancela, para no llamar a
+         * conectar sobre un enlace que está sano. */
+        if (temporizadorReintento != NULL) {
+            xTimerStop(temporizadorReintento, 0);
+        }
         ESP_LOGI(ETIQUETA, "Conectado. Direccion IP: " IPSTR, IP2STR(&evento->ip_info.ip));
         xEventGroupSetBits(grupoRed, RED_CONECTADA);
     }
