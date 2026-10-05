@@ -114,3 +114,33 @@ Observaciones para el informe
     búfer se traba y devuelve un fragmento repetido a velocidades imposibles
     para el cable). Por eso la verificación de las publicaciones se hizo contra
     el servicio publicado, que es la vía que exige la cátedra.
+
+Mejora con un punto de acceso propio (20:53)
+--------------------------------------------
+Con la red del router el módulo recibía −69 dBm y fallaba dos veces en cada
+arranque. Se cambió la red configurada a un punto de acceso propio, en 2,4 GHz
+(canal 11), y el arranque cambió por completo:
+
+    I (5636)  SIGVACH: Conectando a la red saintssud
+    I (8786)  SIGVACH: Conectado. Direccion IP: 192.168.137.240      <- al primer intento
+    I (12786) SIGVACH: Red saintssud: senal -43 dBm, canal 11
+    I (12786) SIGVACH: Caidas de red desde el arranque: 0
+    I (13666) SIGVACH:   -> 4.01 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+    I (20836) SIGVACH:   temp_ambiental       23.50 °C     ->  almacenada
+    I (22476) esp-x509-crt-bundle: Certificate validated
+    I (24826) SIGVACH:   humedad              52.00 %       ->  almacenada
+    ... las seis variables, cada envío con el certificado validado
+
+    Antes  : −69 dBm, dos intentos fallidos en cada arranque, conexión a los 41 s
+    Después: −43 dBm, conexión al primer intento, cero caídas
+
+Veintiséis decibeles de mejora. Para el informe: la señal no era un defecto del
+módulo ni de las credenciales, sino del enlace. Con margen suficiente
+desaparecen los reintentos y, como efecto lateral, al no haber reintentos tampoco
+aparece la ráfaga de trazas de la pila de WiFi que trababa el búfer del puerto
+serie del PC.
+
+Aviso de operación: con esta configuración el módulo publica a través del punto
+de acceso propio. Si ese punto de acceso se apaga, el módulo no pierde lecturas
+—las guarda en la cola— pero no publica hasta que vuelva. Es el comportamiento
+correcto, y conviene tenerlo presente durante la maqueta y la demostración.

@@ -51,26 +51,32 @@ dos puntos caen sobre la recta por construcción.
 Las mediciones se tomaron con el módulo en funcionamiento y se publicaron al
 servicio, que las confirmó con «almacenada» para las seis variables.
 
-Verificación con el patrón de 4,01 (misma jornada, 19:41–19:42)
+Verificación con el patrón de 4,01 (misma jornada, 19:41–20:53)
 --------------------------------------------------------------
 Con el electrodo de vuelta en el patrón de 4,01 y el firmware ya recalibrado, se
 leyeron las lecturas que el módulo publicó al servicio. No se usó el puerto serie
 porque ese día el búfer del controlador quedó trabado devolviendo un fragmento
 repetido a una velocidad imposible para el cable (ver más abajo).
 
+    ph   4,01   publicada 20:53:48   <- coincide exactamente con el patrón
+    ph   4,02   publicada 20:49:48
+    ph   3,91   publicada 20:44:28
+    ph   3,90   publicada 20:44:02
     ph   3,96   publicada 19:48:10
     ph   4,02   publicada 19:42:43
     ph   4,13   publicada 19:42:21
     ph   4,51   publicada 19:41:58
     ph   4,07   publicada 19:41:35
 
-    media 4,14 · mínimo 3,96 · máximo 4,51 · error medio +0,13 unidades
+    media 4,06 · mínimo 3,90 · máximo 4,51 · error medio +0,05 unidades
 
-Son cinco lecturas consecutivas con el electrodo quieto en el patrón. El valor
-correcto es 4,01 y el sistema informa entre 3,96 y 4,51: la mejor lectura se
-desvía 0,05 unidades y el conjunto queda dentro de la dispersión del propio
-instrumento, porque una dispersión de 13 a 20 cuentas de ADC equivale a
-±0,15–0,25 unidades de pH (la pendiente es de 83,9 mV por unidad).
+Son nueve lecturas tomadas con el electrodo quieto en el patrón, repartidas en
+dos tandas de la misma jornada. El valor correcto es 4,01 y el sistema informa
+entre 3,90 y 4,51, con una media de 4,06: un error medio de cinco centésimas.
+Una de las lecturas —la de las 20:53, ya con el enlace nuevo— dio 4,01 exacto.
+El conjunto queda dentro de la dispersión del propio instrumento, porque una
+dispersión de 13 a 21 cuentas de ADC equivale a ±0,15–0,25 unidades de pH (la
+pendiente es de 83,9 mV por unidad).
 
 La serie completa, con lo que había antes en el vaso, muestra el cambio de un
 líquido a otro sin ninguna duda:
@@ -83,6 +89,10 @@ líquido a otro sin ninguna duda:
             19:42:21   pH 4,13
             19:42:43   pH 4,02
             19:48:10   pH 3,96
+            20:44:02   pH 3,90     (los ciclos guardados durante las pruebas del enlace)
+            20:44:28   pH 3,91
+            20:49:48   pH 4,02
+            20:53:48   pH 4,01     (con el enlace nuevo: 4,01 exacto)
 
 Las cuatro lecturas de 19:41 y 19:42 son la cola de almacenamiento que el módulo
 envió al recuperar la conexión, y la de 19:48:10 es el ciclo normal siguiente:
