@@ -18,6 +18,10 @@ tutoría se aprovecha a ciegas; si se sube antes, la reunión sirve para corregi
 tutor ya puede mirar. El sábado 10 a las 23:59 sigue siendo el cierre oficial y funciona como
 colchón, pero no hay que planificar trabajo para ese día: los sábados no están disponibles.
 
+**Según la programación de la cátedra, la T4 incluye además el ensayo de la defensa.** Eso adelanta
+la preparación del guion de 7 minutos al jueves, para poder ensayarlo en la reunión del viernes. No
+se puede dejar para el fin de semana.
+
 | Fecha | Hito | Qué tiene que estar cerrado |
 |---|---|---|
 | **Lun 5** | Trabajo de documento | Recorte de extensión y estructura del E4 |
@@ -37,9 +41,60 @@ colchón, pero no hay que planificar trabajo para ese día: los sábados no est�
 
 ### 2.1 Documento
 
+#### 2.1.1 Medición del 4 de octubre: hay dos documentos, y no son el mismo
+
+Medido con Word sobre los dos archivos que existen hoy. **El entregable del E3 y el borrador completo
+no son el mismo documento: son dos versiones distintas.**
+
+| | Entregable E3 | Borrador completo |
+|---|---|---|
+| Páginas totales | 67 | 91 |
+| Palabras | 13 596 | 19 169 |
+| Tablas | **21** | 9 |
+| Páginas de preliminares | 5 (el Capítulo 1 empieza en la 6) | 11 (empieza en la 12) |
+| Capítulo 3 | **no está** | sí, página 83 |
+| 2.9 Despliegue | **no está** | sí, página 80 |
+| Bibliografía | **no está** | sí, página 88 |
+| Tabla de objetivos, evidencia y conclusión | **sí (Tabla 4)** | no |
+
+En detalle, el entregable del E3 tiene el contenido fino: los **seis diccionarios de datos separados
+por colección** (Tablas 12 a 17, 51 filas), la tabla de **14 requisitos funcionales** con criterios de
+aceptación, la de **25 casos de prueba** y la de fallos, y la correspondencia entre objetivo,
+evidencia y conclusión que necesita el Capítulo 3. El borrador, en cambio, tiene la **estructura
+completa** pero con las tablas consolidadas en menos filas.
+
+**Decisión: se toma el entregable del E3 como documento base**, porque es el que el docente ya revisó
+y el que tiene el contenido detallado y corregido, y se le incorporan del borrador las tres piezas que
+le faltan: **2.9 Despliegue, Capítulo 3 y bibliografía**. Antes de tocar nada hay que comprobar que no
+haya correcciones hechas solo en el borrador que se perderían al descartarlo.
+
+#### 2.1.2 Cuánto hay que sacar
+
+| | Cuerpo real | Límite | Hay que sacar |
+|---|---|---|---|
+| Entregable E3 | páginas 6 a 67 = **62 páginas** | 30 a 40 | **≈ 22 páginas** |
+| Borrador | páginas 12 a 87 = **76 páginas** | 30 a 40 | **≈ 36 páginas** |
+
+No es un ajuste menor: hay que reducir el cuerpo casi a la mitad. La mayor parte se resuelve
+**moviendo a anexos**, que no pierde contenido, y el resto apretando redacción.
+
+| Medida | Ahorro estimado |
+|---|---|
+| Los seis diccionarios de datos (Tablas 12 a 17, 51 filas) al anexo | 6 a 7 páginas |
+| La tabla de 25 casos de prueba al anexo, con un resumen de 8 filas en 2.8 | 3 a 4 páginas |
+| Siete de las doce figuras al anexo, dejando cinco en el cuerpo | 3 páginas |
+| Condensar la prosa de 2.1 y de 2.6 | 6 a 8 páginas |
+| **Total** | **18 a 22 páginas** |
+
+Con eso se llega a 40 páginas o menos sin perder contenido, solo reubicándolo y apretando la
+redacción. **Criterio de orden:** primero se traslada (no pierde nada y es reversible), después se
+condensa.
+
+#### 2.1.3 Estado de las piezas del documento
+
 | Qué | Estado | Detalle |
 |---|---|---|
-| Extensión del cuerpo | **Pendiente, es lo más pesado** | El límite es de 30 a 40 páginas **sin preliminares ni anexos**. El cuerpo lo supera. Las medidas de recorte ya están escritas en el borrador; hay que aplicarlas y volver a medir |
+| Extensión del cuerpo | **Pendiente, es lo más pesado** | Ver 2.1.2 |
 | Recorte por traslado | Pendiente | Mover a anexos lo que es documentación de soporte y no cuerpo: la tabla de casos de prueba y los manuales |
 | Apartado 2.9 Despliegue | Pendiente | Plataforma, procedimiento, entornos, dirección pública, límites del plan gratuito y el respaldo con la restauración probada |
 | Capítulo 3 | Borrador hecho | Una conclusión por objetivo específico, con grado de cumplimiento y evidencia concreta; más recomendaciones |
@@ -76,12 +131,15 @@ recortes que oculten esas dos cosas.
 
 ## 3. Plan día por día
 
-### Lunes 5 — el recorte, que es lo único que crece solo
+### Lunes 5 — unir los dos documentos y empezar el recorte
 
-1. **Medir el documento como está**: páginas del cuerpo sin preliminares ni anexos, para saber cuánto hay que recortar.
-2. **Aplicar el recorte por traslado** (lo que no pierde contenido): tabla de casos de prueba y manuales a los anexos.
-3. **Escribir 2.9 Despliegue**, que hoy es el hueco más grande del cuerpo y además es contenido obligatorio.
-4. Si queda tiempo: preparar el guion de las tres personas para CP-22 y pedirles el turno para el martes.
+La medición ya está hecha (ver 2.1.1 y 2.1.2), así que el lunes no se mide: se une y se recorta.
+
+1. **Comprobar qué tiene el borrador que no tenga el entregable del E3**, aparte de 2.9, el Capítulo 3 y la bibliografía, para no perder correcciones al descartarlo.
+2. **Armar el documento base del E4**: entregable del E3 + 2.9 Despliegue + Capítulo 3 + bibliografía traídos del borrador.
+3. **Aplicar el recorte por traslado**, que es lo que no pierde contenido: diccionarios de datos, tabla de casos de prueba y las siete figuras a los anexos.
+4. **Volver a medir el cuerpo.** Ese número decide si el martes alcanza con condensar prosa o si hay que trasladar más.
+5. Si queda tiempo: preparar el guion de las tres personas para CP-22 y conseguir el turno para el martes.
 
 ### Martes 6 — sin clase, día completo
 
@@ -101,13 +159,13 @@ recortes que oculten esas dos cosas.
 
 1. **Revisión de extremo a extremo** contra la lista de `27_LO_QUE_PIDE_LA_PLENARIA_P4.md` y la auditoría de `11_AUDITORIA_CUMPLIMIENTO.md`.
 2. **Exportar a PDF** y comprobar el índice, la numeración romana y la arábiga.
-3. **Preparar la tutoría**: las preguntas pendientes (colocación del epígrafe de las figuras, alcance del E4, qué espera del sistema en la defensa) y la explicación de la corrección de la Tabla 3 del E3.
-4. Ensayo corto del guion de la defensa, sin público.
+3. **Preparar el guion de la defensa**, porque la tutoría del viernes incluye el ensayo: los 7 minutos de demostración del sistema desplegado, cronometrados, con la maqueta y el panel en vivo.
+4. **Preparar la tutoría**: las preguntas pendientes (colocación del epígrafe de las figuras, alcance del E4, qué espera del sistema en la defensa) y la explicación de la corrección de la Tabla 3 del E3.
 
 ### Viernes 9 — subir y después la tutoría
 
 1. **Por la mañana: subir el E4** (editable y PDF) y responder el cuestionario si ya está disponible.
-2. **17:00 · Tutoría 4**: llegar con el documento subido y con las preguntas escritas. Anotar cada observación del tutor con la hora.
+2. **17:00 · Tutoría 4**: llegar con el documento subido, con el guion de la defensa listo para ensayar y con las preguntas escritas. Anotar cada observación del tutor con la hora.
 3. Cerrar el cierre interno a las 23:59 solo si hubo correcciones que valga la pena subir.
 
 ### Sábado 10 — colchón (sin trabajo previsto)
