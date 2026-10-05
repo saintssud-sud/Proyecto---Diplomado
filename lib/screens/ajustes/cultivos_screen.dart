@@ -160,7 +160,7 @@ class _CultivosCatalogoScreenState extends State<CultivosCatalogoScreen> {
               ),
               const SizedBox(height: 4),
               const Text(
-                'Cada cultivo define los rangos de referencia de las siete variables. '
+                'Cada cultivo define los rangos de referencia de las seis variables. '
                 'El módulo de cultivo se asocia a uno de ellos y sus lecturas se '
                 'evalúan contra esos rangos.',
                 style: TextStyle(color: Colors.grey, fontSize: 13),

@@ -159,18 +159,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 onTap: () => _editar(perfil),
               ),
               ListTile(
-                leading: const Icon(Icons.lock_outline, color: Color(0xFF2E7D32)),
-                title: const Text('Cambiar contraseña'),
-                trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Cambio de contraseña disponible próximamente'),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
                 leading: const Icon(Icons.settings_outlined, color: Color(0xFF2E7D32)),
                 title: const Text('Preferencias de app'),
                 trailing: const Icon(Icons.chevron_right, color: Colors.grey),

@@ -223,7 +223,7 @@ class _SinRangos extends StatelessWidget {
             const SizedBox(height: 8),
             const Text(
               'Se definen en Ajustes → Cultivos: toque "Editar rangos" en el '
-              'cultivo e indique el mínimo y el máximo de cada una de las siete '
+              'cultivo e indique el mínimo y el máximo de cada una de las seis '
               'variables. Mientras un cultivo no tenga rangos, sus lecturas no se '
               'evalúan y no generan alertas.',
               style: TextStyle(fontSize: 13),

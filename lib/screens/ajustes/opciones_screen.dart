@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-/// Pantalla genérica para las opciones de Ajustes que aún no tienen
-/// desarrollo completo (Notificaciones, Dispositivos, Usuarios, Seguridad,
-/// Acerca de SIGVACH).
+/// Pantalla genérica de información para las opciones de Ajustes que no tienen
+/// pantalla propia (por ahora, «Acerca de SIGVACH»): muestra el icono, el
+/// título y la descripción que recibe.
 class OpcionesScreen extends StatelessWidget {
   const OpcionesScreen({
     super.key,

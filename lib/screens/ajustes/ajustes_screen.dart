@@ -35,51 +35,12 @@ class AjustesScreen extends StatelessWidget {
           title: 'Rangos de variables',
           onTap: () => _push(context, const RangosVariablesScreen()),
         ),
-        _OpcionTile(
-          icon: Icons.notifications_outlined,
-          title: 'Notificaciones',
-          onTap: () => _push(
-            context,
-            const OpcionesScreen(
-              titulo: 'Notificaciones',
-              icono: Icons.notifications_outlined,
-              descripcion:
-                  'Configura las notificaciones de alertas de tus variables.',
-            ),
-          ),
-        ),
-        _OpcionTile(
-          icon: Icons.bluetooth,
-          title: 'Dispositivos (BT/ID)',
-          onTap: () => _push(
-            context,
-            const OpcionesScreen(
-              titulo: 'Dispositivos (BT/ID)',
-              icono: Icons.bluetooth,
-              descripcion:
-                  'Vincula sensores por Bluetooth o por ID de dispositivo.',
-            ),
-          ),
-        ),
         if (esAdmin)
           _OpcionTile(
             icon: Icons.group_outlined,
             title: 'Usuarios (admin)',
             onTap: () => _push(context, const UsuariosAdminScreen()),
           ),
-        _OpcionTile(
-          icon: Icons.security_outlined,
-          title: 'Seguridad',
-          onTap: () => _push(
-            context,
-            const OpcionesScreen(
-              titulo: 'Seguridad',
-              icono: Icons.security_outlined,
-              descripcion:
-                  'Opciones de seguridad de la cuenta y del dispositivo.',
-            ),
-          ),
-        ),
         _OpcionTile(
           icon: Icons.info_outline,
           title: 'Acerca de SIGVACH',

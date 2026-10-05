@@ -1,3 +1,16 @@
+import java.util.Properties
+import java.io.FileInputStream
+
+// Firma de release. Las credenciales NO están en el repositorio (es público):
+// viven en android/key.properties, que el .gitignore excluye, junto con el
+// keystore .jks al que apunta. Si el archivo no existe, la configuración de
+// firma queda vacía y la compilación de release falla de forma explícita.
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
+
 plugins {
     id("com.android.application")
     // START: FlutterFire Configuration
@@ -29,11 +42,20 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties["keyAlias"] as String
+            keyPassword = keystoreProperties["keyPassword"] as String
+            storeFile = file(keystoreProperties["storeFile"] as String)
+            storePassword = keystoreProperties["storePassword"] as String
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            // Firma con el keystore propio del proyecto (android/key.properties),
+            // no con las claves de depuración.
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }

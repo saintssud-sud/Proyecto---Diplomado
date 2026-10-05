@@ -60,23 +60,6 @@ class CultivoVariablesScreen extends StatelessWidget {
             value: '${_fmt(preferences.waterLevel)} %',
             detalle: 'Normal',
           ),
-          const SizedBox(height: 16),
-          FilledButton.icon(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Historial disponible próximamente'),
-                ),
-              );
-            },
-            icon: const Icon(Icons.history),
-            label: const Text('Ver historial'),
-            style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFF39B54A),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-            ),
-          ),
         ],
       ),
     );

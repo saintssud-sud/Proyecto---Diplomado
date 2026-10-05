@@ -11,7 +11,7 @@ import '../../widgets/vista_con_estados.dart';
 ///
 /// Consume el servicio a través de [PanelController], el mismo que alimenta el
 /// panel principal: la lista se construye con el **catálogo completo** de
-/// variables (siete) y con la **última lectura** y el **rango de referencia**
+/// variables (seis) y con la **última lectura** y el **rango de referencia**
 /// que entrega el servidor, de modo que esta pantalla y el panel nunca puedan
 /// mostrar datos distintos.
 class VariablesScreen extends StatelessWidget {
