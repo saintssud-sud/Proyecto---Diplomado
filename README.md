@@ -97,9 +97,20 @@ El sistema cuenta además con un **servicio backend** (FastAPI sobre Python 3.13
 - Código y documentación del servicio: [`backend/README.md`](backend/README.md)
 - Ejecución local en modo de demostración, sin credenciales: desde `backend/`, con `USAR_REPOSITORIO_EN_MEMORIA=true`, ejecutar `uvicorn app.main:app --reload`
 - Contrato navegable del servicio (OpenAPI): `http://localhost:8011/docs` en local, y el publicado en https://sigvach-api.onrender.com/docs
-- Pruebas automatizadas del backend: `python -m pytest` desde `backend/` (**106 casos**, sin credenciales ni conexión)
+- Pruebas automatizadas del backend: `python -m pytest` desde `backend/` (**119 casos**, sin credenciales ni conexión)
 - Pruebas automatizadas de la aplicación: `flutter test` desde la raíz (**96 casos**)
 - Los informes de las dos baterías quedan versionados en [`evidencia/`](evidencia/LEEME.md), con la fecha en el nombre del archivo
+- **Registro de una línea por petición** (método, ruta declarada, código y duración), con el registro estándar de Python y sin credenciales, cuerpos ni cadenas de consulta. Nivel ajustable con `NIVEL_REGISTRO`; detalles en [`backend/README.md`](backend/README.md#21-registro-de-una-línea-por-petición)
+- **Respaldo de la base y restauración probada**: los datos del dominio se copian a un JSON fechado pidiéndolos a la API publicada, y el procedimiento de restauración está probado de punta a punta. Los respaldos quedan en `respaldos/` (fuera del repositorio) y la evidencia de la restauración en `evidencia/restauracion-2026-10-05.txt`
+
+```bash
+python scripts/respaldar_base.py            # copia los datos del dominio a respaldos/respaldo-sigvach-<fecha>.json
+python scripts/restaurar_prueba_base.py     # prueba la restauración en un módulo temporal y lo borra al terminar
+```
+
+Las credenciales se leen de un archivo local **fuera del repositorio**
+(`%USERPROFILE%\credenciales-sigvach\`): el respaldo necesita la cuenta de operador y la
+restauración, una de administración. Ninguna credencial se escribe en el proyecto.
 - **Simulador del módulo de adquisición** (envía lecturas como lo hará el ESP32, con la clave de dispositivo):
 
 ```bash

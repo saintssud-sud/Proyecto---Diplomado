@@ -41,6 +41,10 @@ class Configuracion(BaseSettings):
         validation_alias=AliasChoices("ALLOWED_ORIGINS", "ORIGENES_PERMITIDOS"),
     )
     version_api: str = "v1"
+    nivel_registro: str = Field(
+        default="INFO",
+        validation_alias=AliasChoices("NIVEL_REGISTRO", "LOG_LEVEL"),
+    )
 
     # --- Firebase -----------------------------------------------------------
     proyecto_firebase: str = Field(

@@ -27,11 +27,12 @@ incorpora como Anexo B de la monografía.
 ```
 backend/
 ├── app/
-│   ├── main.py               # Aplicación FastAPI: rutas, CORS y manejadores de error
+│   ├── main.py               # Aplicación FastAPI: registro, rutas, CORS y manejadores de error
 │   ├── config.py             # Configuración leída del entorno
 │   ├── errores.py            # Formato único de error {"codigo", "mensaje", "detalle"}
 │   ├── esquemas.py           # Esquemas de entrada y salida, con la validación
 │   ├── seguridad.py          # Autenticación y autorización (usuario y dispositivo)
+│   ├── registro_peticiones.py # Una línea por petición: método, ruta, código y duración
 │   ├── dependencias.py       # Proveedores de repositorios
 │   ├── servicios/
 │   │   ├── evaluacion.py     # Evaluación de rangos, alertas, resumen y CSV
@@ -40,11 +41,43 @@ backend/
 │   │   ├── base.py           # Interfaz de persistencia
 │   │   ├── firestore.py      # Implementación sobre Cloud Firestore
 │   │   └── memoria.py        # Implementación en memoria (desarrollo y pruebas)
-│   └── rutas/                # salud · lecturas · módulos · perfiles · rangos · alertas · exportaciones
-├── pruebas/                  # 54 pruebas automatizadas
+│   └── rutas/                # salud · lecturas · módulos · perfiles · rangos · alertas · exportaciones · usuarios
+├── pruebas/                  # 119 pruebas automatizadas
 ├── requirements.txt          # Dependencias del servicio
 └── requirements-dev.txt      # Dependencias de las pruebas
 ```
+
+### 2.1 Registro de una línea por petición
+
+El servicio escribe **una línea por cada petición** que atiende, con cuatro datos y nada
+más: método, ruta declarada, código de respuesta y duración en milisegundos.
+
+```
+2026-10-05 13:07:52 INFO [sigvach] peticion metodo=GET ruta=/api/v1/modulos/{modulo_id} codigo=401 duracion_ms=113.7
+```
+
+Lo resuelve el middleware ASGI `MiddlewareRegistroPeticiones`
+(`app/registro_peticiones.py`), que escribe la línea en un bloque `finally`: queda
+registrada también la petición que termina en una excepción no prevista, que es la que
+más interesa ver. Se apoya en el registro estándar de Python, con el mismo registro
+(`logging.getLogger("sigvach")`) que ya usaban `main.py` y el repositorio de Firestore.
+
+**Qué no se registra.** Ni la cabecera `Authorization` ni la `X-Device-Key`, ni los
+cuerpos de petición o respuesta —el registro de lecturas manuales lleva observaciones
+escritas por personas—, ni la cadena de consulta. La ruta se escribe **declarada**, con
+los parámetros entre llaves, de modo que `/api/v1/usuarios/AbC123` se registre como
+`/api/v1/usuarios/{uid}` y el registro sirva para diagnosticar sin dejar rastro de datos.
+
+**El registro no puede tumbar una petición.** Todo el trabajo de registro está encerrado
+en una función que no propaga ninguna excepción: si el registro falla, la petición se
+atiende igual. Hay pruebas para las dos cosas —una petición cuyo registrador falla
+responde 200, y una petición rechazada por autorización sigue respondiendo 401— en
+`pruebas/test_registro_peticiones.py`.
+
+El nivel se ajusta con `NIVEL_REGISTRO`. Sin configuración explícita, el módulo añade un
+manejador sobre la salida estándar cuando nadie configuró otro: ni Uvicorn ni la
+plataforma de despliegue configuran el registro de la aplicación, y sin ese manejador los
+mensajes de nivel INFO se descartan y el registro quedaría vacío.
 
 ## 3. Requisitos
 
@@ -151,7 +184,8 @@ python -m pytest
 
 Las pruebas no requieren credenciales ni conexión: sustituyen el repositorio de
 Cloud Firestore por el de memoria y el verificador de identidad por uno simulado.
-La última ejecución registró 59 casos aprobados y ninguno fallido.
+La última ejecución registró 119 casos aprobados y ninguno fallido
+(`pytest -q`, 6,34 s, el 5 de octubre de 2026).
 
 | Archivo | Qué verifica |
 |---|---|
@@ -159,6 +193,7 @@ La última ejecución registró 59 casos aprobados y ninguno fallido.
 | `pruebas/test_validacion.py` | Validación de los datos de entrada, en el esquema y a través de la API (código 422 y campo rechazado) |
 | `pruebas/test_api_lecturas.py` | Contrato de lecturas: recepción desde el dispositivo, registro manual, filtros, resumen y exportación |
 | `pruebas/test_api_autorizacion.py` | Autenticación, autorización por rol, cuenta desactivada y acceso público al diagnóstico |
+| `pruebas/test_registro_peticiones.py` | El registro de una línea por petición: los cuatro datos, la ausencia de credenciales y de la cadena de consulta, y que un fallo del registro no rompa la petición |
 | `pruebas/test_semilla.py` | Datos del modo de demostración y las alertas que la propia regla de negocio genera sobre ellos |
 
 ## 7. Variables de entorno
@@ -175,6 +210,7 @@ que afectan a este servicio son:
 | `FIREBASE_SERVICE_ACCOUNT_JSON` | Credenciales de la cuenta de servicio, en una sola línea |
 | `GOOGLE_APPLICATION_CREDENTIALS` | Ruta al archivo de credenciales (alternativa a la anterior) |
 | `USAR_REPOSITORIO_EN_MEMORIA` | Fuerza el repositorio en memoria, para demostración |
+| `NIVEL_REGISTRO` | Nivel del registro de la aplicación, incluida la línea de cada petición (por omisión `INFO`) |
 | `ROL_ADMINISTRADOR` · `ROL_OPERADOR` | Nombres de los roles que habilitan la administración y la operación |
 | `MINUTOS_TOLERANCIA_RELOJ` | Tolerancia admitida para la marca de tiempo que envía el dispositivo |
 
@@ -209,13 +245,20 @@ antes de la demostración.
 
 Las consultas de lecturas que combinan un filtro de igualdad con un rango de fechas, y
 las que ordenan por marca de tiempo, requieren un índice compuesto. Firestore devuelve
-en el error un enlace directo para crearlo; los índices previstos son:
+en el error un enlace directo para crearlo. Los índices declarados en
+`firestore.indexes.json` son:
 
 | Colección | Campos |
 |---|---|
+| `modulos_cultivo` | `activo` (asc) · `nombre` (asc) |
 | `lecturas` | `modulo_id` (asc) · `timestamp` (desc) |
 | `lecturas` | `variable` (asc) · `timestamp` (desc) |
+| `alertas` | `estado` (asc) · `modulo_id` (asc) · `timestamp` (desc) |
 | `alertas` | `estado` (asc) · `timestamp` (desc) |
+| `alertas` | `modulo_id` (asc) · `timestamp` (desc) — **falta declararlo** (véase el pendiente 3) |
+
+Los índices declarados no bastan hasta que se despliegan con
+`firebase deploy --only firestore:indexes`.
 
 ## 10. Pendientes conocidos
 
@@ -227,3 +270,13 @@ en el error un enlace directo para crearlo; los índices previstos son:
   con Cloud Firestore debe comprobarse en el entorno de despliegue.
 - El borrado de la cuenta de autenticación de un usuario dado de baja requiere funciones
   del lado del servidor; hoy alcanza con eliminar su perfil, según lo declarado en 2.7.
+- **La consulta de alertas por módulo responde HTTP 500 en el servicio publicado.** La
+  operación `GET /api/v1/alertas?modulo_id=...` —sin el filtro `estado`— necesita el índice
+  compuesto `alertas(modulo_id asc, timestamp desc)`, que **no** está declarado en
+  `firestore.indexes.json`; Firestore rechaza la consulta y el servicio responde
+  `{"codigo":"error_interno", ...}`. Con el filtro `estado` la consulta funciona, porque ese
+  índice sí está declarado, y ese es el rodeo que usa hoy `scripts/respaldar_base.py` para
+  respaldar las alertas. Comprobado contra el servicio publicado el 5 de octubre de 2026:
+  `GET /api/v1/alertas?modulo_id=v6wrYSXxeHyttf3prDd7` → **500**, y
+  `GET /api/v1/alertas?estado=activa&modulo_id=v6wrYSXxeHyttf3prDd7` → **200**. Se corrige
+  declarando el índice que falta y desplegándolo.

@@ -17,6 +17,7 @@ from . import __version__
 from .config import Configuracion, obtener_configuracion
 from .errores import registrar_manejadores_de_error
 from .dependencias import obtener_repositorio
+from .registro_peticiones import MiddlewareRegistroPeticiones, configurar_registro
 from .rutas import enrutador_api
 from .semilla import sembrar_demostracion
 
@@ -118,8 +119,14 @@ async def ciclo_de_vida(_: FastAPI) -> AsyncIterator[None]:
 
 
 def crear_aplicacion() -> FastAPI:
-    """Construye la aplicación con sus rutas, su CORS y sus manejadores de error."""
+    """Construye la aplicación con su registro, sus rutas, su CORS y sus manejadores de error."""
     configuracion = obtener_configuracion()
+
+    # El registro de la aplicación se deja en condiciones de escribir antes de
+    # construir nada: sin un nivel y un manejador, el módulo estándar de Python
+    # descarta los mensajes de nivel INFO y el registro de peticiones quedaría
+    # vacío tanto en local como en el servicio publicado.
+    configurar_registro(configuracion.nivel_registro)
 
     aplicacion = FastAPI(
         title="SIGVACH — API",
@@ -138,6 +145,12 @@ def crear_aplicacion() -> FastAPI:
         allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
         allow_headers=["Authorization", "Content-Type", "X-Device-Key"],
     )
+
+    # Una línea por petición: método, ruta declarada, código y duración.
+    # Se añade después del CORS, de modo que quede por fuera de él y registre
+    # también el examen previo que hace el navegador antes de las peticiones con
+    # token: es el que más se rompe al configurar los orígenes permitidos.
+    aplicacion.add_middleware(MiddlewareRegistroPeticiones)
 
     registrar_manejadores_de_error(aplicacion)
     aplicacion.include_router(enrutador_api, prefix="/api/v1")

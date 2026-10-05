@@ -1,0 +1,146 @@
+==============================================================================
+PRUEBA DE RESTAURACIÓN DEL RESPALDO — SIGVACH
+==============================================================================
+  Fecha de la prueba    : 2026-10-05 13:16:37 -0400 (hora de Bolivia)
+  Servicio              : https://sigvach-api.onrender.com
+  Cuenta                : administrador@proyecto.test
+  Archivo de respaldo   : D:\SIGVACH-Monograf\Proyecto SIGVACH\respaldos\respaldo-sigvach-2026-10-05_130910.json
+  Tamaño del respaldo   : 747700 bytes
+  Marca de las lecturas : restauracion de prueba 2026-10-05
+  Lecturas a restaurar  : 3
+
+  El procedimiento crea su propio módulo de prueba, restaura lecturas
+  del respaldo en él y borra todo lo creado. No modifica ningún dato
+  preexistente del cultivo.
+
+------------------------------------------------------------------------------
+1. COMPROBACIÓN DE PERMISOS
+------------------------------------------------------------------------------
+  [1.1] GET /api/v1/usuarios/perfil  ->  HTTP 200
+      respuesta: {"id":"ricOhA6gQ1gneNA6HAXvmCO6liA2","email":"administrador@proyecto.test","nombre":"Administrador de prueba","rol":"administrador","activo":true,"telefono":"","cargo":"Cuenta de prueba"}
+      nota     : La prueba crea y borra un módulo: exige administración.
+  Cuenta                : administrador@proyecto.test
+  Rol                   : administrador
+
+------------------------------------------------------------------------------
+2. COMPROBACIÓN PREVIA DEL ESTADO DE LA BASE
+------------------------------------------------------------------------------
+  [2.1] GET /api/v1/modulos  ->  HTTP 200
+      respuesta: [{"id":"modulo-1","nombre":"Módulo 1","tipo_cultivo":"Lechuga","perfil_id":"perfil-lechuga","perfil_nombre":"Lechuga","ubicacion":"Invernadero Norte","activo":true},{"id":"2YkZtoJULdSWspaLMKzM","nombre":"Modulo 2","tipo_cultivo":"Hortaliza","perfil_id":"ZmFigZHHiTl2yjuWbL5N","perfil_nombre":"Acelga","ubicacion":"Invernadero Norte","activo":true},{"id":"5qb9eiYhJzoxvhsgoOim","nombre":"Modulo3","tipo_cultivo":"Hortaliza","perfil_id":"LbjTRBgxIaLSCoSJvdxV","perfil_nombre":"Apio","ubicacion":"Invernadero Norte","activo":true},{"id":"v6wrYSXxeHyttf3prDd7","nombre":"Maqueta NFT - Lechuga","tipo_cult
+  Módulos en el sistema : 4
+      · Módulo 1                   modulo-1
+      · Modulo 2                   2YkZtoJULdSWspaLMKzM
+      · Modulo3                    5qb9eiYhJzoxvhsgoOim
+      · Maqueta NFT - Lechuga      v6wrYSXxeHyttf3prDd7
+      -> No existe un módulo con ese nombre: se puede crear.
+
+  Huella del módulo real: 1000 lecturas y 605 alertas visibles (identificadores guardados para comprobar al final que ninguno desaparece)
+
+------------------------------------------------------------------------------
+3. QUÉ SE EXPORTÓ Y QUÉ SE VA A RESTAURAR
+------------------------------------------------------------------------------
+  Archivo de respaldo   : D:\SIGVACH-Monograf\Proyecto SIGVACH\respaldos\respaldo-sigvach-2026-10-05_130910.json
+  Generado en           : 2026-10-05T17:09:10.310124+00:00
+  Origen                : API REST publicada (sin acceso directo a la base de datos)
+  Contenido del respaldo:
+      · perfiles         3
+      · modulos          4
+      · rangos           6
+      · lecturas      1464
+      · alertas        605
+      aviso: La consulta de alertas por módulo (/api/v1/alertas?modulo_id=v6wrYSXxeHyttf3prDd7&limite=500) respondió HTTP 500: {"codigo":"error_interno","mensaje":"Ocurrió un error no previsto al procesar la petición.","detalle":{}}. Se usó la consulta por estado, que sí está indexada.
+      aviso: Las alertas en estado 'activa' llegaron al límite de 500 de la API: puede haber más.
+  [3.1] GET /api/v1/modulos/v6wrYSXxeHyttf3prDd7  ->  HTTP 200
+      respuesta: {"id":"v6wrYSXxeHyttf3prDd7","nombre":"Maqueta NFT - Lechuga","tipo_cultivo":"Lechuga","perfil_id":"perfil-lechuga","perfil_nombre":"Lechuga","ubicacion":"Interior - maqueta demostrativa","activo":true}
+  Módulo de la maqueta  : Maqueta NFT - Lechuga (v6wrYSXxeHyttf3prDd7)
+  Perfil de cultivo     : perfil-lechuga
+  [3.2] GET /api/v1/rangos?perfil_id=perfil-lechuga  ->  HTTP 200
+      respuesta: [{"id":"rango-ec","perfil_id":"perfil-lechuga","variable":"ec","minimo":1.2,"maximo":1.8,"unidad":"mS/cm"},{"id":"rango-humedad","perfil_id":"perfil-lechuga","variable":"humedad","minimo":50.0,"maximo":80.0,"unidad":"%"},{"id":"rango-ph","perfil_id":"perfil-lechuga","variable":"ph","minimo":5.5,"maximo":6.5,"unidad":""},{"id":"rango-tds","perfil_id":"perfil-lechuga","variable":"tds","minimo":600.0,"maximo":900.0,"unidad":"ppm"},{"id":"rango-temp_ambiental","perfil_id":"perfil-lechuga","variable":"temp_ambiental","minimo":15.0,"maximo":25.0,"unidad":"°C"},{"id":"rango-temp_solucion","perfil_id"
+      nota     : Los rangos son la referencia con la que se evalúan las lecturas.
+
+  Lecturas elegidas del respaldo (la más reciente de cada variable):
+      · ph               valor=2.87     rango=[5.5, 6.5]  original=2026-10-05T02:43:35Z
+      · humedad          valor=52.3     rango=[50.0, 80.0]  original=2026-10-05T02:43:14Z
+      · temp_solucion    valor=21.81    rango=[15.0, 25.0]  original=2026-10-05T02:43:19Z
+
+------------------------------------------------------------------------------
+4. RESTAURACIÓN: MÓDULO DE PRUEBA
+------------------------------------------------------------------------------
+  [4.1] POST /api/v1/modulos  ->  HTTP 201
+      peticion : {"nombre": "PRUEBA DE RESTAURACION", "tipo_cultivo": "Lechuga", "perfil_id": "perfil-lechuga", "ubicacion": "Modulo temporal de la prueba de restauracion", "activo": true}
+      respuesta: {"id":"maiYb43qH3wwcGQ4gORa","nombre":"PRUEBA DE RESTAURACION","tipo_cultivo":"Lechuga","perfil_id":"perfil-lechuga","perfil_nombre":"Lechuga","ubicacion":"Modulo temporal de la prueba de restauracion","activo":true}
+  Módulo de prueba creado: maiYb43qH3wwcGQ4gORa
+
+------------------------------------------------------------------------------
+5. RESTAURACIÓN: LECTURAS
+------------------------------------------------------------------------------
+  [5.1] POST /api/v1/lecturas/manual  ->  HTTP 201
+      peticion : {"modulo_id": "maiYb43qH3wwcGQ4gORa", "variable": "ph", "valor": 2.87, "timestamp": "2026-10-05T02:43:35Z", "observacion": "restauracion de prueba 2026-10-05 | original: 2026-10-05T02:43:35Z"}
+      respuesta: {"id":"rb0o8DKo1oQiKdnZhti0","modulo_id":"maiYb43qH3wwcGQ4gORa","variable":"ph","valor":2.87,"unidad":"","origen":"manual","registrado_por":"ricOhA6gQ1gneNA6HAXvmCO6liA2","timestamp":"2026-10-05T02:43:35Z","estado_rango":"bajo","observacion":"restauracion de prueba 2026-10-05 | original: 2026-10-05T02:43:35Z"}
+      estado_rango = bajo   (evaluada por el servidor contra [5.5, 6.5])
+  [5.2] POST /api/v1/lecturas/manual  ->  HTTP 201
+      peticion : {"modulo_id": "maiYb43qH3wwcGQ4gORa", "variable": "humedad", "valor": 52.3, "timestamp": "2026-10-05T02:43:14Z", "observacion": "restauracion de prueba 2026-10-05 | original: 2026-10-05T02:43:14Z"}
+      respuesta: {"id":"oakiFg2Ftz3xzG9Uc1St","modulo_id":"maiYb43qH3wwcGQ4gORa","variable":"humedad","valor":52.3,"unidad":"%","origen":"manual","registrado_por":"ricOhA6gQ1gneNA6HAXvmCO6liA2","timestamp":"2026-10-05T02:43:14Z","estado_rango":"dentro","observacion":"restauracion de prueba 2026-10-05 | original: 2026-10-05T02:43:14Z"}
+      estado_rango = dentro   (evaluada por el servidor contra [50.0, 80.0])
+  [5.3] POST /api/v1/lecturas/manual  ->  HTTP 201
+      peticion : {"modulo_id": "maiYb43qH3wwcGQ4gORa", "variable": "temp_solucion", "valor": 21.81, "timestamp": "2026-10-05T02:43:19Z", "observacion": "restauracion de prueba 2026-10-05 | original: 2026-10-05T02:43:19Z"}
+      respuesta: {"id":"rQ1soQKmecm4exyYi9ar","modulo_id":"maiYb43qH3wwcGQ4gORa","variable":"temp_solucion","valor":21.81,"unidad":"°C","origen":"manual","registrado_por":"ricOhA6gQ1gneNA6HAXvmCO6liA2","timestamp":"2026-10-05T02:43:19Z","estado_rango":"dentro","observacion":"restauracion de prueba 2026-10-05 | original: 2026-10-05T02:43:19Z"}
+      estado_rango = dentro   (evaluada por el servidor contra [15.0, 25.0])
+
+------------------------------------------------------------------------------
+6. COMPROBACIÓN DE LO RESTAURADO
+------------------------------------------------------------------------------
+  [6.1] GET /api/v1/lecturas?modulo_id=maiYb43qH3wwcGQ4gORa&limite=1000  ->  HTTP 200
+      respuesta: [{"id":"rb0o8DKo1oQiKdnZhti0","modulo_id":"maiYb43qH3wwcGQ4gORa","variable":"ph","valor":2.87,"unidad":"","origen":"manual","registrado_por":"ricOhA6gQ1gneNA6HAXvmCO6liA2","timestamp":"2026-10-05T02:43:35Z","estado_rango":"bajo","observacion":"restauracion de prueba 2026-10-05 | original: 2026-10-05T02:43:35Z"},{"id":"rQ1soQKmecm4exyYi9ar","modulo_id":"maiYb43qH3wwcGQ4gORa","variable":"temp_solucion","valor":21.81,"unidad":"°C","origen":"manual","registrado_por":"ricOhA6gQ1gneNA6HAXvmCO6liA2","timestamp":"2026-10-05T02:43:19Z","estado_rango":"dentro","observacion":"restauracion de prueba 2026-
+      · ph               valor=2.87     estado_rango=bajo      origen=manual    observación=restauracion de prueba 2026-10-05 | original: 2026-10-05T02:
+      · temp_solucion    valor=21.81    estado_rango=dentro    origen=manual    observación=restauracion de prueba 2026-10-05 | original: 2026-10-05T02:
+      · humedad          valor=52.3     estado_rango=dentro    origen=manual    observación=restauracion de prueba 2026-10-05 | original: 2026-10-05T02:
+
+  Alertas generadas por las lecturas de prueba:
+  [6.2.activa] GET /api/v1/alertas?estado=activa&modulo_id=maiYb43qH3wwcGQ4gORa&limite=500  ->  HTTP 200
+      respuesta: [{"id":"Ir4kshuKQ2iEcmaYJ5A7","lectura_id":"rb0o8DKo1oQiKdnZhti0","modulo_id":"maiYb43qH3wwcGQ4gORa","variable":"ph","valor":2.87,"rango_minimo":5.5,"rango_maximo":6.5,"estado":"activa","timestamp":"2026-10-05T02:43:35Z","observacion":null,"unidad":"","desviacion":"bajo"}]
+      · ph               valor=2.87     desviación=bajo   estado=activa
+  [6.2.atendida] GET /api/v1/alertas?estado=atendida&modulo_id=maiYb43qH3wwcGQ4gORa&limite=500  ->  HTTP 200
+      respuesta: []
+
+------------------------------------------------------------------------------
+7. LIMPIEZA: SE BORRA TODO LO CREADO
+------------------------------------------------------------------------------
+  [7.1.1] DELETE /api/v1/alertas/Ir4kshuKQ2iEcmaYJ5A7  ->  HTTP 204
+      respuesta: 
+      nota     : 204: borrada. 404: ya no estaba (cuenta como borrada).
+  [7.2.1] DELETE /api/v1/lecturas/rb0o8DKo1oQiKdnZhti0  ->  HTTP 204
+      respuesta: 
+  [7.2.2] DELETE /api/v1/lecturas/oakiFg2Ftz3xzG9Uc1St  ->  HTTP 204
+      respuesta: 
+  [7.2.3] DELETE /api/v1/lecturas/rQ1soQKmecm4exyYi9ar  ->  HTTP 204
+      respuesta: 
+  [7.3] DELETE /api/v1/modulos/maiYb43qH3wwcGQ4gORa  ->  HTTP 204
+      respuesta: 
+
+------------------------------------------------------------------------------
+8. COMPROBACIÓN FINAL: LA BASE QUEDÓ COMO ESTABA
+------------------------------------------------------------------------------
+  [8.1] GET /api/v1/modulos/maiYb43qH3wwcGQ4gORa  ->  HTTP 404
+      respuesta: {"codigo":"no_encontrado","mensaje":"El módulo de cultivo 'maiYb43qH3wwcGQ4gORa' no existe.","detalle":{}}
+      nota     : Se espera 404.
+  [8.2] GET /api/v1/lecturas?modulo_id=maiYb43qH3wwcGQ4gORa&limite=1000  ->  HTTP 200
+      respuesta: []
+      nota     : Se espera una lista vacía.
+  [8.3] GET /api/v1/modulos  ->  HTTP 200
+      respuesta: [{"id":"modulo-1","nombre":"Módulo 1","tipo_cultivo":"Lechuga","perfil_id":"perfil-lechuga","perfil_nombre":"Lechuga","ubicacion":"Invernadero Norte","activo":true},{"id":"2YkZtoJULdSWspaLMKzM","nombre":"Modulo 2","tipo_cultivo":"Hortaliza","perfil_id":"ZmFigZHHiTl2yjuWbL5N","perfil_nombre":"Acelga","ubicacion":"Invernadero Norte","activo":true},{"id":"5qb9eiYhJzoxvhsgoOim","nombre":"Modulo3","tipo_cultivo":"Hortaliza","perfil_id":"LbjTRBgxIaLSCoSJvdxV","perfil_nombre":"Apio","ubicacion":"Invernadero Norte","activo":true},{"id":"v6wrYSXxeHyttf3prDd7","nombre":"Maqueta NFT - Lechuga","tipo_cult
+
+  Módulo de la maqueta  : v6wrYSXxeHyttf3prDd7
+      · Lecturas   visibles antes=1000  después=1000   desaparecidos=0  sin cambios en lo que existía
+      · Alertas    visibles antes=605   después=605    desaparecidos=0  sin cambios en lo que existía
+
+------------------------------------------------------------------------------
+9. CONCLUSIÓN
+------------------------------------------------------------------------------
+  El procedimiento de restauración SIRVE y quedó probado contra el
+  servicio publicado: se exportó el dominio a un archivo JSON, se creó un
+  módulo de prueba asociado al perfil de cultivo real, se restauraron
+  lecturas del respaldo en él, el servidor las almacenó y las evaluó
+  contra su rango de referencia (el campo 'estado_rango' de la respuesta
+  trae esa evaluación), y después se borró todo lo creado, dejando los
+  datos del cultivo sin cambios.

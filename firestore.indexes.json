@@ -37,6 +37,14 @@
       "collectionGroup": "alertas",
       "queryScope": "COLLECTION",
       "fields": [
+        { "fieldPath": "modulo_id", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "alertas",
+      "queryScope": "COLLECTION",
+      "fields": [
         { "fieldPath": "estado", "order": "ASCENDING" },
         { "fieldPath": "timestamp", "order": "DESCENDING" }
       ]

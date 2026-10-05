@@ -58,6 +58,12 @@ serviceAccountKey.json
 firebase-adminsdk*.json
 serviceAccountKey.json
 
+# ==================== Respaldos de la base ====================
+# Los respaldos que genera `scripts/respaldar_base.py` son copias de los datos
+# del cultivo y pueden contener mediciones, observaciones y datos de las cuentas.
+# Se guardan en el disco como evidencia de trabajo, pero no se versionan.
+respaldos/
+
 # ==================== Prototipo (hardware/) ====================
 # La clave del dispositivo y la red WiFi del modulo viven en configuracion.h.
 # El .gitignore de la carpeta del firmware ya lo excluye, pero se repite aqui
