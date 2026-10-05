@@ -16,7 +16,7 @@ lo hará el ESP32. Sirve para dos cosas:
 
 Uso
 ---
-    # Un envío de las siete variables (el más útil para la demostración)
+    # Un envío de las seis variables (el más útil para la demostración)
     python scripts/simulador_dispositivo.py --modulo MOD-001 --ciclos 1
 
     # Envío continuo cada 30 s, contra el servicio publicado

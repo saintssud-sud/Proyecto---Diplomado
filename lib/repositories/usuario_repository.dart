@@ -69,26 +69,6 @@ class UsuarioRepository {
     return obtenerPorUid(user.uid);
   }
 
-  /// Lista todos los usuarios registrados (para el panel del admin).
-  Future<List<UsuarioPerfil>> listarTodos() async {
-    final snap = await _usuarios.orderBy('creado_en', descending: true).get();
-    return snap.docs
-        .map((doc) => UsuarioPerfil.fromMap(doc.data(), uid: doc.id))
-        .toList();
-  }
-
-  /// Escucha en tiempo real todos los usuarios (para el panel del admin).
-  Stream<List<UsuarioPerfil>> verTodos() {
-    return _usuarios
-        .orderBy('creado_en', descending: true)
-        .snapshots()
-        .map(
-          (snap) => snap.docs
-              .map((doc) => UsuarioPerfil.fromMap(doc.data(), uid: doc.id))
-              .toList(),
-        );
-  }
-
   /// Actualiza datos personales de un usuario.
   Future<void> actualizarDatos({
     required String uid,
@@ -103,26 +83,5 @@ class UsuarioRepository {
     if (data.isNotEmpty) {
       await _doc(uid).update(data);
     }
-  }
-
-  /// Cambia el rol de un usuario.
-  Future<void> cambiarRol({required String uid, required String rol}) async {
-    await _doc(uid).update(<String, dynamic>{'rol': Roles.normalizar(rol)});
-  }
-
-  /// Activa o desactiva un usuario.
-  Future<void> cambiarActivo({
-    required String uid,
-    required bool activo,
-  }) async {
-    await _doc(uid).update(<String, dynamic>{'activo': activo});
-  }
-
-  /// Elimina el perfil de un usuario de Firestore.
-  ///
-  /// Nota: no elimina la cuenta de Firebase Auth (eso requiere Cloud
-  /// Functions). Con esto el usuario deja de aparecer en el sistema.
-  Future<void> eliminar(String uid) async {
-    await _doc(uid).delete();
   }
 }

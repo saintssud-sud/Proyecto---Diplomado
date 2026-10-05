@@ -3,7 +3,7 @@
 Es público y sin autenticación: sirve para comprobar que el servicio responde y
 que alcanza la base de datos. Se documenta en el apartado 2.9 como el mecanismo
 empleado para verificar el despliegue y para medir el efecto de la suspensión
-por inactividad de la capa gratuita (RNF-02).
+por inactividad de la capa gratuita (RNF-05, disponibilidad).
 """
 
 from fastapi import APIRouter, Depends

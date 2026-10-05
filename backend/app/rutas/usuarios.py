@@ -23,6 +23,7 @@ from ..config import Configuracion, obtener_configuracion
 from ..dependencias import obtener_repositorio
 from ..errores import (
     CODIGO_CONFLICTO,
+    CODIGO_DATOS_INVALIDOS,
     CODIGO_NO_ENCONTRADO,
     CODIGO_VALIDACION,
     ErrorApi,
@@ -102,7 +103,7 @@ def actualizar_mi_perfil(
     if not cambios:
         raise ErrorApi(
             400,
-            "solicitud_invalida",
+            CODIGO_DATOS_INVALIDOS,
             "No se indicó ningún dato para modificar.",
         )
 
@@ -184,7 +185,7 @@ def actualizar_cuenta(
     if not cambios:
         raise ErrorApi(
             400,
-            "solicitud_invalida",
+            CODIGO_DATOS_INVALIDOS,
             "No se indicó ningún dato para modificar.",
         )
 

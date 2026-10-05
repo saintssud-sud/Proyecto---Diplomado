@@ -41,7 +41,7 @@ del perfil del usuario en la base.
 | `backend/app/seguridad.py` | 108 | `requiere_administracion` |
 | `backend/app/seguridad.py` | 126 | `requiere_consulta` |
 | `backend/app/seguridad.py` | 150 | `requiere_operacion` |
-| `backend/app/rutas/*.py` | — | **28 rutas** declaran su dependencia; por ejemplo `usuarios.py:167` |
+| `backend/app/rutas/*.py` | — | **32 endpoints** en total: **30** exigen identidad de usuario (**28** de ellos con una dependencia de rol y **2** con solo el perfil propio), **1** se autentica con la clave del dispositivo (`lecturas.py:45`) y **1** es público (`salud.py:19`); por ejemplo `usuarios.py:167` |
 
 **Cómo se muestra en vivo.** Con la sesión del operador se llama a `GET /api/v1/usuarios` y el
 servicio responde:

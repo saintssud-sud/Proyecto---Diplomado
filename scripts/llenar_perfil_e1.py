@@ -379,7 +379,7 @@ requisitos = [
      "CA-03.1 Dado un administrador autenticado, cuando registra un módulo con su tipo de cultivo y su perfil, entonces el módulo queda disponible en el panel. "
      "CA-03.2 Dado un módulo con lecturas registradas, cuando se intenta eliminar, entonces el servicio rechaza la operación con un conflicto y conserva el historial.",
      "Must"),
-    ("RF-04", "Como administrador, quiero disponer del catálogo de las siete variables con su unidad, para que toda lectura quede referenciada a una variable conocida.",
+    ("RF-04", "Como administrador, quiero disponer del catálogo de las seis variables con su unidad, para que toda lectura quede referenciada a una variable conocida.",
      "CA-04.1 Dada una lectura almacenada, cuando se consulta, entonces informa la unidad heredada del catálogo. "
      "CA-04.2 Dado un envío con una variable fuera del catálogo, cuando se recibe, entonces el servicio responde 422 señalando el campo rechazado.",
      "Could"),
@@ -407,7 +407,7 @@ requisitos = [
      "CA-10.1 Dada una alerta activa, cuando el operador la marca como atendida, entonces deja de figurar entre las activas y permanece en el historial. "
      "CA-10.2 Dado un intento de atención sin conexión con el servicio, cuando se envía, entonces la aplicación informa el fallo y ofrece reintentar sin perder el estado.",
      "Should"),
-    ("RF-11", "Como operador, quiero ver el estado actual de las siete variables con su valor, su unidad y su rango, para conocer la situación del módulo de un vistazo.",
+    ("RF-11", "Como operador, quiero ver el estado actual de las seis variables con su valor, su unidad y su rango, para conocer la situación del módulo de un vistazo.",
      "CA-11.1 Dado un módulo con lecturas, cuando se abre el panel, entonces presenta el valor, el rango y el indicador de estado de cada variable y la fecha de la última lectura. "
      "CA-11.2 Dado un módulo sin lecturas, cuando se abre el panel, entonces informa el estado vacío con la acción concreta para registrar la primera medición.",
      "Must"),

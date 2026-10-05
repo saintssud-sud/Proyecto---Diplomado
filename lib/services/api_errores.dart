@@ -72,10 +72,6 @@ class ErrorDeContrato implements Exception {
   String toString() => 'ErrorDeContrato: $mensaje';
 }
 
-///
-/// Se produce cuando no hay red, cuando el servicio no responde o cuando la
-/// respuesta tarda más de lo admitido. No es un rechazo del servidor: el
-/// servidor puede no haberse enterado de la petición.
 /// Error de conexión: la petición no llegó a completarse.
 ///
 /// Se produce cuando no hay red, cuando el servicio no responde o cuando la

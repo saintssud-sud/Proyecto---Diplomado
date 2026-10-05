@@ -4,7 +4,7 @@
  *  Pines de la placa de expansión:
  *     P33 · GPIO 33 · sensor de ambiente (AM2302 / DHT22, o DHT11)
  *     P32 · GPIO 32 · DS18B20 para la temperatura de la solución
- *     SVP · GPIO 36 · pH                                           (pendiente)
+ *     SVP · GPIO 36 · pH                                           (calibrado y publicado)
  *     SVN · GPIO 39 · TDS
  * ==========================================================================*/
 
