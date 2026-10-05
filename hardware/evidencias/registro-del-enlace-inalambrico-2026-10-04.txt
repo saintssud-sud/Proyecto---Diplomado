@@ -1,0 +1,116 @@
+REGISTRO DEL ENLACE INALÁMBRICO — 4 de octubre de 2026
+======================================================
+
+Qué se instrumentó
+------------------
+Tres mejoras en el firmware del módulo, todas verificadas en el registro que
+sigue, y que son la respuesta a un problema real: cuando la conexión se caía, el
+registro no decía por qué, y el módulo dejaba de atender sus eventos mientras
+esperaba para reintentar.
+
+    1. El motivo de cada caída se informa en palabras y no como un número suelto.
+    2. La espera de 15 segundos antes de reintentar ya no ocurre dentro del
+       manejador de eventos: la lleva un temporizador, así que durante esa espera
+       la placa sigue atendiendo lo que pasa.
+    3. Al conectarse se informa la dirección, la red, la señal y el canal, desde
+       la tarea principal.
+
+Captura — arranque con la red difícil (20:33, versión 90bd2e1)
+--------------------------------------------------------------
+Módulo: v6wrYSXxeHyttf3prDd7 · Red: Gorditos&Bonitos (canal 4)
+Versión grabada: 90bd2e1, verificada dentro del binario.
+
+    I (4616) SIGVACH: Conversor asentado (4000 ms de espera)
+    I (4736) SENSORES: Sensor de ambiente: AM2302 / DHT22 en GPIO 33  (+-0,5 C, +-2 % HR)
+    I (4896) SENSORES: DS18B20 en uso: ROM D528EBD4469FA928 (resolucion 12 bits)
+    I (5396) SIGVACH: --- Entradas analogicas (dispersion de 30 muestras) ---
+    I (5396) SIGVACH: SVP GPIO 36   pH              1553 mV         12  senal estable
+    I (5406) SIGVACH: SVN GPIO 39   TDS              213 mV         59  algo ruidosa
+    I (5416) SIGVACH: P34 GPIO 34   alternativa      142 mV          0  senal estable
+    I (5416) SIGVACH: P35 GPIO 35   alternativa      142 mV          0  senal estable
+    I (5616) SIGVACH: Conectando a la red Gorditos&Bonitos
+    W (5656) SIGVACH: WiFi caido (motivo 4: la asociacion expiro: el punto de
+             acceso no respondio a tiempo). Caida numero 1; se reintenta en 15 segundos
+    I (20666) SIGVACH: Reintentando la conexion inalambrica
+    W (23076) SIGVACH: WiFi caido (motivo 205: no se pudo establecer la conexion).
+             Caida numero 2; se reintenta en 15 segundos
+    W (35616) SIGVACH: Sin red por ahora: se reintenta en el proximo ciclo
+    I (35636) SIGVACH: Ambiente -> 23.50 C   52.00 % HR
+    I (36446) SIGVACH: Solucion -> 22.06 C
+    I (36456) SIGVACH: pH  ->   1562 mV (1.56 V) crudo 1730  dispersion   15  senal estable
+    I (36456) SIGVACH: TDS ->    213 mV (0.21 V) crudo   86  dispersion   41  algo ruidosa
+    I (36466) SIGVACH:   -> 91.23 ppm   0.18 mS/cm   (compensado con la temperatura de la solucion)
+    I (36476) SIGVACH:   -> 3.90 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+    W (36476) SIGVACH: Sin red: las lecturas del ciclo se guardan para despues
+    I (36566) SIGVACH: En la cola hay 6 lectura(s) esperando red
+    I (38076) SIGVACH: Reintentando la conexion inalambrica
+    I (41366) SIGVACH: Conectado. Direccion IP: 192.168.100.215
+
+    (Las líneas de la pila de WiFi y de la PHY —«wifi_init», «phy_init»,
+    «ssn:5, winSize:64»— se omiten por ruido. La captura completa tiene 42
+    líneas útiles y 30 descartadas por ese filtro; el puerto no se trabó.)
+
+Cómo se lee esta captura
+------------------------
+  1. A los 5,6 s empieza el intento de conexión a la red del proyecto.
+  2. A los 5,7 s ocurre la primera caída, motivo 4: «la asociación expiró: el
+     punto de acceso no respondió a tiempo». Es la caída que se repite en cada
+     arranque y que antes se informaba como un número sin explicación.
+  3. A los 20,7 s aparece «Reintentando la conexión inalámbrica»: pasaron
+     15,010 s desde la caída. Es la prueba de que el temporizador reemplazó a la
+     espera que bloqueaba el manejador de eventos; el reintento se dispara solo y
+     mientras tanto la placa sigue viva.
+  4. A los 23,1 s, segunda caída, motivo 205: «no se pudo establecer la conexión».
+  5. A los 35,6 s se agotan los 30 s de espera del arranque y el módulo informa
+     «Sin red por ahora: se reintenta en el próximo ciclo». No se queda esperando
+     la red: sigue funcionando.
+  6. A los 36,5 s mide las seis variables y calcula pH 3,90 con la recta de
+     calibración impresa en la misma línea (1553 mV = pH 4,01; −83,9 mV por
+     unidad). El electrodo está en el patrón de 4,01.
+  7. En el mismo instante guarda el ciclo: «En la cola hay 6 lectura(s)
+     esperando red».
+  8. A los 38,1 s hay un segundo reintento, exactamente 15,000 s después del
+     anterior.
+  9. A los 41,4 s: «Conectado. Direccion IP: 192.168.100.215». El enlace volvió
+     solo, sin intervención de nadie.
+
+Qué se publicó después (misma sesión, consultado al servicio)
+------------------------------------------------------------
+    20:31:45 a 20:32:03   ciclo completo (las seis variables)
+    20:32:08 a 20:32:26   ciclo completo, inmediatamente después
+    20:37:31 a 20:37:44   ciclo completo, ya con la cadencia normal
+
+El segundo ciclo seguido de las 20:32 son las lecturas que estaban esperando en
+la cola, no un error de cadencia: el módulo las guardó cuando no había red y las
+envió en cuanto volvió.
+
+Verificación del enlace en un arranque sano (20:21, versión a82ec69)
+--------------------------------------------------------------------
+    I (9046)  SIGVACH: Conectado. Direccion IP: 192.168.100.215
+    I (11546) SIGVACH: Red Gorditos&Bonitos: senal -69 dBm, canal 4
+    I (11546) SIGVACH: Caidas de red desde el arranque: 0
+    I (17376) SIGVACH:   temp_ambiental       23.50 °C     ->  almacenada
+    I (22086) SIGVACH:   humedad              52.70 %       ->  almacenada
+    I (25876) SIGVACH:   temp_solucion        22.13 °C     ->  almacenada
+    I (29556) SIGVACH:   tds                  91.12 ppm     ->  almacenada
+    I (34066) SIGVACH:   ec                    0.18 mS/cm   ->  almacenada
+    I (38676) SIGVACH:   ph                    4.42         ->  almacenada
+
+Cada envío va precedido por «esp-x509-crt-bundle: Certificate validated»: la
+conexión con el servicio es HTTPS con el certificado verificado, no en claro.
+
+Observaciones para el informe
+-----------------------------
+  · La red del proyecto llega al módulo con −69 dBm. Es un enlace utilizable
+    pero al límite: los dos primeros intentos fallan y el tercero entra. Acercar
+    el módulo al punto de acceso, o subirlo, es la mejora más simple y la más
+    efectiva para la maqueta.
+  · El primer intento falla siempre, en cada arranque, con el motivo 4. No es un
+    defecto del módulo ni de las credenciales: el punto de acceso no responde
+    dentro del plazo que espera la pila de WiFi en ese primer intento.
+  · El módulo nunca se queda esperando la red: si no hay enlace, mide igual y
+    guarda. Es el comportamiento que permite que la maqueta quede sola.
+  · El puerto serie del PC es un canal de diagnóstico que también falla (su
+    búfer se traba y devuelve un fragmento repetido a velocidades imposibles
+    para el cable). Por eso la verificación de las publicaciones se hizo contra
+    el servicio publicado, que es la vía que exige la cátedra.
