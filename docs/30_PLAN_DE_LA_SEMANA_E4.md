@@ -90,7 +90,33 @@ Con eso se llega a 40 páginas o menos sin perder contenido, solo reubicándolo 
 redacción. **Criterio de orden:** primero se traslada (no pierde nada y es reversible), después se
 condensa.
 
-#### 2.1.3 Estado de las piezas del documento
+#### 2.1.3 Formato institucional: qué cumple cada uno (verificado el 4 de octubre)
+
+La pregunta obligada antes de tocar nada es si el documento sigue el formato de la entrega. Se
+comprobó leyendo los estilos, las secciones y la numeración de los dos archivos con `python-docx`.
+
+| Exigencia del Formato 2020 | Entregable E3 | Borrador completo |
+|---|---|---|
+| Arial 12 puntos | ✅ Arial 12 en los valores por defecto del documento | ✅ Arial 12 en el estilo Normal |
+| Interlineado 1,5 | ✅ | ✅ |
+| Papel carta | 🟡 la portada sí, pero **hay tres secciones en A4** (dos verticales y una horizontal) | ✅ las dos secciones en carta |
+| Márgenes 4/3/3/3 | ✅ | ✅ |
+| **Numeración romana en preliminares y arábiga desde el Capítulo 1** | ❌ **todo en arábiga**, sin prefijo romano | ✅ romana en los preliminares y arábiga desde el Capítulo 1 |
+| Campo de número en el pie | ✅ | ✅ |
+| Tablas sin líneas verticales | ❌ las 21 tablas las tienen | ❌ las 9 tablas también |
+| Resumen de 300 palabras como máximo | ✅ 290 palabras | ✅ |
+
+**Consecuencia para el plan:** el entregable del E3 aporta el **contenido** y el borrador aporta el
+**formato**. El documento del E4 tiene que quedar con el formato del borrador y el contenido del E3,
+así que hay trabajo de formato que no estaba previsto y que hay que sumar a la semana:
+**numeración romana en los preliminares**, **unificar el papel a carta** y **quitar las líneas
+verticales de las tablas**. Las tres son acotadas y mecánicas, pero no son opcionales.
+
+> Corrección de una comprobación previa: la tipografía del entregable del E3 **sí** cumple. La primera
+> lectura marcó «revisar» porque el estilo Normal no declara la fuente; está declarada en los valores
+> por defecto del documento (Arial, 12 puntos, interlineado 1,5), que es de donde Word la toma.
+
+#### 2.1.4 Estado de las piezas del documento
 
 | Qué | Estado | Detalle |
 |---|---|---|
@@ -201,5 +227,6 @@ Cierre oficial a las 23:59 y cuestionario Q4.
 
 1. La **corrección de la Tabla 3** del E3, con la explicación de por qué no se volvió a subir el archivo.
 2. La pregunta sobre **dónde va el epígrafe de las figuras**: la plantilla oficial y el módulo se contradicen.
-3. **Qué espera del sistema en la defensa** y qué peso tiene el hardware frente al software.
-4. Los dos **casos fallidos registrados** —la corrección del manejador de WiFi y la limitación del agua de baja mineralización—, que valen más que una tabla donde todo pasó.
+3. Si las **tablas deben ir sin líneas verticales** —hoy los dos documentos las tienen— y si el papel A4 de tres secciones del entregable del E3 es aceptable o hay que unificar todo a carta.
+4. **Qué espera del sistema en la defensa** y qué peso tiene el hardware frente al software.
+5. Los dos **casos fallidos registrados** —la corrección del manejador de WiFi y la limitación del agua de baja mineralización—, que valen más que una tabla donde todo pasó.
