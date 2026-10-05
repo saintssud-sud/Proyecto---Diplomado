@@ -123,3 +123,46 @@ controlador CP210x del lado del PC, no del módulo, y se destraba re-enumerando 
 dispositivo (desconectar y reconectar el cable, mejor en otro puerto USB). Por eso
 la verificación se hizo contra el servicio publicado, que es además la vía que
 exige la cátedra para las evidencias.
+
+Verificación final: el patrón contra el agua de grifo (20:59 a 21:48)
+---------------------------------------------------------------------
+Con la sonda ya verificada se hizo la prueba que decide si el agua del proyecto
+es alcalina o si la lectura está mal. Se pasó la sonda del patrón de 4,01 al agua
+de grifo y de vuelta, sin tocar el calibrado ni el conexionado.
+
+    En el patrón de 4,01            En el agua de grifo
+    20:59:21   pH 3,91              21:09:27   pH 8,22
+    21:04:26   pH 3,99              21:14:28   pH 8,66
+    21:32:13   pH 3,95              21:20:55   pH 8,99
+    21:37:41   pH 4,01              21:26:46   pH 8,46
+    21:43:06   pH 4,07              21:48:32   pH 8,11
+
+    media 3,99 · error −0,02        media 8,49
+    dispersión total 0,16           dispersión total 0,88
+
+En la misma tanda el módulo informó, por el puerto serie, una dispersión de 9 a 13
+con «señal estable» en el patrón, y de 22 a 41 en el agua. Medida con el mismo
+instrumento y el mismo calibrado, la sonda repite diez veces mejor en el patrón
+que en el agua: 0,16 contra 0,88 unidades de pH.
+
+Interpretación
+--------------
+  1. La sonda y el calibrado están bien. En el patrón, con el electrodo quieto,
+     el sistema informa 3,99 de media contra un patrón de 4,01: un error de dos
+     centésimas, y una de las lecturas dio 4,01 exacto, con dispersión 13 y señal
+     estable.
+  2. El agua de grifo del proyecto es realmente alcalina: entre 8,11 y 8,99, con
+     una media de 8,49. No es un error de la sonda ni del calibrado.
+  3. En esa agua la lectura es menos repetible (0,88 contra 0,16 unidades). Es lo
+     esperable y tiene explicación: el agua tiene 93 ppm de sólidos disueltos
+     —0,19 mS/cm—, o sea muy pocos iones, y en aguas de baja mineralización la
+     junta de referencia del electrodo pierde contacto y la lectura se vuelve
+     lenta e inestable. Es una limitación de la técnica, no del equipo.
+  4. Consecuencia para el cultivo: como el agua de partida ya está en 8,5, la
+     solución con nutrientes va a quedar por encima del rango de la lechuga
+     (5,8–6,5) y habrá que corregirla con ácido al prepararla. Queda por medir en
+     la solución ya preparada, donde al haber muchos más iones se espera una
+     lectura repetible; esa medición es la que cierra el lazo con el cultivo.
+
+Las horas de esta serie están tomadas del reloj del servicio y se comprobó que
+coincide con el de la PC al segundo, de modo que sirven como evidencia fechada.
