@@ -167,7 +167,12 @@ Pueden pedir **un cambio pequeño en vivo**: un texto, una validación, un campo
 > «Un rol que solo se esconde en el frontend no está implementado.» El nuestro se verifica en el
 > servidor, así que ese punto está cubierto.
 
-### 6.2 E4 · sábado 10 de octubre a las 23:59, con el cuestionario Q4
+### 6.2 E4 · cierre interno el viernes 9, oficial el sábado 10 a las 23:59, con el cuestionario Q4
+
+> **El E4 se sube antes de la tutoría del viernes 9 a las 17:00.** El cierre interno coincide con el
+> día de la tutoría, así que el objetivo es tenerlo subido por la mañana y usar la reunión para
+> corregir sobre lo ya entregado. El sábado 10 a las 23:59 sigue siendo el cierre oficial y funciona
+> como colchón.
 
 Documento completo (Capítulos 1, 2 y 3, preliminares, bibliografía y anexos) · despliegue verificado
 el día de la entrega · los dos manuales como anexos · monitoreo y medición del rendimiento en
@@ -183,7 +188,8 @@ producción · repositorio final sin secretos.
 | **Sábado 3 de octubre, 23:59** | **E3 y cuestionario Q3** |
 | 5 al 9 de octubre | Tutoría T4: revisión del E3, documento completo y **ensayo de la defensa** |
 | **Viernes 9 de octubre, 17:00** | **T4 del Grupo 3** (el martes 6 no hay actividad; los Grupos 3 y 4 tienen su T4 el viernes a las 17:00 y 18:00) |
-| **Sábado 10 de octubre, 23:59** | **E4 y cuestionario Q4** |
+| **Viernes 9 de octubre, por la mañana** | **Subida del E4** — cierre interno a las 23:59 del mismo día |
+| **Sábado 10 de octubre, 23:59** | **Cierre oficial del E4 y cuestionario Q4** (colchón) |
 | 12 al 15 de octubre | T5: defensa técnica evaluada, 7 minutos de demostración y 5 de preguntas |
 | Martes 13 de octubre, 17:00 | Franja del Grupo 3 para la defensa |
 
