@@ -1,0 +1,86 @@
+# Monitoreo de disponibilidad del servicio publicado.
+#
+# Para qué existe
+# ---------------
+# El E4 pide que el monitoreo de disponibilidad esté activo y que el servicio
+# muestre la API en línea en los últimos días. Este flujo consulta la ruta de
+# salud cada quince minutos, desde los servidores de GitHub y no desde la
+# computadora del autor, y falla si el servicio no responde o si la base de datos
+# no contesta.
+#
+# Dos razones para hacerlo acá y no con un servicio aparte:
+#   · el historial de ejecuciones del repositorio queda como página de estado
+#     pública, que es lo que el tribunal puede abrir y ver;
+#   · no hace falta crear ninguna cuenta.
+#
+# Efecto secundario, y conviene tenerlo presente: al consultar cada quince
+# minutos, el servicio de la capa gratuita no se suspende por inactividad, así
+# que tampoco hay espera de arranque en frío durante la demostración. El consumo
+# de horas de la capa gratuita queda declarado como limitación en el apartado 2.9
+# del documento.
+#
+# Si además se configura un servicio dedicado (UptimeRobot, Better Stack), su
+# enlace se declara en 2.9 y este flujo sigue funcionando como segunda vía.
+
+name: Monitoreo de disponibilidad
+
+on:
+  schedule:
+    # Cada quince minutos. GitHub puede demorarlo unos minutos en horas de mucha
+    # carga, lo que no afecta al sentido de la medición.
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  salud:
+    name: Consultar la ruta de salud
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Consultar /api/v1/salud
+        env:
+          URL_SALUD: https://sigvach-api.onrender.com/api/v1/salud
+        run: |
+          echo "Momento de la consulta: $(date -u +'%Y-%m-%dT%H:%M:%SZ') (UTC)"
+          echo "Ruta consultada: $URL_SALUD"
+          echo ""
+
+          codigo=$(curl -s -o respuesta.json -w "%{http_code}" \
+                   --max-time 120 --retry 2 --retry-delay 10 "$URL_SALUD" || echo "000")
+
+          echo "Código HTTP: $codigo"
+          echo "Respuesta:"
+          cat respuesta.json 2>/dev/null || echo "(sin cuerpo)"
+          echo ""
+
+          if [ "$codigo" != "200" ]; then
+            echo "::error::El servicio no respondió 200 (respondió $codigo)."
+            exit 1
+          fi
+
+          if ! grep -q '"estado":"ok"' respuesta.json; then
+            echo "::error::El servicio responde, pero no informa estado ok."
+            exit 1
+          fi
+
+          if ! grep -q '"base_de_datos":"conectada"' respuesta.json; then
+            echo "::error::El servicio responde, pero la base de datos no está conectada."
+            exit 1
+          fi
+
+          echo "En línea: el servicio responde y la base de datos está conectada."
+
+      - name: Resumen de la consulta
+        if: always()
+        run: |
+          echo "### Monitoreo de disponibilidad" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Dato | Valor |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Momento (UTC) | $(date -u +'%Y-%m-%d %H:%M:%S') |" >> $GITHUB_STEP_SUMMARY
+          echo "| Ruta | \`/api/v1/salud\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Resultado | ${{ job.status }} |" >> $GITHUB_STEP_SUMMARY

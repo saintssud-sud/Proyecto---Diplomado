@@ -37,7 +37,7 @@ El tribunal valora la precisión, no el optimismo.
 |---|---|---|
 | El sistema funciona hoy en producción, con un usuario de prueba por rol | 🟡 funciona; falta la verificación formal | Probar desde **otro dispositivo, en incógnito**, con las dos cuentas |
 | Los ocho requisitos mínimos del punto 4 de los Lineamientos | 🟡 verificados en la auditoría del 14/09 | Pasada de verificación contra el sistema en vivo, uno por uno |
-| **Monitoreo de disponibilidad activo** sobre `/api/v1/salud` | ❌ hoy sólo el visor propio en la PC | Configurar un servicio externo (UptimeRobot, Better Stack o cron-job.org) y dejar el enlace al panel de estado |
+| **Monitoreo de disponibilidad activo** sobre `/api/v1/salud` | 🟡 **el 5/10 quedó creado el flujo `monitoreo.yml`**, que consulta cada 15 minutos desde los servidores de GitHub y falla si el servicio o la base de datos no responden; el historial de ejecuciones del repositorio es la página de estado pública | Sumar el servicio dedicado (UptimeRobot o Better Stack) con su enlace en 2.9 |
 | Errores registrados: cada 500 con ruta, hora y traza, sin datos sensibles | ❌ sin declarar | Configurar o declarar la limitación en 2.9 |
 | Una línea de registro por petición: método, ruta, código y duración | ❌ por verificar | Verificar en el backend y documentarlo |
 | Tiempos de respuesta medidos en producción | ❌ pendiente (CP-24) | Medir **antes y después** de la corrección, con el número |
@@ -126,7 +126,10 @@ demostración se corta a los siete minutos, esté donde esté, y se ensaya en la
 
 Estos puntos **no estaban** en el plan y salen de la lectura de la consigna y de la plenaria:
 
-1. **Monitoreo con un servicio externo.** El visor propio no cuenta: tiene que ser algo que avise solo.
+1. **Monitoreo con un servicio externo.** **Hecho el 5/10**: el flujo `monitoreo.yml` consulta la ruta
+   de salud cada 15 minutos desde los servidores de GitHub, y su historial de ejecuciones queda como
+   página de estado pública. Falta sumar el servicio dedicado, que además avisa por correo, con su
+   enlace declarado en 2.9. Dos vías: si una falla, la otra queda.
 2. **Respaldo de la base con una restauración probada.** No alcanza con tener copia.
 3. **Prueba de fuego del manual de instalación**, hecha por otra persona.
 4. **Reorganizar el manual de usuario por tareas**, no por pantallas, y capturarlo en producción.
