@@ -40,9 +40,10 @@ backend/
 │   ├── repositorios/
 │   │   ├── base.py           # Interfaz de persistencia
 │   │   ├── firestore.py      # Implementación sobre Cloud Firestore
+│   │   ├── cache.py          # Memoria intermedia de las consultas de lecturas
 │   │   └── memoria.py        # Implementación en memoria (desarrollo y pruebas)
 │   └── rutas/                # salud · lecturas · módulos · perfiles · rangos · alertas · exportaciones · usuarios
-├── pruebas/                  # 119 pruebas automatizadas
+├── pruebas/                  # 149 pruebas automatizadas
 ├── requirements.txt          # Dependencias del servicio
 └── requirements-dev.txt      # Dependencias de las pruebas
 ```
@@ -78,6 +79,36 @@ El nivel se ajusta con `NIVEL_REGISTRO`. Sin configuración explícita, el módu
 manejador sobre la salida estándar cuando nadie configuró otro: ni Uvicorn ni la
 plataforma de despliegue configuran el registro de la aplicación, y sin ese manejador los
 mensajes de nivel INFO se descartan y el registro quedaría vacío.
+
+### 2.2 Memoria intermedia de las consultas de lecturas (RNF-01)
+
+La medición del **RNF-01** del 5 de octubre de 2026 dejó el incumplimiento por escrito:
+con 200 registros en una sola consulta, la mediana era de 878 ms y el percentil 95 de
+1.461 ms, contra un objetivo de 800 ms (`evidencia/rendimiento-2026-10-05-limite-200.txt`).
+El filtrado no era el costo —las consultas ya empujan sus filtros a Firestore y usan el
+índice compuesto—, sino **leer y serializar muchos documentos en cada petición**, repetida
+además cada pocos segundos desde el panel.
+
+`app/repositorios/cache.py` envuelve al repositorio activo con `RepositorioConCache`, que
+memoriza el resultado de `listar_lecturas` durante unos segundos. Se envuelve en
+`dependencias.obtener_repositorio`, el único lugar donde se elige la implementación, de
+modo que la memoria vale igual sobre Cloud Firestore (el servicio) y sobre el repositorio
+en memoria (desarrollo y pruebas). **El contrato de la API no cambia**: mismas rutas,
+mismos campos y mismos códigos.
+
+| Decisión | Cómo se resuelve |
+|---|---|
+| ¿Cuánto dura lo memorizado? | `SEGUNDOS_CACHE_LECTURAS`, diez segundos por omisión; con `0` la memoria queda desactivada y toda consulta va a la base |
+| ¿Qué consultas comparten resultado? | Solo las que coinciden en **los cinco** parámetros: módulo, variable, fecha desde, fecha hasta y límite. Las fechas se normalizan a UTC para que dos instantes iguales escritos con otro uso horario compartan clave |
+| ¿Cómo se evita mostrar datos viejos? | Al registrar o eliminar una lectura se descarta lo memorizado de la colección: el panel ve el dato recién registrado |
+| ¿Y si la memoria falla? | Ninguna operación de la memoria propaga su error: se deja constancia en el registro y se consulta la base como antes. Si lo que falla es el descarte tras una escritura, la memoria queda fuera de servicio hasta el próximo arranque, porque la corrección manda sobre el rendimiento |
+| ¿Se ve en el registro? | Con `NIVEL_REGISTRO=DEBUG`, cada consulta anota si salió de la memoria o de la base: es lo que permite atribuir una consulta lenta al camino que le corresponde |
+
+La frescura no queda comprometida: el módulo de adquisición publica cada cinco minutos y
+medio, así que diez segundos de antigüedad en la consulta no cambian lo que muestra el
+panel. Las pruebas de `pruebas/test_cache_lecturas.py` comprueban las cinco decisiones de
+la tabla, incluida la invalidación al registrar por las dos vías —dispositivo y registro
+manual— y que los dos repositorios se comportan igual.
 
 ## 3. Requisitos
 
@@ -184,8 +215,9 @@ python -m pytest
 
 Las pruebas no requieren credenciales ni conexión: sustituyen el repositorio de
 Cloud Firestore por el de memoria y el verificador de identidad por uno simulado.
-La última ejecución registró 119 casos aprobados y ninguno fallido
-(`pytest -q`, 6,34 s, el 5 de octubre de 2026).
+La última ejecución registró 149 casos aprobados y ninguno fallido
+(`pytest -q`, 8,76 s, el 5 de octubre de 2026), treinta más que antes de la memoria
+intermedia de lecturas.
 
 | Archivo | Qué verifica |
 |---|---|
@@ -193,6 +225,7 @@ La última ejecución registró 119 casos aprobados y ninguno fallido
 | `pruebas/test_validacion.py` | Validación de los datos de entrada, en el esquema y a través de la API (código 422 y campo rechazado) |
 | `pruebas/test_api_lecturas.py` | Contrato de lecturas: recepción desde el dispositivo, registro manual, filtros, resumen y exportación |
 | `pruebas/test_api_autorizacion.py` | Autenticación, autorización por rol, cuenta desactivada y acceso público al diagnóstico |
+| `pruebas/test_cache_lecturas.py` | Memoria intermedia de lecturas: que la segunda consulta igual no vuelva a la base, que la clave distinga cualquier cambio de parámetros, que registrar o eliminar descarte lo memorizado, el vencimiento de la ventana y que un fallo de la memoria no tumbe la petición |
 | `pruebas/test_registro_peticiones.py` | El registro de una línea por petición: los cuatro datos, la ausencia de credenciales y de la cadena de consulta, y que un fallo del registro no rompa la petición |
 | `pruebas/test_semilla.py` | Datos del modo de demostración y las alertas que la propia regla de negocio genera sobre ellos |
 
@@ -210,7 +243,8 @@ que afectan a este servicio son:
 | `FIREBASE_SERVICE_ACCOUNT_JSON` | Credenciales de la cuenta de servicio, en una sola línea |
 | `GOOGLE_APPLICATION_CREDENTIALS` | Ruta al archivo de credenciales (alternativa a la anterior) |
 | `USAR_REPOSITORIO_EN_MEMORIA` | Fuerza el repositorio en memoria, para demostración |
-| `NIVEL_REGISTRO` | Nivel del registro de la aplicación, incluida la línea de cada petición (por omisión `INFO`) |
+| `SEGUNDOS_CACHE_LECTURAS` | Ventana de la memoria intermedia de las consultas de lecturas, en segundos (por omisión `10`; con `0` queda desactivada) |
+| `NIVEL_REGISTRO` | Nivel del registro de la aplicación, incluida la línea de cada petición, y el acierto o fallo de la memoria de lecturas (por omisión `INFO`) |
 | `ROL_ADMINISTRADOR` · `ROL_OPERADOR` | Nombres de los roles que habilitan la administración y la operación |
 | `MINUTOS_TOLERANCIA_RELOJ` | Tolerancia admitida para la marca de tiempo que envía el dispositivo |
 

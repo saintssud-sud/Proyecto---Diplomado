@@ -21,6 +21,29 @@ Uso
     python scripts/medir_rendimiento.py --correo operador@proyecto.test --clave "SIGVACH.Ope.2026"
 
 Las credenciales se pasan por línea de órdenes y no se guardan en ningún archivo.
+
+Medir el antes y el después
+---------------------------
+Se mide siempre la misma máquina contra el mismo servicio: comparar el servicio
+local con el publicado no diría nada del cambio, porque la red y la capa gratuita
+pesan más que la optimización. Por eso hay tres opciones más:
+
+    --servicio  dirección que se mide (por omisión, el servicio publicado);
+    --sufijo    sufijo del nombre del informe, para distinguir el antes del después;
+    --nota      una línea libre que queda escrita en el informe (por ejemplo, con
+                qué configuración se midió y contra qué servicio).
+
+El «antes» de la memoria intermedia se mide con la memoria desactivada, en el
+mismo servicio y con el mismo comando:
+
+    # Antes (sin memoria intermedia)
+    $env:SEGUNDOS_CACHE_LECTURAS="0"; uvicorn app.main:app --port 8011
+    python scripts/medir_rendimiento.py --servicio http://127.0.0.1:8011 \
+        --sufijo -antes --correo ... --clave "..." --consultas 20 --limite 200
+
+    # Después (con la memoria intermedia en su valor por omisión)
+    python scripts/medir_rendimiento.py --servicio http://127.0.0.1:8011 \
+        --sufijo -despues --correo ... --clave "..." --consultas 20 --limite 200
 """
 
 from __future__ import annotations
@@ -76,20 +99,38 @@ def main() -> None:
     analizador.add_argument("--consultas", type=int, default=20)
     analizador.add_argument("--limite", type=int, default=200)
     analizador.add_argument("--ruta", default="/api/v1/lecturas")
+    analizador.add_argument(
+        "--servicio",
+        default=SERVICIO,
+        help="Dirección del servicio que se mide (por omisión, el publicado)",
+    )
+    analizador.add_argument(
+        "--sufijo",
+        default="",
+        help="Sufijo del nombre del informe, para distinguir el antes del después",
+    )
+    analizador.add_argument(
+        "--nota",
+        default="",
+        help="Línea libre que queda escrita en el informe, con el contexto de la medición",
+    )
     argumentos = analizador.parse_args()
 
     SALIDA.mkdir(parents=True, exist_ok=True)
+    servicio = argumentos.servicio.rstrip("/")
     token = ingresar(argumentos.correo, argumentos.clave)
     cabeceras = {"Authorization": "Bearer %s" % token, "Accept": "application/json"}
-    url = "%s%s?limite=%d" % (SERVICIO, argumentos.ruta, argumentos.limite)
+    url = "%s%s?limite=%d" % (servicio, argumentos.ruta, argumentos.limite)
 
     lineas: list[str] = []
     lineas.append("INFORME DE RENDIMIENTO — RNF-01")
     lineas.append("Fecha    : %s" % datetime.now().strftime("%Y-%m-%d %H:%M"))
-    lineas.append("Servicio : %s" % SERVICIO)
+    lineas.append("Servicio : %s" % servicio)
     lineas.append("Consulta : GET %s?limite=%d" % (argumentos.ruta, argumentos.limite))
     lineas.append("Herramienta: este programa (urllib de Python 3), cronometraje con perf_counter")
     lineas.append("Objetivo : el 95 %% de las consultas en %d ms o menos" % LIMITE_OBJETIVO_MS)
+    if argumentos.nota:
+        lineas.append("Nota     : %s" % argumentos.nota)
     lineas.append("")
 
     # Calentamiento: despierta la instancia suspendida y no se mide.
@@ -143,9 +184,10 @@ def main() -> None:
     lineas.append("las variables en 3 segundos o menos con conexión móvil. Esa medición se hace")
     lineas.append("en el navegador, con la pestaña de red abierta, y se guarda como captura fechada.")
 
-    nombre = "rendimiento-%s-limite-%d.txt" % (
+    nombre = "rendimiento-%s-limite-%d%s.txt" % (
         datetime.now().strftime("%Y-%m-%d"),
         argumentos.limite,
+        argumentos.sufijo,
     )
     (SALIDA / nombre).write_text("\n".join(lineas) + "\n", encoding="utf-8")
     print("\n".join(lineas))

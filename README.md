@@ -97,10 +97,11 @@ El sistema cuenta además con un **servicio backend** (FastAPI sobre Python 3.13
 - Código y documentación del servicio: [`backend/README.md`](backend/README.md)
 - Ejecución local en modo de demostración, sin credenciales: desde `backend/`, con `USAR_REPOSITORIO_EN_MEMORIA=true`, ejecutar `uvicorn app.main:app --reload`
 - Contrato navegable del servicio (OpenAPI): `http://localhost:8011/docs` en local, y el publicado en https://sigvach-api.onrender.com/docs
-- Pruebas automatizadas del backend: `python -m pytest` desde `backend/` (**119 casos**, sin credenciales ni conexión)
+- Pruebas automatizadas del backend: `python -m pytest` desde `backend/` (**149 casos**, sin credenciales ni conexión)
 - Pruebas automatizadas de la aplicación: `flutter test` desde la raíz (**96 casos**)
 - Los informes de las dos baterías quedan versionados en [`evidencia/`](evidencia/LEEME.md), con la fecha en el nombre del archivo
 - **Registro de una línea por petición** (método, ruta declarada, código y duración), con el registro estándar de Python y sin credenciales, cuerpos ni cadenas de consulta. Nivel ajustable con `NIVEL_REGISTRO`; detalles en [`backend/README.md`](backend/README.md#21-registro-de-una-línea-por-petición)
+- **Memoria intermedia de las consultas de lecturas** (RNF-01, rendimiento): el panel repite la misma consulta cada pocos segundos y cada repetición volvía a leer la colección entera. La memoria guarda el resultado unos segundos —ventana ajustable con `SEGUNDOS_CACHE_LECTURAS`, diez por omisión— y se descarta al registrar o eliminar una lectura. La medición antes y después está en [`evidencia/rendimiento-2026-10-05-comparacion.txt`](evidencia/rendimiento-2026-10-05-comparacion.txt)
 - **Respaldo de la base y restauración probada**: los datos del dominio se copian a un JSON fechado pidiéndolos a la API publicada, y el procedimiento de restauración está probado de punta a punta. Los respaldos quedan en `respaldos/` (fuera del repositorio) y la evidencia de la restauración en `evidencia/restauracion-2026-10-05.txt`
 
 ```bash

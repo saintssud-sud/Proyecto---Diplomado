@@ -5,6 +5,12 @@ repositorio por el de memoria y la verificación del token por una identidad
 fija. Lo que se prueba es la lógica del backend —validación, autorización,
 evaluación de rangos y formato de las respuestas—, que es justamente la parte
 que debe funcionar sin depender del cliente.
+
+La aplicación recibe el repositorio de memoria **envuelto en la memoria
+intermedia de lecturas**, que es como queda en el servicio (véase
+`dependencias.obtener_repositorio`). El repositorio sin envolver queda accesible
+en `entorno.repositorio` para comprobar contra los datos guardados sin pasar por
+la memoria.
 """
 
 from dataclasses import dataclass
@@ -16,6 +22,7 @@ from fastapi.testclient import TestClient
 from app.config import Configuracion, obtener_configuracion
 from app.dependencias import obtener_repositorio
 from app.main import crear_aplicacion
+from app.repositorios.cache import RepositorioConCache
 from app.repositorios.memoria import RepositorioMemoria
 from app import seguridad
 from app.seguridad import UsuarioAutenticado, usuario_actual
@@ -32,6 +39,7 @@ class Entorno:
     """Entorno de prueba con los datos mínimos del dominio ya cargados."""
 
     repositorio: RepositorioMemoria
+    repositorio_api: RepositorioConCache
     configuracion: Configuracion
     perfil_id: str
     modulo_id: str
@@ -88,6 +96,7 @@ def entorno() -> Entorno:
 
     return Entorno(
         repositorio=repositorio,
+        repositorio_api=RepositorioConCache(repositorio),
         configuracion=configuracion,
         perfil_id=perfil["id"],
         modulo_id=modulo["id"],
@@ -99,7 +108,7 @@ def _aplicacion(entorno: Entorno, identidad: UsuarioAutenticado | None) -> FastA
     """Crea la aplicación con el repositorio y la configuración de prueba."""
     aplicacion = crear_aplicacion()
     aplicacion.dependency_overrides[obtener_configuracion] = lambda: entorno.configuracion
-    aplicacion.dependency_overrides[obtener_repositorio] = lambda: entorno.repositorio
+    aplicacion.dependency_overrides[obtener_repositorio] = lambda: entorno.repositorio_api
     if identidad is not None:
         aplicacion.dependency_overrides[usuario_actual] = lambda: identidad
     return aplicacion

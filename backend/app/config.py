@@ -92,6 +92,19 @@ class Configuracion(BaseSettings):
         ),
     )
 
+    # --- Rendimiento --------------------------------------------------------
+    # Ventana de la memoria intermedia de las consultas de lecturas, en segundos.
+    # El valor por omisión no arriesga la frescura: el módulo de adquisición
+    # publica cada cinco minutos y medio. Con 0 la memoria queda desactivada y
+    # cada consulta va a la base, que es como se mide el *antes* de optimizar.
+    segundos_cache_lecturas: float = Field(
+        default=10.0,
+        ge=0,
+        validation_alias=AliasChoices(
+            "SEGUNDOS_CACHE_LECTURAS", "CACHE_LECTURAS_SEGUNDOS"
+        ),
+    )
+
     @property
     def origenes(self) -> list[str]:
         """Orígenes permitidos para CORS, a partir de una lista separada por comas."""

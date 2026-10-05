@@ -1,0 +1,46 @@
+INFORME DE RENDIMIENTO — RNF-01
+Fecha    : 2026-10-05 13:59
+Servicio : https://sigvach-api.onrender.com
+Consulta : GET /api/v1/lecturas?limite=200
+Herramienta: este programa (urllib de Python 3), cronometraje con perf_counter
+Objetivo : el 95 % de las consultas en 800 ms o menos
+
+Calentamiento (no se mide): 0.78 s, HTTP 200
+  registros devueltos por la consulta: 200
+
+  consulta  1:   1240 ms   HTTP 200
+  consulta  2:    851 ms   HTTP 200
+  consulta  3:    807 ms   HTTP 200
+  consulta  4:    837 ms   HTTP 200
+  consulta  5:    855 ms   HTTP 200
+  consulta  6:    897 ms   HTTP 200
+  consulta  7:    850 ms   HTTP 200
+  consulta  8:    861 ms   HTTP 200
+  consulta  9:    794 ms   HTTP 200
+  consulta 10:   1076 ms   HTTP 200
+  consulta 11:    822 ms   HTTP 200
+  consulta 12:    843 ms   HTTP 200
+  consulta 13:    895 ms   HTTP 200
+  consulta 14:    710 ms   HTTP 200
+  consulta 15:    958 ms   HTTP 200
+  consulta 16:   1005 ms   HTTP 200
+  consulta 17:   1229 ms   HTTP 200
+  consulta 18:   1604 ms   HTTP 200
+  consulta 19:   1461 ms   HTTP 200
+  consulta 20:    933 ms   HTTP 200
+
+RESULTADOS (en milisegundos)
+  consultas medidas      : 20
+  respuestas 200         : 20
+  mínima                 : 710
+  mediana                : 878
+  promedio               : 976
+  percentil 95           : 1461
+  máxima                 : 1604
+  dentro del objetivo    : 2 de 20 (10 %)
+
+CONCLUSIÓN: NO CUMPLE el RNF-01 en su parte de API (percentil 95 = 1461 ms, objetivo 800 ms).
+
+QUEDA PENDIENTE la otra mitad del RNF-01: que el panel muestre el estado de
+las variables en 3 segundos o menos con conexión móvil. Esa medición se hace
+en el navegador, con la pestaña de red abierta, y se guarda como captura fechada.

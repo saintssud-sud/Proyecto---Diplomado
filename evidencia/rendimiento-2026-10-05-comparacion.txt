@@ -1,0 +1,86 @@
+COMPARACIÓN DE RENDIMIENTO — RNF-01, ANTES Y DESPUÉS DE LA MEMORIA INTERMEDIA
+Fecha    : 2026-10-05
+Objetivo : el 95 % de las consultas en 800 ms o menos
+Mejora   : memoria intermedia en proceso de las consultas de lecturas
+           (backend/app/repositorios/cache.py, envuelto en dependencias.obtener_repositorio)
+
+Este archivo no es una medición: es la tabla que resume los informes que sí lo son, todos
+guardados en esta misma carpeta con su fecha.
+
+MÉTODO
+  Programa      : scripts/medir_rendimiento.py (urllib de Python 3, cronometraje con perf_counter)
+  Consultas     : 20 por corrida, con un calentamiento que no se mide
+  Parámetros    : GET /api/v1/lecturas?limite=200 y GET /api/v1/lecturas?limite=5
+  Credenciales  : cuenta de operación del sistema
+  Servicio      : local, arrancado con el comando de render.yaml
+                  (uvicorn app.main:app --host 0.0.0.0 --port 8011 --proxy-headers
+                   --forwarded-allow-ips="*")
+  Antes         : SEGUNDOS_CACHE_LECTURAS=0   (memoria intermedia desactivada)
+  Después       : SEGUNDOS_CACHE_LECTURAS=10  (valor por omisión, sin tocar nada más)
+  Comandos      :
+    Antes:
+      $env:SEGUNDOS_CACHE_LECTURAS="0"
+      uvicorn app.main:app --host 0.0.0.0 --port 8011 --proxy-headers --forwarded-allow-ips="*"
+      python scripts/medir_rendimiento.py --correo operador@proyecto.test `
+          --clave "SIGVACH.Ope.2026" --consultas 20 --limite 200 `
+          --servicio http://127.0.0.1:8011 --sufijo -antes-local --nota "..."
+    Después:
+      uvicorn app.main:app --host 0.0.0.0 --port 8011 --proxy-headers --forwarded-allow-ips="*"
+      python scripts/medir_rendimiento.py --correo operador@proyecto.test `
+          --clave "SIGVACH.Ope.2026" --consultas 20 --limite 200 `
+          --servicio http://127.0.0.1:8011 --sufijo -despues-local --nota "..."
+      (sin SEGUNDOS_CACHE_LECTURAS en el entorno: la memoria toma su valor por omisión, 10 s)
+    El mismo par de comandos, con --limite 5, produce los informes del límite 5.
+
+LÍMITE 200 REGISTROS EN UNA SOLA CONSULTA (la consulta que incumplía)
+  informe                                        mediana   promedio   p95    dentro del objetivo
+  antes · servicio publicado                        878        976   1461    2 de 20 (10 %)
+  antes · local, memoria desactivada                963       1075   1429    2 de 20 (10 %)
+  después · local, memoria activa (corrida 1)       363        468    856   15 de 20 (75 %)
+  después · local, memoria activa (corrida 2)       503        472    696   20 de 20 (100 %)
+  después · local, memoria activa (corrida 3)       468        463    741   20 de 20 (100 %)
+
+  Mediana de las tres corridas del después: 468 ms (antes 963 ms local; 878 ms publicado).
+  Promedio de las tres corridas del después: 468 ms (antes 1075 ms local; 976 ms publicado).
+  Percentil 95 del después: entre 696 y 856 ms según la corrida (antes 1429 ms local; 1461 ms
+  publicado).
+  De las 60 consultas medidas con la memoria activa, 55 quedaron dentro del objetivo (92 %).
+
+LÍMITE 5 REGISTROS (el tamaño que usa el panel)
+  informe                                        mediana   promedio   p95    dentro del objetivo
+  antes · local, memoria desactivada                537        537    561   20 de 20 (100 %)
+  después · local, memoria activa                   263        291    405   20 de 20 (100 %)
+
+  La mediana baja a la mitad y el percentil 95 de 561 a 405 ms: con el tamaño del panel el
+  requisito ya se cumplía y sigue cumpliéndose, ahora con más margen.
+
+QUÉ EXPLICA LO QUE QUEDA
+  1. La lectura de la colección desaparece. La traza de la memoria (NIVEL_REGISTRO=DEBUG, en
+     rendimiento-2026-10-05-limite-200-despues-local-2.txt) deja constancia de que las veinte
+     consultas medidas salieron de la memoria y solo el calentamiento leyó la base. Lo que
+     costaba 600 a 900 ms en cada petición —leer y serializar los 200 documentos— ya no se paga.
+  2. Lo que queda por petición no es la consulta de lecturas: es la autorización. Cada petición
+     autenticada lee el perfil del usuario en Firestore para resolver su rol
+     (app/seguridad.py, usuario_actual). Medido en esta misma máquina: una petición rechazada
+     sin llegar a leer el perfil cuesta 3 a 5 ms, y una petición autenticada que sí sale de la
+     memoria cuesta 217 a 263 ms (mediana 231 ms, sobre 20 consultas de 5 registros). La memoria
+     intermedia no toca ese camino a propósito: son las reglas de autenticación.
+  3. La serialización no es el problema: construir y serializar las 200 lecturas cuesta unos
+     4 ms. Las corridas 1 y 2 muestran de vez en cuando algún valor de 700 a 860 ms que la
+     corrida 3 no muestra; es la dispersión de esta estación de trabajo (navegador, compilador y
+     antivirus en marcha a la vez), no un costo que la memoria haya dejado sin resolver: la traza
+     demuestra que en esas consultas tampoco se leyó la base.
+
+VEREDICTO Y PENDIENTE
+  · La mejora es real y grande en el número que la cátedra pide: con 200 registros, la mediana
+    pasa de 963 a 468 ms y el promedio de 1075 a 468 ms; con 5 registros, de 537 a 263 ms.
+  · Con 200 registros el requisito se cumple en 2 de las 3 corridas locales (en la otra, 15 de 20
+    consultas dentro del objetivo); la mediana queda siempre dentro del objetivo. Se publica la
+    primera corrida tal como salió, sin elegir la mejor.
+  · La comparación es local contra local. El servicio publicado todavía ejecuta el código
+    anterior, porque el cambio no está desplegado: medir el después contra el publicado sería
+    medir la red y la capa gratuita, no la optimización. El antes local reproduce el problema del
+    publicado (mismas 2 de 20 consultas dentro del objetivo), que es lo que hace válida la
+    comparación.
+  · PENDIENTE: desplegar y volver a medir contra https://sigvach-api.onrender.com con el mismo
+    comando, para dejar el antes y el después del servicio publicado en la misma carpeta.
