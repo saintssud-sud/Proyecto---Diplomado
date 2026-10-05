@@ -87,4 +87,7 @@ jobs:
         run: flutter test --reporter expanded
 
       - name: Compilar la versión web
-        run: flutter build web --release
+        # La dirección del servicio se pasa al compilar: sin este parámetro, la
+        # aplicación publicada busca el servicio en 127.0.0.1 y ninguna consulta
+        # llega. Es el error que dejó la aplicación sin datos el 5 de octubre.
+        run: flutter build web --release --dart-define=API_BASE_URL=https://sigvach-api.onrender.com
