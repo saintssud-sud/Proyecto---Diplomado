@@ -81,14 +81,38 @@ y el que tiene el contenido detallado y corregido, y se le incorporan del borrad
 le faltan: **2.9 Despliegue, Capítulo 3 y bibliografía**. Antes de tocar nada hay que comprobar que no
 haya correcciones hechas solo en el borrador que se perderían al descartarlo.
 
+**Hecho el 5 de octubre.** El documento base está armado y guardado como `Santos_Freddy_E4.docx` en la
+raíz del proyecto. El entregable del E3 quedó intacto. Lo que se hizo, con las herramientas en
+`_diagnostico/`:
+
+  1. **Se regeneró el borrador desde su fuente.** El `.docx` del borrador era del 25 de septiembre y su
+     `.md` del 2 de octubre, así que el Word estaba viejo: regenerado, tiene 1 022 palabras y una tabla
+     más. Se trabajó con esa versión.
+  2. **Se copiaron con Word** (para no perder formato ni imágenes) el 2.9 Despliegue, el Capítulo 3 y la
+     bibliografía, y se pegaron al final del cuerpo, después del 2.8.
+  3. **Se corrigió la jerarquía de títulos.** El entregable del E3 **no tenía el título del Capítulo 2**
+     —le faltaba— y usaba el nivel de capítulo para los apartados 2.1 a 2.8. Ahora: capítulo en nivel 1,
+     apartado en nivel 2 y subapartado en nivel 3, como pide el índice oficial. Se reubicaron 8
+     apartados y 20 subapartados.
+  4. **Se corrigieron tres defectos** aparecidos al armar: el título del Capítulo 2 insertado por
+     duplicado en la zona del índice, el título del 2.9 que se perdió al copiar, y una leyenda de
+     figura («Figura 9») que venía del E3 con estilo de título y por eso aparecía en el índice.
+
 #### 2.1.2 Cuánto hay que sacar
 
 | | Cuerpo real | Límite | Hay que sacar |
 |---|---|---|---|
 | Entregable E3 | páginas 6 a 67 = **62 páginas** | 30 a 40 | **≈ 22 páginas** |
 | Borrador | páginas 12 a 87 = **76 páginas** | 30 a 40 | **≈ 36 páginas** |
+| **Documento base del E4** (medido el 5/10) | **≈ 70 páginas** | 30 a 40 | **≈ 30 páginas** |
 
-No es un ajuste menor: hay que reducir el cuerpo casi a la mitad. La mayor parte se resuelve
+El documento base del E4 se armó el 5 de octubre: es el entregable del E3 más el 2.9 Despliegue, el
+Capítulo 3 y la bibliografía que se tomaron del borrador actualizado. Quedó en **78 páginas totales y
+16 111 palabras**, con la bibliografía empezando en la página 76, así que el cuerpo ronda las 70
+páginas. La extensión empeoró respecto del E3 porque se le agregaron los tres bloques que le
+faltaban: es lo esperado, y es lo que hay que resolver con el recorte.
+
+No es un ajuste menor: hay que reducir el cuerpo a más de la mitad. La mayor parte se resuelve
 **moviendo a anexos**, que no pierde contenido, y el resto apretando redacción.
 
 | Medida | Ahorro estimado |
@@ -97,6 +121,20 @@ No es un ajuste menor: hay que reducir el cuerpo casi a la mitad. La mayor parte
 | La tabla de 25 casos de prueba al anexo, con un resumen de 8 filas en 2.8 | 3 a 4 páginas |
 | Siete de las doce figuras al anexo, dejando cinco en el cuerpo | 3 páginas |
 | Condensar la prosa de 2.1 y de 2.6 | 6 a 8 páginas |
+| **Total de las medidas ya previstas** | **18 a 22 páginas** |
+
+Con eso no alcanza para las 30 páginas: faltan del orden de **8 a 10** que hay que sacar de otro
+lado. Las candidatas, en orden:
+
+  1. **Trasladar también el contrato de la API (Tabla 18) y la tabla del stack (Tabla 19) a los anexos**, dejando en el cuerpo el resumen de las rutas.
+  2. **Achicar las figuras** que quedan en el cuerpo: hoy ocupan media página cada una.
+  3. **Condensar el 2.4 Diseño**, que es el apartado más extenso del documento.
+  4. **Revisar el 2.1 Fundamentos**: son seis subapartados de teoría que pueden resumirse sin perder las citas.
+
+> **Llevar el número al tutor el viernes.** El límite de 30 a 40 páginas es explícito, pero conviene
+> preguntarle si es estricto o si admite el rango contando tablas y figuras. Con el número medido en
+> la mano —78 páginas totales, 16 111 palabras— la consulta es concreta y la respuesta puede ahorrar
+> horas de recorte.
 | **Total** | **18 a 22 páginas** |
 
 Con eso se llega a 40 páginas o menos sin perder contenido, solo reubicándolo y apretando la
