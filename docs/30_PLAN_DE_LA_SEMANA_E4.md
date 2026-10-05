@@ -112,6 +112,10 @@ así que hay trabajo de formato que no estaba previsto y que hay que sumar a la 
 **numeración romana en los preliminares**, **unificar el papel a carta** y **quitar las líneas
 verticales de las tablas**. Las tres son acotadas y mecánicas, pero no son opcionales.
 
+> **Decisión del 4 de octubre: todo el documento va en papel carta.** No quedan secciones en A4. Las
+> tres secciones en A4 del entregable del E3 se convierten, y si alguna tabla ancha necesita más
+> espacio se resuelve con carta horizontal o achicando columnas, no cambiando de papel.
+
 > Corrección de una comprobación previa: la tipografía del entregable del E3 **sí** cumple. La primera
 > lectura marcó «revisar» porque el estilo Normal no declara la fuente; está declarada en los valores
 > por defecto del documento (Arial, 12 puntos, interlineado 1,5), que es de donde Word la toma.
@@ -227,6 +231,6 @@ Cierre oficial a las 23:59 y cuestionario Q4.
 
 1. La **corrección de la Tabla 3** del E3, con la explicación de por qué no se volvió a subir el archivo.
 2. La pregunta sobre **dónde va el epígrafe de las figuras**: la plantilla oficial y el módulo se contradicen.
-3. Si las **tablas deben ir sin líneas verticales** —hoy los dos documentos las tienen— y si el papel A4 de tres secciones del entregable del E3 es aceptable o hay que unificar todo a carta.
+3. Si las **tablas deben ir sin líneas verticales**: hoy los dos documentos las tienen y la norma de presentación las prohíbe, pero conviene confirmarlo antes de rehacer 21 tablas.
 4. **Qué espera del sistema en la defensa** y qué peso tiene el hardware frente al software.
 5. Los dos **casos fallidos registrados** —la corrección del manejador de WiFi y la limitación del agua de baja mineralización—, que valen más que una tabla donde todo pasó.
