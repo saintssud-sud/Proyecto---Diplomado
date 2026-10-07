@@ -521,13 +521,13 @@ falta. La frase que cierra bien: «esto es lo que no está; lo demás está y lo
 
 ### 3.2 Desde que el módulo mide hasta que la lectura queda guardada y evaluada
 
-1. `hardware/firmware/main/main.c:828-838` — el módulo abre la memoria no volátil y la cola de pendientes.
-2. `hardware/firmware/main/main.c:248-288` — inicializa el conversor analógico con su calibración de fábrica y espera a que se asiente.
-3. `hardware/firmware/main/main.c:702-732` — lee el ambiente, la temperatura de la solución y las dos entradas analógicas (pH y TDS).
-4. `hardware/firmware/main/main.c:748` — convierte el TDS a ppm compensando con la temperatura de la solución.
-5. `hardware/firmware/main/main.c:764-765` — convierte milivoltios a pH con la recta de calibración y descarta el valor si se sale del rango del catálogo.
-6. `hardware/firmware/main/main.c:780-795` — sin red, guarda las seis lecturas en la cola con su hora y termina el ciclo.
-7. `hardware/firmware/main/main.c:621-627` — con red, toma la marca de tiempo **antes** de enviar, para que una lectura guardada conserve la hora en que se midió.
+1. `hardware/firmware/main/main.c:856-868` — el módulo abre la memoria no volátil y la cola de pendientes.
+2. `hardware/firmware/main/main.c:248-315` — inicializa el conversor analógico con su calibración de fábrica y espera a que se asiente.
+3. `hardware/firmware/main/main.c:730-762` — lee el ambiente, la temperatura de la solución y las dos entradas analógicas (pH y TDS).
+4. `hardware/firmware/main/main.c:776-778` — convierte el TDS a ppm compensando con la temperatura de la solución y aplica `TDS_FACTOR_CORRECCION`.
+5. `hardware/firmware/main/main.c:792-795` — convierte milivoltios a pH con la recta de calibración y descarta el valor si se sale del rango del catálogo.
+6. `hardware/firmware/main/main.c:808-823` — sin red, guarda las seis lecturas en la cola con su hora y termina el ciclo.
+7. `hardware/firmware/main/main.c:641-655` — con red, toma la marca de tiempo **antes** de enviar, para que una lectura guardada conserve la hora en que se midió.
 8. `hardware/firmware/main/publicacion.c:82-135` — arma el JSON y hace `POST` a `/api/v1/lecturas` con la cabecera `X-Device-Key`.
 9. `backend/app/rutas/lecturas.py:45-57` — el endpoint exige `dispositivo_autorizado` y llama al servicio.
 10. `backend/app/seguridad.py:168-186` — compara la clave del dispositivo con `compare_digest`; si no coincide, 401.
@@ -829,14 +829,14 @@ Las otras cinco secciones de esta guía ya están ajustadas a este estado.
    tiene `8000` por defecto, mientras `.env.example:14` y `lib/config/api_config.dart:36` usan `8011`.
    Si falta el `.env`, el servicio arranca en 8000 y la aplicación busca en 8011: un fallo de conexión
    que parece un problema de red y es de configuración.
-7. **Falta un índice compuesto y ya produjo un error del servidor en producción.** Esto dejó de ser
-   hipotético: `scripts/respaldar_base.py:47-50` documenta que
-   `/api/v1/alertas?modulo_id=…` responde **HTTP 500** en el servicio publicado porque falta el índice
-   `(modulo_id, timestamp)`, y el informe lo registra con la respuesta textual en
-   `evidencia/restauracion-2026-10-05.txt:51`. `firestore.indexes.json` sigue con sus cinco índices
-   (líneas 27-43) y ninguno cubre esa consulta. Si en la defensa se filtran las alertas por módulo, se
-   puede ver el 500 en vivo: conviene saberlo antes. Además, la API no pagina alertas: el máximo es 500
-   por consulta (`respaldar_base.py:51-53`).
+7. ~~**Faltaba un índice compuesto y ya produjo un error del servidor en producción.**~~
+   **Resuelto**: el índice `alertas(modulo_id, timestamp)` está declarado en
+   `firestore.indexes.json:36-43` (seis índices en total) y desplegado con
+   `firebase deploy --only firestore:indexes --project sigvach26-bd`. La consulta
+   `/api/v1/alertas?modulo_id=…` que respondía **HTTP 500** (`evidencia/restauracion-2026-10-05.txt:51`)
+   ahora responde **200**, y conviene decirlo así si alguien recuerda el 500. Queda en pie el otro
+   detalle de ese punto: la API no pagina alertas, el máximo es 500 por consulta
+   (`scripts/respaldar_base.py:51-53`).
 8. **Si falta `firebase-admin`, todo lo autenticado responde 500 y no 401.**
    `backend/app/seguridad.py:43-48` devuelve 500 cuando el verificador no está disponible. Es correcto
    para diagnosticar, pero conviene saber que un despliegue sin esa dependencia no falla «por falta de
@@ -876,15 +876,15 @@ Las otras cinco secciones de esta guía ya están ajustadas a este estado.
     que se cargan a mano en el panel son **tres**, no cuatro (las que llevan `sync: false`). La misma
     cuenta vieja está en `docs/BITACORA_LUNES_2026-09-14.md:167`.
 13. **Los números de las pruebas quedaron viejos en la evidencia.** Esta es la que más puede doler en
-    la pregunta 6, porque se muestra justamente ese archivo. `evidencia/LEEME.md:9-17` dice que la
-    última ejecución fue el **29 de septiembre** y que son **202 pruebas (106 del servicio y 96 de la
-    aplicación)**; hoy son **215 (119 y 96)**, porque el 5/10 se sumaron las 13 del registro de
-    peticiones. El informe guardado más reciente del servicio es `evidencia/pytest-2026-10-02.txt`, del
-    2/10, con 106. Dos salidas, y conviene hacer una antes de la defensa: **volver a correr las dos
-    baterías y guardar el informe con la fecha del día** (los comandos están en `evidencia/LEEME.md:32-44`),
-    o decir el número correcto y explicar que el informe guardado es anterior. Lo mismo pasa con
-    `docs/32_LISTA_DE_VERIFICACION_DEL_E4.md:40-44`, que sigue listando como pendientes el respaldo y la
-    línea por petición.
+    la pregunta 6, porque se muestra justamente ese archivo. El número vigente —ya corregido en
+    `evidencia/LEEME.md:9-29`— es de **245 pruebas: 149 del servicio y 96 de la aplicación**, con los
+    informes `pytest-2026-10-05-memoria-lecturas.txt` y `flutter-test-2026-10-05.txt` del 5/10. Los
+    informes del 29 de septiembre se conservan como historial y dicen 202: son anteriores a los trece
+    casos del registro de peticiones y a los treinta de la memoria intermedia. Si se muestra un informe
+    viejo, decir el número correcto y explicar por qué el guardado es anterior — o volver a correr las
+    dos baterías con los comandos de `evidencia/LEEME.md:35-42` y guardar el informe con la fecha del
+    día. Lo mismo pasa con `docs/32_LISTA_DE_VERIFICACION_DEL_E4.md:40-44`, que sigue listando como
+    pendientes el respaldo y la línea por petición.
 
 **Resumen para tener a mano: 9 puntos resueltos el 5/10 y 13 vigentes** (ocho de la sección 6.2 y
 cinco de la 6.3). De los vigentes, dos son los que más conviene tener preparados: el **séptimo**, que

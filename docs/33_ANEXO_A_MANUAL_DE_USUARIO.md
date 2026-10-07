@@ -545,6 +545,10 @@ Registré una medición y no se generó ninguna alerta. Puede ocurrir por dos mo
 
 ¿Qué diferencia hay entre módulo y cultivo? El módulo es la instalación física donde están los sensores; el cultivo es la especie sembrada en él y define los rangos de referencia. Un módulo se asocia a un cultivo y sus lecturas se evalúan contra los rangos de ese cultivo.
 
+El TDS bajó de golpe y la solución no cambió. Es el síntoma típico de una película sobre las placas de la sonda: la lectura puede llegar a caer un 16 %. Saque la sonda, sumerja sólo la punta —los dos pines y el cuerpo blanco— en alcohol isopropílico, déjela evaporar, enjuáguela con agua desionizada y vuelva a medir. Si el valor se recupera, era eso. Conviene verificar después contra una solución patrón.
+
+¿Cómo guardo las sondas cuando no las uso? El electrodo de pH va en su solución de almacenamiento (Hanna HI70300), parado y con el bulbo hacia abajo: si se seca, su calibración se corre y hay que recalibrarlo. La sonda de TDS, en cambio, se enjuaga con agua desionizada y se guarda **seca y limpia**: si se guarda con restos de líquido encima, al secarse se forma una película sobre las placas que hace bajar la lectura.
+
 ## 8. Glosario de las variables gestionadas
 
 | Variable | Unidad | Qué mide y por qué importa |
@@ -567,6 +571,8 @@ Registré una medición y no se generó ninguna alerta. Puede ocurrir por dos mo
 7. Dejar los campos vacíos cuando no se midió esa variable. Un valor inventado o copiado de otro día contamina el historial y puede generar alertas falsas.
 8. Desactivar en lugar de eliminar. Cuando un módulo deja de usarse o una persona deja de participar, la desactivación conserva la información; la eliminación no se puede deshacer.
 9. Consultar el historial al cerrar un ciclo de cultivo. El resumen del periodo, con su promedio, su máximo y su mínimo, permite comparar un ciclo con el siguiente.
+10. Cuidar las sondas cuando no se usan. El electrodo de pH no puede quedarse seco: entre mediciones va en su solución de almacenamiento, parado y con el bulbo hacia abajo. La sonda de TDS se enjuaga con agua desionizada y se guarda seca y limpia. Las dos fallan sin dar aviso: una lectura que se aparta de a poco no se nota hasta que alguien la compara con un patrón.
+11. Limpiar la sonda de TDS cuando la lectura se aparta. Si el valor se aleja más de un 5 % de lo esperado, sumerja sólo la punta en alcohol isopropílico, déjela evaporar, enjuáguela con agua desionizada y vuelva a medir. Verifique después contra el patrón: en una medición propia, la limpieza recuperó un 16 %.
 
 ---
 

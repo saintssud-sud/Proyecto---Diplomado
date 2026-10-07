@@ -413,6 +413,27 @@ original (`medida el 2026-09-23T20:58:40Z`).
 > neutra: si le entra agua, la lectura se vuelve errática con los días — y no es
 > un fallo evidente, es de los que envenenan los datos sin que uno se dé cuenta.
 
+> **Cuidado con la sonda de TDS: se limpia.** Medido el 7 de octubre de 2026: la
+> sonda pasó una noche guardada seca con restos de líquido encima, se formó una
+> película sobre las placas y **la lectura cayó un 16 %** — de 1758 mV a 1456 mV en
+> el mismo patrón. Se limpió la punta con alcohol isopropílico y volvió a
+> **1733 mV / 707 ppm**. Reglas que salen de eso:
+>
+> 1. **Antes de guardarla, enjuagarla con agua desionizada** y sacudirla. Nunca se
+>    guarda seca con restos encima.
+> 2. Se guarda **seca y limpia**, nunca dejando líquido en el recipiente de medida.
+> 3. Si la lectura se aparta más de un 5 %, limpiar sólo la punta con **alcohol
+>    isopropílico**, dejar evaporar y enjuagar con agua desionizada.
+> 4. **Después de limpiar, verificar contra el patrón**: la lectura puede cambiar
+>    hasta un 16 %.
+>
+> Dato útil: el piso del módulo es **~58 ppm**. Con la sonda seca al aire informa
+> 142 mV y ≈58 ppm, así que **nunca llega a cero**; por debajo de ~60 ppm la lectura
+> no es un valor real.
+>
+> Detalle completo: `hardware/evidencias/limpieza-de-la-sonda-de-tds-2026-10-07.txt`
+> y `docs/BITACORA_MIERCOLES_2026-10-07.md`.
+
 ---
 
 *Documento de trabajo del prototipo. El programa y su guía se versionan en el
