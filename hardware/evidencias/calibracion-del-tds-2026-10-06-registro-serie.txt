@@ -1,0 +1,183 @@
+Escuchando COM6 a 115200 baudios durante 180 segundos. Pulsa RESET en la placa.
+I (11136) SIGVACH: Ambiente -> 24.30 C   47.60 % HR
+I (11946) SIGVACH: Solucion -> 23.63 C
+I (11956) SIGVACH: pH  ->    712 mV (0.71 V) crudo  694  dispersion   17  senal estable
+I (11956) SIGVACH: TDS ->   1761 mV (1.76 V) crudo 1972  dispersion   51  algo ruidosa
+I (11966) SIGVACH:   -> 752.89 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+W (11966) SIGVACH:   -> pH fuera de rango (712 mV): la sonda puede estar desconectada
+I (16996) SIGVACH: Ambiente -> 24.30 C   47.70 % HR
+I (17806) SIGVACH: Solucion -> 23.63 C
+I (17816) SIGVACH: pH  ->    900 mV (0.90 V) crudo  923  dispersion   14  senal estable
+I (17816) SIGVACH: TDS ->   1760 mV (1.76 V) crudo 1971  dispersion   96  algo ruidosa
+I (17826) SIGVACH:   -> 752.26 ppm   1.50 mS/cm   (compensado con la temperatura de la solucion)
+I (17826) SIGVACH:   -> 11.79 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (22856) SIGVACH: Ambiente -> 24.30 C   47.70 % HR
+I (23666) SIGVACH: Solucion -> 23.63 C
+I (23676) SIGVACH: pH  ->    784 mV (0.78 V) crudo  782  dispersion  127  algo ruidosa
+I (23676) SIGVACH: TDS ->   1761 mV (1.76 V) crudo 1972  dispersion   32  senal estable
+I (23686) SIGVACH:   -> 752.89 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (23686) SIGVACH:   -> 13.18 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (28716) SIGVACH: Ambiente -> 24.30 C   47.70 % HR
+I (29526) SIGVACH: Solucion -> 23.63 C
+I (29536) SIGVACH: pH  ->   1179 mV (1.18 V) crudo 1263  dispersion  255  nada conectado (pin flotando)
+I (29536) SIGVACH: TDS ->   1761 mV (1.76 V) crudo 1972  dispersion   10  senal estable
+I (29546) SIGVACH:   -> 752.89 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (29556) SIGVACH:   -> 8.47 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (34576) SIGVACH: Ambiente -> 24.30 C   47.60 % HR
+I (35386) SIGVACH: Solucion -> 23.63 C
+I (35396) SIGVACH: pH  ->   1641 mV (1.64 V) crudo 1826  dispersion   17  senal estable
+I (35396) SIGVACH: TDS ->   1760 mV (1.76 V) crudo 1971  dispersion   21  senal estable
+I (35406) SIGVACH:   -> 752.26 ppm   1.50 mS/cm   (compensado con la temperatura de la solucion)
+I (35406) SIGVACH:   -> 2.96 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (40436) SIGVACH: Ambiente -> 24.30 C   47.60 % HR
+I (41246) SIGVACH: Solucion -> 23.63 C
+I (41256) SIGVACH: pH  ->   1640 mV (1.64 V) crudo 1825  dispersion    8  senal estable
+I (41256) SIGVACH: TDS ->   1759 mV (1.76 V) crudo 1969  dispersion   14  senal estable
+I (41266) SIGVACH:   -> 751.62 ppm   1.50 mS/cm   (compensado con la temperatura de la solucion)
+I (41266) SIGVACH:   -> 2.97 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (46296) SIGVACH: Ambiente -> 24.30 C   47.60 % HR
+I (47106) SIGVACH: Solucion -> 23.63 C
+I (47116) SIGVACH: pH  ->   1600 mV (1.60 V) crudo 1776  dispersion  209  nada conectado (pin flotando)
+I (47116) SIGVACH: TDS ->   1760 mV (1.76 V) crudo 1971  dispersion   31  senal estable
+I (47126) SIGVACH:   -> 752.26 ppm   1.50 mS/cm   (compensado con la temperatura de la solucion)
+I (47136) SIGVACH:   -> 3.45 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (52156) SIGVACH: Ambiente -> 24.20 C   47.60 % HR
+I (52966) SIGVACH: Solucion -> 23.56 C
+I (52976) SIGVACH: pH  ->   1191 mV (1.19 V) crudo 1278  dispersion  141  algo ruidosa
+I (52976) SIGVACH: TDS ->   1759 mV (1.76 V) crudo 1970  dispersion   63  algo ruidosa
+I (52986) SIGVACH:   -> 753.06 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (52986) SIGVACH:   -> 8.32 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (58016) SIGVACH: Ambiente -> 24.20 C   47.60 % HR
+I (58826) SIGVACH: Solucion -> 23.63 C
+I (58836) SIGVACH: pH  ->    797 mV (0.80 V) crudo  798  dispersion   31  senal estable
+I (58836) SIGVACH: TDS ->   1761 mV (1.76 V) crudo 1972  dispersion   38  senal estable
+I (58846) SIGVACH:   -> 752.89 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (58846) SIGVACH:   -> 13.02 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (63876) SIGVACH: Ambiente -> 24.20 C   47.70 % HR
+I (64686) SIGVACH: Solucion -> 23.63 C
+I (64696) SIGVACH: pH  ->   1064 mV (1.06 V) crudo 1123  dispersion  271  nada conectado (pin flotando)
+I (64696) SIGVACH: TDS ->   1762 mV (1.76 V) crudo 1973  dispersion   19  senal estable
+I (64706) SIGVACH:   -> 753.53 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (64716) SIGVACH:   -> 9.84 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (69736) SIGVACH: Ambiente -> 24.20 C   47.70 % HR
+I (70546) SIGVACH: Solucion -> 23.56 C
+I (70556) SIGVACH: pH  ->   1542 mV (1.54 V) crudo 1705  dispersion  197  nada conectado (pin flotando)
+I (70556) SIGVACH: TDS ->   1760 mV (1.76 V) crudo 1971  dispersion   46  algo ruidosa
+I (70566) SIGVACH:   -> 753.70 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (70576) SIGVACH:   -> 4.14 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (75596) SIGVACH: Ambiente -> 24.20 C   47.70 % HR
+I (76406) SIGVACH: Solucion -> 23.56 C
+I (76416) SIGVACH: pH  ->   1641 mV (1.64 V) crudo 1826  dispersion    8  senal estable
+I (76416) SIGVACH: TDS ->   1760 mV (1.76 V) crudo 1971  dispersion   28  senal estable
+I (76426) SIGVACH:   -> 753.70 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (76426) SIGVACH:   -> 2.96 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (81456) SIGVACH: Ambiente -> 24.20 C   47.70 % HR
+I (82266) SIGVACH: Solucion -> 23.56 C
+I (82276) SIGVACH: pH  ->   1257 mV (1.26 V) crudo 1358  dispersion  142  algo ruidosa
+I (82276) SIGVACH: TDS ->   1760 mV (1.76 V) crudo 1971  dispersion   45  algo ruidosa
+I (82286) SIGVACH:   -> 753.70 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (82286) SIGVACH:   -> 7.54 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (87316) SIGVACH: Ambiente -> 24.20 C   47.70 % HR
+I (88126) SIGVACH: Solucion -> 23.56 C
+I (88136) SIGVACH: pH  ->    878 mV (0.88 V) crudo  897  dispersion   48  algo ruidosa
+I (88136) SIGVACH: TDS ->   1762 mV (1.76 V) crudo 1973  dispersion   11  senal estable
+I (88146) SIGVACH:   -> 754.99 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (88146) SIGVACH:   -> 12.06 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (93176) SIGVACH: Ambiente -> 24.20 C   47.80 % HR
+I (93986) SIGVACH: Solucion -> 23.56 C
+I (93996) SIGVACH: pH  ->   1132 mV (1.13 V) crudo 1206  dispersion  273  nada conectado (pin flotando)
+I (93996) SIGVACH: TDS ->   1761 mV (1.76 V) crudo 1972  dispersion    9  senal estable
+I (94006) SIGVACH:   -> 754.34 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (94016) SIGVACH:   -> 9.03 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (99036) SIGVACH: Ambiente -> 24.20 C   47.80 % HR
+I (99846) SIGVACH: Solucion -> 23.56 C
+I (99856) SIGVACH: pH  ->   1640 mV (1.64 V) crudo 1825  dispersion    4  senal estable
+I (99856) SIGVACH: TDS ->   1764 mV (1.76 V) crudo 1975  dispersion   16  senal estable
+I (99866) SIGVACH:   -> 756.27 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (99866) SIGVACH:   -> 2.97 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (104896) SIGVACH: Ambiente -> 24.20 C   47.70 % HR
+I (105706) SIGVACH: Solucion -> 23.56 C
+I (105716) SIGVACH: pH  ->   1428 mV (1.43 V) crudo 1566  dispersion   55  algo ruidosa
+I (105716) SIGVACH: TDS ->   1763 mV (1.76 V) crudo 1974  dispersion   14  senal estable
+I (105726) SIGVACH:   -> 755.63 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (105726) SIGVACH:   -> 5.50 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (110756) SIGVACH: Ambiente -> 24.20 C   47.70 % HR
+I (111566) SIGVACH: Solucion -> 23.56 C
+I (111576) SIGVACH: pH  ->   1638 mV (1.64 V) crudo 1822  dispersion   84  algo ruidosa
+I (111576) SIGVACH: TDS ->   1763 mV (1.76 V) crudo 1974  dispersion   46  algo ruidosa
+I (111586) SIGVACH:   -> 755.63 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (111586) SIGVACH:   -> 3.00 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (116616) SIGVACH: Ambiente -> 24.20 C   47.70 % HR
+I (117426) SIGVACH: Solucion -> 23.56 C
+I (117436) SIGVACH: pH  ->   1130 mV (1.13 V) crudo 1203  dispersion  141  algo ruidosa
+I (117436) SIGVACH: TDS ->   1763 mV (1.76 V) crudo 1974  dispersion   21  senal estable
+I (117446) SIGVACH:   -> 755.63 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (117446) SIGVACH:   -> 9.05 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (122476) SIGVACH: Ambiente -> 24.20 C   47.80 % HR
+I (123286) SIGVACH: Solucion -> 23.56 C
+I (123296) SIGVACH: pH  ->    809 mV (0.81 V) crudo  812  dispersion    9  senal estable
+I (123296) SIGVACH: TDS ->   1763 mV (1.76 V) crudo 1974  dispersion   19  senal estable
+I (123306) SIGVACH:   -> 755.63 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (123306) SIGVACH:   -> 12.88 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (128336) SIGVACH: Ambiente -> 24.20 C   47.80 % HR
+I (129146) SIGVACH: Solucion -> 23.56 C
+I (129156) SIGVACH: pH  ->   1373 mV (1.37 V) crudo 1499  dispersion  243  nada conectado (pin flotando)
+I (129156) SIGVACH: TDS ->   1762 mV (1.76 V) crudo 1973  dispersion   26  senal estable
+I (129166) SIGVACH:   -> 754.99 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (129176) SIGVACH:   -> 6.16 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (134196) SIGVACH: Ambiente -> 24.20 C   47.80 % HR
+I (135006) SIGVACH: Solucion -> 23.56 C
+I (135016) SIGVACH: pH  ->   1640 mV (1.64 V) crudo 1825  dispersion    5  senal estable
+I (135016) SIGVACH: TDS ->   1763 mV (1.76 V) crudo 1974  dispersion   50  algo ruidosa
+I (135026) SIGVACH:   -> 755.63 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (135026) SIGVACH:   -> 2.97 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (140056) SIGVACH: Ambiente -> 24.20 C   47.70 % HR
+I (140866) SIGVACH: Solucion -> 23.56 C
+I (140876) SIGVACH: pH  ->   1566 mV (1.57 V) crudo 1735  dispersion  205  nada conectado (pin flotando)
+I (140876) SIGVACH: TDS ->   1762 mV (1.76 V) crudo 1973  dispersion   28  senal estable
+I (140886) SIGVACH:   -> 754.99 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (140896) SIGVACH:   -> 3.86 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (145916) SIGVACH: Ambiente -> 24.10 C   47.80 % HR
+I (146726) SIGVACH: Solucion -> 23.56 C
+I (146736) SIGVACH: pH  ->   1080 mV (1.08 V) crudo 1143  dispersion  139  algo ruidosa
+I (146736) SIGVACH: TDS ->   1762 mV (1.76 V) crudo 1973  dispersion   94  algo ruidosa
+I (146746) SIGVACH:   -> 754.99 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (146746) SIGVACH:   -> 9.65 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (151776) SIGVACH: Ambiente -> 24.10 C   47.70 % HR
+I (152586) SIGVACH: Solucion -> 23.56 C
+I (152596) SIGVACH: pH  ->    757 mV (0.76 V) crudo  749  dispersion    9  senal estable
+I (152596) SIGVACH: TDS ->   1762 mV (1.76 V) crudo 1973  dispersion   22  senal estable
+I (152606) SIGVACH:   -> 754.99 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (152606) SIGVACH:   -> 13.50 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (157636) SIGVACH: Ambiente -> 24.10 C   47.80 % HR
+I (158446) SIGVACH: Solucion -> 23.50 C
+I (158456) SIGVACH: pH  ->   1048 mV (1.05 V) crudo 1104  dispersion  273  nada conectado (pin flotando)
+I (158456) SIGVACH: TDS ->   1762 mV (1.76 V) crudo 1973  dispersion   28  senal estable
+I (158466) SIGVACH:   -> 756.44 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (158476) SIGVACH:   -> 10.03 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (163496) SIGVACH: Ambiente -> 24.10 C   47.80 % HR
+I (164306) SIGVACH: Solucion -> 23.50 C
+I (164316) SIGVACH: pH  ->   1495 mV (1.50 V) crudo 1648  dispersion  232  nada conectado (pin flotando)
+I (164316) SIGVACH: TDS ->   1760 mV (1.76 V) crudo 1971  dispersion   10  senal estable
+I (164326) SIGVACH:   -> 755.16 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (164336) SIGVACH:   -> 4.70 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (169356) SIGVACH: Ambiente -> 24.10 C   47.80 % HR
+I (170166) SIGVACH: Solucion -> 23.50 C
+I (170176) SIGVACH: pH  ->   1641 mV (1.64 V) crudo 1826  dispersion    7  senal estable
+I (170176) SIGVACH: TDS ->   1760 mV (1.76 V) crudo 1971  dispersion   22  senal estable
+I (170186) SIGVACH:   -> 755.16 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (170186) SIGVACH:   -> 2.96 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (175216) SIGVACH: Ambiente -> 24.10 C   47.80 % HR
+I (176026) SIGVACH: Solucion -> 23.56 C
+I (176036) SIGVACH: pH  ->    755 mV (0.76 V) crudo  747  dispersion  130  algo ruidosa
+I (176036) SIGVACH: TDS ->   1761 mV (1.76 V) crudo 1972  dispersion   23  senal estable
+I (176046) SIGVACH:   -> 754.34 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (176046) SIGVACH:   -> 13.52 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (181076) SIGVACH: Ambiente -> 24.10 C   47.80 % HR
+I (181886) SIGVACH: Solucion -> 23.50 C
+I (181896) SIGVACH: pH  ->   1013 mV (1.01 V) crudo 1061  dispersion  283  nada conectado (pin flotando)
+I (181896) SIGVACH: TDS ->   1760 mV (1.76 V) crudo 1971  dispersion   11  senal estable
+I (181906) SIGVACH:   -> 755.16 ppm   1.51 mS/cm   (compensado con la temperatura de la solucion)
+I (181916) SIGVACH:   -> 10.45 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+I (186936) SIGVACH: Ambiente -> 24.10 C   47.80 % HR
+--- fin del escucha: 181 linea(s) ---

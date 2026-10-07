@@ -205,7 +205,7 @@ recortes que oculten esas dos cosas.
 | Servicio publicado | Operativo, con TLS y certificado validado |
 | Aplicación web publicada | Operativa |
 | Módulo de adquisición | Publicando cada ~5 minutos y media, con cola de respaldo si no hay red |
-| Sensores | pH calibrado y verificado; temperatura y humedad verificadas; **TDS pendiente de calibrar** cuando llegue el patrón de 1413 µS/cm |
+| Sensores | pH calibrado y verificado; temperatura y humedad verificadas; **TDS calibrado el 6 de octubre** contra el patrón Hanna HI7031: leía 6,7 % alto, factor 0,9373 aplicado y verificación en 707,97 ppm |
 | Maqueta | Falta armarla y dejarla funcionando sola (módulo alimentado con cargador, no con la PC) |
 
 ---
@@ -275,7 +275,7 @@ Cierre oficial a las 23:59 y cuestionario Q4.
 |---|---|
 | **El recorte de extensión se come el martes entero** | Es lo primero del lunes, y el traslado a anexos no pierde contenido: si el tiempo aprieta, se traslada más y se recorta menos |
 | **El hardware falla justo el día de la defensa** | La demostración se apoya en el sistema desplegado, no en el módulo. El módulo es el valor agregado; si falla, la defensa sigue en pie |
-| **El TDS no llega calibrado** | Se declara como pendiente con el procedimiento escrito. Es una limitación honesta, no un hueco |
+| **El TDS no llega calibrado** | **Riesgo cerrado el 6 de octubre**: llegó el patrón HI7031, se midió el desvío y quedó calibrado y verificado en 707,97 ppm. Si hubiera fallado el envío, el plan B era declararlo pendiente con el procedimiento escrito (`docs/36_CALIBRACION_DEL_TDS.md`) |
 | **La capa gratuita del servicio está dormida en plena demostración** | Calentamiento con `/api/v1/salud` un minuto antes, ya previsto en el guion |
 | **La tutoría del viernes revela correcciones grandes** | El cierre oficial del sábado queda como colchón, y el viernes se sube temprano justamente para que la reunión sirva |
 

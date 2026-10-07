@@ -148,7 +148,7 @@ flutter test
 
 | Pendiente | Estado |
 |---|---|
-| La **calibración del TDS** | El módulo publica el TDS, pero todavía con el factor de fábrica: falta contrastarlo con el patrón de 1413 µS/cm, que está pedido y en camino. El **pH sí quedó calibrado** el 1 de octubre, con los patrones de 4,01 y 6,86 |
+| La **calibración del TDS** | **Cerrada el 6 de octubre de 2026.** Llegó el patrón Hanna HI7031 de 1413 µS/cm —707 ppm— y con él se midió que la sonda leía un **6,7 % alto**: 754,25 ppm de media en 30 lecturas con el patrón en el vaso. Se aplicó el factor `TDS_FACTOR_CORRECCION` (0,9373) en `main.c` y la verificación dio **707,97 ppm** contra los 707 del patrón. Es una calibración de **pendiente con un solo punto**: no se afirma precisión cerca de 0 ppm. El **pH** quedó calibrado antes, el 1 y el 4 de octubre, con los patrones de 4,01 y 6,86 |
 | El **monitoreo y el respaldo** de la base | Del E4 |
 | El punto `DELETE /api/v1/lecturas/{id}` | Quitado de la tabla de requisitos; queda decidir si se elimina del servicio o se convierte en anulación con motivo |
 | El **rendimiento con respuestas grandes** | Medido: cumple con el tamaño que usa el panel (536 ms de percentil 95) y no cumple con 200 registros (1042 ms). La optimización, con su número antes y después, es del E4 |

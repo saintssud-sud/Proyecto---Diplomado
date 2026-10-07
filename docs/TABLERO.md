@@ -8,9 +8,7 @@
 
 ## 📋 Backlog
 
-| ID | Tarea | Requisito | Prioridad |
-|---|---|---|---|
-| T-32 | Calibrar el sensor de TDS con el patrón de 707 ppm | 2.8 · calibración | Must |
+Vacío. La última tarjeta, T-32, pasó a «Hecho» el 6 de octubre de 2026.
 
 ---
 
@@ -84,6 +82,12 @@
 | T-19 | **Verificación de adaptabilidad con capturas en tres anchos:** la aplicación en el teléfono, la ventana del navegador en **768 px** y en **1920 px** | RNF-06 · Requisito mínimo 4 | 02/10 |
 | T-42 | Apartados **2.7 Seguridad** y **2.8 Pruebas** del documento, con la tabla de casos y su evidencia | Entregable E3 | 02/10 |
 
+### Semana 5 (03 al 09/10)
+
+| ID | Tarea | Requisito | Fecha |
+|---|---|---|---|
+| T-32 | **Calibrar el sensor de TDS** con el patrón Hanna HI7031 de 1413 µS/cm (707 ppm): la sonda leía un **6,7 % alto**, se aplicó el factor `TDS_FACTOR_CORRECCION` en el firmware y la verificación con el patrón dio **707,97 ppm** | 2.8 · calibración | 06/10 |
+
 ---
 
 ## 📊 Estado del sistema al 2 de octubre de 2026
@@ -99,6 +103,9 @@
 
 **Estado al cierre de la Semana 4:** 40 tareas terminadas · 1 en curso · 1 en el backlog.
 
+**Estado al 6 de octubre de 2026:** 41 tareas terminadas · 1 en curso (T-28) · **0 en el backlog**.
+El TDS quedó calibrado contra patrón trazable, que era el último requisito de calibración abierto.
+
 **Lo que cambió desde el 27 de septiembre.** El electrodo de pH volvió a medir tras el remojo, se
 montó el **divisor ÷2** entre la salida `Po` del módulo PH-4502C y el GPIO 36, y se calibró con los
 patrones de 4,01 y 6,86 —1520 mV y 1280 mV, o sea −84,2 mV por unidad de pH—. El módulo publica ya
@@ -107,9 +114,12 @@ caño llegó al panel como pH 7,74, dentro de lo esperable para esa agua. El rec
 quedó verificado de punta a punta: el servicio la genera, el operador la atiende desde la interfaz
 y reaparece en el historial conservando su lectura de origen.
 
-**Lo que sigue pendiente.** La calibración del TDS con el patrón de 1413 µS/cm (T-32), cuyo pedido
-está en camino. La verificación de adaptabilidad en tres anchos (T-19) se cerró el 2 de octubre con
-las capturas del teléfono, de la tableta y del escritorio.
+**Lo que sigue pendiente.** El montaje del módulo sobre el cultivo (T-28) y la medición de la
+geometría del depósito para el nivel manual. La calibración del TDS (T-32) **quedó cerrada el 6 de
+octubre**: llegó el patrón Hanna HI7031 y con él se midió que la sonda leía un 6,7 % alto; el factor
+0,9373 quedó aplicado en el firmware y la verificación con el patrón en el vaso dio 707,97 ppm contra
+los 707 ppm del patrón. La verificación de adaptabilidad en tres anchos (T-19) se había cerrado el 2
+de octubre con las capturas del teléfono, de la tableta y del escritorio.
 
 > **Sobre la tarea T-29.** El entregable E2 se subió al aula virtual el sábado 26 de
 > septiembre: el documento en PDF, con las figuras ajustadas al ancho de la página, y

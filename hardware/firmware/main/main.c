@@ -102,6 +102,34 @@ static const char *ETIQUETA = "SIGVACH";
 #define PH_LIMITE_MINIMO    0.0f   /* rango del catálogo del servicio            */
 #define PH_LIMITE_MAXIMO   14.0f
 
+/* ---------------------------------------------------------------------------
+ *  Calibración de la sonda de TDS
+ *
+ *  Factor obtenido el 6 de octubre de 2026 contra el patrón de conductividad
+ *  Hanna HI7031 (1413 µS/cm a 25 °C, trazable a material de referencia NIST),
+ *  que equivale a 707 ppm con la conversión de 500 que usa este programa:
+ *
+ *      valor del patrón      ->  707 ppm
+ *      medido por el módulo  ->  754,25 ppm de media
+ *                                 (30 lecturas, 751,62 a 756,44: 0,6 %)
+ *      factor = 707 / 754,25 =  0,9373
+ *
+ *  La corrección se aplica MULTIPLICANDO el resultado del polinomio del
+ *  fabricante, que es el método que indica el propio fabricante del módulo.
+ *  Así `sensores.c` conserva la conversión del datasheet y acá vive el número
+ *  medido para ESTA sonda: mezclarlos haría que después nadie sepa cuál de los
+ *  dos números es del fabricante y cuál se midió en el laboratorio.
+ *
+ *  Con un solo patrón se calibra la PENDIENTE, no el cero: se corrige el error
+ *  de forma proporcional en todo el rango y **no** se afirma precisión cerca de
+ *  0 ppm, que no está verificada. Un error del 6,7 % en ppm equivale a un 4,5 %
+ *  en la tensión de entrada; con un único punto no se puede distinguir una cosa
+ *  de la otra, así que se declara como corrección de pendiente y nada más.
+ *
+ *  Evidencia: `hardware/evidencias/calibracion-del-tds-2026-10-06.txt`.
+ * ------------------------------------------------------------------------- */
+#define TDS_FACTOR_CORRECCION  0.9373f
+
 
 /* Pines del ADC1 que la placa de expansión expone como entradas analógicas.
  *
@@ -746,6 +774,8 @@ static void cicloDeLectura(void)
     /* Conversión a ppm. La compensación por temperatura usa la lectura del
      * DS18B20: es la razón de ser de ese sensor en este montaje. */
     float ppm = sensores_tds_a_ppm((float)mvTDS / 1000.0f, temperaturaSolucion);
+    /* Corrección de pendiente medida con el patrón de conductividad. */
+    if (!isnan(ppm)) ppm *= TDS_FACTOR_CORRECCION;
     if (!isnan(ppm)) {
         char textoPpm[16], textoEc[16];
         formatear2(textoPpm, sizeof(textoPpm), ppm);

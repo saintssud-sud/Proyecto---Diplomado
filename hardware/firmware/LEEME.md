@@ -401,7 +401,7 @@ original (`medida el 2026-09-23T20:58:40Z`).
 
 ## 9. Qué sigue
 
-1. **Calibrar** el TDS con el patrón de 1413 µS/cm (707 ppm). El **pH ya quedó calibrado** el 1 de octubre con los patrones 4,01 y 6,86.
+1. ~~**Calibrar** el TDS con el patrón de 1413 µS/cm (707 ppm).~~ **Hecho** el 6 de octubre de 2026: con el patrón Hanna HI7031 la sonda leía un **6,7 % alto** (754,25 ppm de media en 30 lecturas), el factor quedó en `TDS_FACTOR_CORRECCION` (0,9373) y la verificación dio **707,97 ppm**. Es una calibración de pendiente con un solo punto. Evidencia en `hardware/evidencias/calibracion-del-tds-2026-10-06.txt`. El **pH ya estaba calibrado** el 1 de octubre con los patrones 4,01 y 6,86.
 2. ~~Recuperar y calibrar el electrodo de pH e instalar su divisor ÷2.~~ **Hecho**: el electrodo volvió a medir con el remojo y el divisor ÷2 quedó instalado en el GPIO 36.
 3. **Medir la geometría** del depósito para el nivel manual.
 4. **Registrar** los valores de calibración: son evidencia directa para el Capítulo 2.

@@ -442,17 +442,18 @@ señalar que no alcanza con que el servicio responda: el flujo falla si la base 
 
 **Respuesta en voz alta.** Se contesta con la lista, sin adornos, y conviene empezar aclarando lo que
 **ya dejó de estar pendiente**: el respaldo de la base con su restauración probada y el registro de una
-línea por petición se cerraron el 5 de octubre. Lo que queda es esto. Primero, **eliminar una cuenta
-borra el perfil pero no la credencial** de Firebase Authentication: dar de baja la credencial exige el
-SDK de administración y quedó fuera del alcance; está escrito en el propio código. Segundo, **falta un
-índice compuesto y ya se notó en producción**: la consulta de alertas filtrada por módulo responde
-error del servidor porque el índice `(modulo_id, timestamp)` no está declarado. Tercero, **la
-calibración del TDS**: el módulo publica el TDS, pero con el polinomio de fábrica, sin contrastar
-contra un patrón; el pH sí quedó calibrado. Cuarto, **el rendimiento con respuestas grandes**: cumple
-con el tamaño que usa el panel y no cumple con 200 registros. Quinto, **la anulación de lecturas**: la
-operación `DELETE /api/v1/lecturas/{id}` sigue existiendo y borra de verdad, aunque la revisión del E3
-recomendaba quitarla o convertirla en anulación con motivo. Y sexto, un detalle menor: en
-`lib/repositories/usuario_repository.dart` quedó un método sin usar que escribe directo en la base.
+línea por petición se cerraron el 5 de octubre; **la calibración del TDS quedó cerrada el 6 de octubre**
+contra el patrón trazable Hanna HI7031, con la verificación en 707,97 ppm y una aclaración importante
+—corrige la pendiente con un solo punto, así que no se afirma precisión cerca de 0 ppm—; y el **índice
+compuesto que faltaba** —el de `alertas` por `(modulo_id, timestamp)`, que ya había dado error del
+servidor en producción— está declarado en `firestore.indexes.json` y desplegado, con la consulta
+verificada en 200. Lo que queda es esto. Primero, **eliminar una cuenta borra el perfil pero no la
+credencial** de Firebase Authentication: dar de baja la credencial exige el SDK de administración y
+quedó fuera del alcance; está escrito en el propio código. Segundo, **el rendimiento con respuestas
+grandes**: cumple con el tamaño que usa el panel y no cumple con 200 registros. Tercero, **la anulación
+de lecturas**: la operación `DELETE /api/v1/lecturas/{id}` sigue existiendo y borra de verdad, aunque la
+revisión del E3 recomendaba quitarla o convertirla en anulación con motivo. Y cuarto, un detalle menor:
+en `lib/repositories/usuario_repository.dart` quedó un método sin usar que escribe directo en la base.
 
 **Dónde vive en el código**
 
@@ -464,9 +465,10 @@ recomendaba quitarla o convertirla en anulación con motivo. Y sexto, un detalle
 | `backend/app/registro_peticiones.py` | 104-121 | **Ya no es un pendiente**: desde el 5/10 cada petición deja su línea (método, ruta, código y duración), instalada en `main.py:129` y `:153`. |
 | `backend/app/main.py` | 48-54 y 73-77 | Lo que sí se registra: si las credenciales de servicio llegaron y con qué proyecto quedó el SDK. |
 | `backend/app/repositorios/firestore.py` | 322-324 | Se registra el fallo de la base con su causa, para distinguir una credencial ausente de un problema de permisos. |
-| `hardware/firmware/main/sensores.c` | 355-392 | La conversión del TDS: compensación por temperatura y polinomio cúbico del fabricante, sin contraste contra patrón. |
-| `hardware/firmware/main/main.c` | 69-104 y 764-777 | La calibración del pH sí está hecha, con la recta del 4 de octubre y su evidencia. |
-| `firestore.indexes.json` | 27-43 | Los índices de `alertas` que sí están: `(estado, modulo_id, timestamp)` y `(estado, timestamp)`. **Falta `(modulo_id, timestamp)`**, y esa consulta ya devolvió error del servidor en producción. |
+| `hardware/firmware/main/sensores.c` | 355-392 | La conversión del TDS: compensación por temperatura y polinomio cúbico del fabricante. **Sigue sin corrección propia a propósito**: acá vive el datasheet, no la sonda. |
+| `hardware/firmware/main/main.c` | 68-103 y 790-805 | La calibración del pH, con la recta del 4 de octubre y su evidencia. |
+| `hardware/firmware/main/main.c` | 105-131 y 776-778 | La calibración del TDS: `TDS_FACTOR_CORRECCION` (0,9373) medido contra el patrón Hanna HI7031 el 6 de octubre, aplicado justo después del polinomio, y la verificación en 707,97 ppm. |
+| `firestore.indexes.json` | 36-43 | El índice `alertas(modulo_id, timestamp)` que faltaba: **declarado y desplegado**, con la consulta verificada en 200. |
 | `docs/32_LISTA_DE_VERIFICACION_DEL_E4.md` | 40-44 | La lista de lo que faltaba en despliegue **al cierre de ese documento**; dos de sus filas —el respaldo con restauración probada y la línea por petición— quedaron cerradas el 5/10 y conviene decirlo al mostrarla. |
 | `docs/30_PLAN_DE_LA_SEMANA_E4.md` | 180 y 196 | El respaldo, que figuraba como tarea pendiente del apartado 2.9 y ya está hecho (`evidencia/restauracion-2026-10-05.txt`). |
 

@@ -1,0 +1,62 @@
+Escuchando COM6 a 115200 baudios durante 150 segundos. Pulsa RESET en la placa.
+I (4666) SIGVACH: Conversor asentado (4000 ms de espera)
+I (4666) SENSORES: Buscando el sensor de ambiente (primero en P33)...
+I (4786) SENSORES: Sensor de ambiente: AM2302 / DHT22 en GPIO 33  (+-0,5 C, +-2 % HR)
+I (4786) SIGVACH: Ambiente en uso: AM2302 (DHT22) en GPIO 33 (responde)
+I (4786) SENSORES: Bus OneWire instalado en GPIO 32 (periferico RMT)
+I (4946) SENSORES: DS18B20 en uso: ROM D528EBD4469FA928 (resolucion 12 bits)
+I (4946) SENSORES: Sensores DS18B20 encontrados: 1
+I (5446) SIGVACH: --- Entradas analogicas (dispersion de 30 muestras) ---
+I (5446) SIGVACH: PIN           PREVISTO        MEDIANA DISPERSION  ESTADO
+I (5446) SIGVACH: SVP GPIO 36   pH              1642 mV         22  senal estable
+I (5456) SIGVACH: SVN GPIO 39   TDS             1758 mV          4  senal estable
+I (5466) SIGVACH: P34 GPIO 34   alternativa      142 mV          0  senal estable
+I (5466) SIGVACH: P35 GPIO 35   alternativa      142 mV         17  senal estable
+I (5476) SIGVACH: -------------------------------------------------------
+I (5476) SIGVACH: Un sensor conectado da una dispersion de decenas;
+I (5486) SIGVACH: una entrada al aire salta cientos o miles de cuentas.
+I (5506) wifi:wifi driver task: 3ffc37c4, prio:23, stack:6656, core=0
+I (5526) wifi:wifi firmware version: 4df78f2
+I (5526) wifi:wifi certification version: v7.0
+I (5526) wifi:config NVS flash: enabled
+I (5526) wifi:config nano formatting: disabled
+I (5526) wifi:Init data frame dynamic rx buffer num: 32
+I (5536) wifi:Init static rx mgmt buffer num: 5
+I (5536) wifi:Init management short buffer num: 32
+I (5536) wifi:Init dynamic tx buffer num: 32
+I (5546) wifi:Init static rx buffer size: 1600
+I (5546) wifi:Init static rx buffer num: 10
+I (5556) wifi:Init dynamic rx buffer num: 32
+I (5556) wifi_init: rx ba win: 6
+I (5556) wifi_init: accept mbox: 6
+I (5566) wifi_init: tcpip mbox: 32
+I (5566) wifi_init: udp mbox: 6
+I (5566) wifi_init: tcp mbox: 6
+I (5576) wifi_init: tcp tx win: 5760
+I (5576) wifi_init: tcp rx win: 5760
+I (5576) wifi_init: tcp mss: 1440
+I (5576) wifi_init: WiFi IRAM OP enabled
+I (5586) wifi_init: WiFi RX IRAM OP enabled
+I (5586) phy_init: phy_version 4863,a3a4459,Oct 28 2025,14:30:06
+I (5666) phy_init: Saving new calibration data due to checksum failure or outdated calibration data, mode(0)
+I (5786) wifi:mode : sta (cc:db:a7:96:d5:fc)
+I (5786) wifi:enable tsf
+I (5796) SIGVACH: Conectando a la red saintssud
+W (8206) SIGVACH: WiFi caido (motivo 201: no se encontro la red). Caida numero 1; se reintenta en 15 segundos
+I (23206) SIGVACH: Reintentando la conexion inalambrica
+W (25616) SIGVACH: WiFi caido (motivo 201: no se encontro la red). Caida numero 2; se reintenta en 15 segundos
+W (35796) SIGVACH: Sin red por ahora: se reintenta en el proximo ciclo
+W (35796) SIGVACH: Hay 60 lectura(s) en la cola, pero no hay red
+I (35816) SIGVACH: Ambiente -> 24.00 C   48.10 % HR
+I (36626) SIGVACH: Solucion -> 23.44 C
+I (36636) SIGVACH: pH  ->    722 mV (0.72 V) crudo  706  dispersion  167  nada conectado (pin flotando)
+I (36636) SIGVACH: TDS ->   1758 mV (1.76 V) crudo 1968  dispersion   16  senal estable
+I (36646) SIGVACH:   -> 707.97 ppm   1.42 mS/cm   (compensado con la temperatura de la solucion)
+I (36656) SIGVACH:   -> 13.91 pH   (recta: 1553 mV = pH 4.01, -83.9 mV por unidad)
+W (36656) SIGVACH: Sin red: las lecturas del ciclo se guardan para despues
+I (36706) SIGVACH: En la cola hay 60 lectura(s) esperando red
+I (40616) SIGVACH: Reintentando la conexion inalambrica
+W (43026) SIGVACH: WiFi caido (motivo 201: no se encontro la red). Caida numero 3; se reintenta en 15 segundos
+I (58026) SIGVACH: Reintentando la conexion inalambrica
+W (60436) SIGVACH: WiFi caido (motivo 201: no se encontro la red). Caida numero 4; se reintenta en 15 segundos
+I (75436) SIGVACH: Reintentando la conexion inalambrica

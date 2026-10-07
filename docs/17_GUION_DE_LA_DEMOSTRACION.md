@@ -78,7 +78,7 @@ no una versión local.
 | **1–4** | **Demostración** con el módulo | Los ocho pasos del apartado 3, condensados |
 | **4–5** | **Arquitectura**, en una frase por pieza | *"La aplicación presenta y recoge; el servicio decide, valida y autoriza; la base guarda el estado y nadie la toca sin pasar por el servicio."* |
 | **5–6** | **El módulo**: lo que aporta | *"Mide las seis variables de forma automática; guarda las lecturas en memoria no volátil si el servicio no responde, y las publica con la hora en que se midieron."* |
-| **6–7** | **Riesgos y límites** | El arranque en frío de la capa gratuita, y la calibración del TDS —que todavía usa el factor de fábrica— a la espera del patrón de 1413 µS/cm |
+| **6–7** | **Riesgos y límites** | El arranque en frío de la capa gratuita —la primera petición puede tardar hasta un minuto— y la calibración del TDS: quedó hecha contra el patrón trazable, pero **con un solo punto**, así que corrige la pendiente y no se afirma precisión cerca de 0 ppm |
 
 ---
 

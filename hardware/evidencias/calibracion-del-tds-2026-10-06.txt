@@ -1,0 +1,171 @@
+CALIBRACIÓN DE LA SONDA DE TDS — 6 de octubre de 2026
+=====================================================
+
+Qué se hizo
+-----------
+Primera calibración del TDS del proyecto. Hasta hoy el módulo publicaba el
+resultado del polinomio del fabricante sin ninguna corrección propia, y así
+estaba declarado en el documento: el TDS figuraba como pendiente de calibrar.
+
+Se midió con el patrón de conductividad Hanna HI7031 (1413 µS/cm a 25 °C,
+± 5 µS/cm, trazable a material de referencia NIST), que con la conversión de
+500 que usa el programa equivale a 707 ppm.
+
+Condiciones
+-----------
+Patrón en un vaso de vidrio, unos 4 cm de columna de líquido. Las dos sondas
+—la de TDS y el DS18B20— dentro del mismo vaso, a unos 2 cm del fondo, sin
+tocarse entre sí y con los cables apoyados en el borde para que quedaran
+quietas. Sonda enjuagada con agua destilada y luego con un chorrito del propio
+patrón, que se descartó. No se introdujo la sonda en la botella.
+
+Temperatura de la solución durante la tanda: 23,50 a 23,63 °C.
+La sonda no se movió en los tres minutos que duró el registro.
+
+Mediciones
+----------
+Treinta ciclos consecutivos, uno cada 5 segundos, con el firmware de prueba.
+Se anota también la tensión cruda y la dispersión que informa el programa,
+porque son el indicador de que la lectura está asentada:
+
+     #    mV crudos    ppm       dispersión   estado
+    ---  ----------  --------   -----------  --------------
+     1      1761      752,89        51        algo ruidosa
+     2      1760      752,26        96        algo ruidosa
+     3      1761      752,89        32        señal estable
+     4      1761      752,89        10        señal estable
+     5      1760      752,26        21        señal estable
+     6      1759      751,62        14        señal estable
+     7      1760      752,26        31        señal estable
+     8      1760      752,89        63        algo ruidosa
+     9      1761      752,89        38        señal estable
+    10      1762      753,53        19        señal estable
+    11      1760      753,70        46        algo ruidosa
+    12      1760      753,70        28        señal estable
+    13      1760      753,70        45        algo ruidosa
+    14      1762      754,99        11        señal estable
+    15      1761      754,34         9        señal estable
+    16      1764      756,27        16        señal estable
+    17      1763      755,63        14        señal estable
+    18      1763      755,63        46        algo ruidosa
+    19      1763      755,63        21        señal estable
+    20      1763      755,63        19        señal estable
+    21      1762      754,99        26        señal estable
+    22      1763      755,63        50        algo ruidosa
+    23      1762      754,99        28        señal estable
+    24      1762      754,99        94        algo ruidosa
+    25      1762      754,99        22        señal estable
+    26      1762      756,44        28        señal estable
+    27      1760      755,16        10        señal estable
+    28      1760      755,16        22        señal estable
+    29      1761      754,34        23        señal estable
+    30      1760      755,16        11        señal estable
+
+    media 754,25 ppm · mínimo 751,62 · máximo 756,44 · recorrido 4,82 ppm (0,6 %)
+
+Lectura de los datos: la sonda repite dentro de medio punto porcentual en un
+líquido quieto, y la tensión cruda se mueve entre 1759 y 1764 mV, o sea 5 mV en
+1,76 V (0,3 %). El montaje estaba correcto: la mayoría de los ciclos dieron
+«señal estable», y los que dieron «algo ruidosa» no se apartaron del resto. Hay
+una deriva suave hacia arriba —de 752 a 755— en los tres minutos, compatible
+con el asentamiento térmico del vaso, y no cambia el resultado.
+
+El factor
+---------
+    valor del patrón        707 ppm
+    medido por el módulo    754,25 ppm
+    factor = 707 / 754,25 = 0,9373
+
+O sea: el módulo leía un 6,7 % alto.
+
+Qué se cambió en el firmware
+----------------------------
+Se agregó una constante al bloque de calibración de `main.c`, junto a las del
+pH, y se aplica multiplicando el resultado del polinomio del fabricante:
+
+    #define TDS_FACTOR_CORRECCION  0.9373f
+
+    float ppm = sensores_tds_a_ppm((float)mvTDS / 1000.0f, temperaturaSolucion);
+    if (!isnan(ppm)) ppm *= TDS_FACTOR_CORRECCION;
+
+`sensores.c` quedó intacto: ahí vive la conversión del datasheet —la
+compensación por temperatura y el polinomio cúbico— y en `main.c` viven los
+números medidos para esta sonda. Separarlos es lo que permite que dentro de seis
+meses se sepa cuál de los dos números vino del fabricante y cuál se midió acá.
+
+Interpretación del error, y qué NO se puede afirmar
+---------------------------------------------------
+El factor corrige la PENDIENTE. Con un solo patrón no se puede determinar
+también el cero, así que el error se corrige de forma proporcional en todo el
+rango y **no se declara precisión cerca de 0 ppm**: ese extremo no está
+verificado y decir lo contrario sería inventar un dato.
+
+Vale la pena dejar anotada la equivalencia, porque acota lo que este número es:
+un error del 6,7 % en ppm corresponde a que el módulo entrega la tensión un
+4,5 % alta (el polinomio es cúbico, así que un 4,5 % de tensión se convierte en
+un 6,7 % de ppm). Un 4,5 % de error de ganancia es lo esperable en un módulo de
+este tipo, y con un único punto de calibración **no se puede distinguir** si el
+origen está en la sonda, en el amplificador del módulo o en el convertidor. Por
+eso se aplica como corrección de pendiente —el método que indica el propio
+fabricante del módulo— y se declara como tal, sin atribuirle una causa física
+que no se midió.
+
+Efecto en el rango de trabajo: para las soluciones del proyecto la diferencia
+entre corregir en ppm o corregir en tensión es de unas 3 ppm sobre 800 (0,4 %),
+así que la elección no cambia ninguna decisión de cultivo. Lo que cambia es que
+la lectura deja de estar un 6,7 % alta contra un patrón trazable.
+
+Verificación con el patrón (misma sesión, entre las 22:21 y las 22:27)
+---------------------------------------------------------------------
+Con el patrón todavía en el vaso, sin tocar las sondas ni el montaje, se grabó
+el firmware final —el del factor aplicado y la publicación restablecida— y se
+volvió a leer el puerto serie:
+
+    I (36636) SIGVACH: TDS ->   1758 mV (1.76 V) crudo 1968  dispersion   16  senal estable
+    I (36646) SIGVACH:   -> 707.97 ppm   1.42 mS/cm   (compensado con la temperatura de la solucion)
+
+    valor del patrón   707 ppm
+    medido             707,97 ppm
+    error              +0,97 ppm  =  +0,14 %
+
+El firmware, además, informa la recta y el factor en marcha, que es lo que
+permite leer de un vistazo con qué constantes está trabajando el módulo.
+
+Comprobación aritmética hacia atrás: la tensión cruda pasó de 1761 a 1758 mV
+entre las dos tandas —el líquido se enfrió de 23,56 a 23,44 °C— y el resultado
+corregido da 707,97 contra los 754,25 ppm de antes. La diferencia entre ambas
+mediciones es del 6,13 %, coherente con el factor 0,9373 aplicado sobre una
+tensión 0,3 % menor.
+
+Cómo se obtuvo (repetible)
+--------------------------
+    pwsh -File _diagnostico/leer_serial.ps1 -Puerto COM6 -Segundos 180
+
+con el firmware compilado con `PUBLICAR_EN_SERVICIO 0`, que da una lectura cada
+5 segundos y no publica: así el registro sale limpio y no se llena la cola de
+almacenamiento. En producción la cadencia es de 300 segundos.
+
+Los volcados crudos de las dos tandas quedaron junto a esta nota:
+`calibracion-del-tds-2026-10-06-registro-serie.txt` (las 30 lecturas) y
+`calibracion-del-tds-2026-10-06-verificacion.txt` (la verificación).
+
+Nota sobre el enlace inalámbrico
+--------------------------------
+Durante la verificación el módulo informó «WiFi caído (motivo 201: no se
+encontró la red)»: el punto de acceso del proyecto estaba apagado. Las lecturas
+del ciclo quedaron guardadas en la cola interna —«En la cola hay 60 lectura(s)
+esperando red»— y se publicarán solas cuando el módulo recupere la conexión. Es
+el comportamiento previsto y ya probado: sin red no se pierde el ciclo.
+
+Por eso la verificación de esta calibración es contra el puerto serie y no
+contra el panel. Cuando el punto de acceso esté encendido, la lectura corregida
+aparecerá también en el servicio y se podrá capturar la pantalla del panel.
+
+Nota sobre la sonda de pH
+-------------------------
+Durante toda la sesión el canal de pH informó valores absurdos —712 mV, 1641 mV,
+«nada conectado (pin flotando)»— porque el electrodo estaba fuera del líquido y
+su entrada de alta impedancia quedaba al aire. No tiene relación con el TDS ni
+afecta esta calibración: son canales analógicos independientes. Sí conviene
+recordar que el electrodo de pH no debe quedar seco: entre mediciones va en la
+solución de almacenamiento Hanna HI70300, que es justamente para eso.
