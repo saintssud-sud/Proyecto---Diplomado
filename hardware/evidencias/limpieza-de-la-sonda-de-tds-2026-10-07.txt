@@ -1,0 +1,128 @@
+LIMPIEZA DE LA SONDA DE TDS Y VERIFICACIÓN DE LA CALIBRACIÓN — 7 de octubre de 2026
+=====================================================================================
+
+Qué se hizo
+-----------
+Al repetir la verificación de la calibración del TDS, la sonda informó un 16 a 23 %
+MENOS que el día anterior para el mismo patrón. Se probaron cinco hipótesis con
+mediciones y ninguna explicaba el desvío. La sexta —el estado de la superficie de
+las placas— resultó ser la causa: una película sobre los electrodos.
+
+La limpieza con alcohol isopropílico devolvió la lectura al valor correcto y la
+calibración del 6 de octubre quedó VALIDADA.
+
+1. El síntoma
+-------------
+Mismo patrón Hanna HI7031 (1413 µS/cm = 707 ppm), misma sonda, misma temperatura:
+
+    6 de octubre (calibración)   1758 mV   ->  754 ppm sin corregir
+    7 de octubre (sin limpiar)   1456 mV   ->  583 ppm sin corregir
+                                             (546 ppm con el factor aplicado)
+
+    Diferencia: 17 % menos.
+
+2. Hipótesis probadas y descartadas
+-----------------------------------
+Todas con medición, no con opinión:
+
+| Hipótesis | Prueba | Resultado |
+|---|---|---|
+| Dilución por agua en el recipiente | Prueba con agua desionizada en el frasco nuevo | **Descartada**: el agua desionizada dio 58,48 ppm, que es el piso del módulo (sonda seca: 142 mV, 58 ppm). El frasco y las sondas estaban limpios |
+| Recipiente con agua escondida en el fondo | Vaso de fondo grueso vs frasco de fondo plano | **Descartada**: el frasco seco dio el valor más bajo de todos, no el más alto |
+| Alimentación del módulo (3,3 V vs 5 V) | Se movió la alimentación al pin 5V y se midió con multímetro | **Descartada**: 3,28 V -> 1456 mV; 5,08 V -> 1468 mV. Diferencia de 0,8 % |
+| Geometría del recipiente | Tres recipientes distintos | **Descartada** |
+| Profundidad de inmersión de la sonda | Barrido de 21 lecturas moviendo la sonda de arriba abajo | **Descartada**: 1472 a 1482 mV, o sea 10 mV (0,7 %) en todo el recorrido |
+| **Película sobre las placas** | Limpieza con alcohol isopropílico | **CONFIRMADA**: ver punto 3 |
+
+Datos adicionales medidos en la sesión:
+
+    Piso del instrumento (agua desionizada)   58,48 ppm  (142 mV, dispersión 0)
+    Alimentación real del módulo              3,28 V (pin 3V3)
+    Temperatura de la solución en la sesión   22,75 a 25,19 °C
+
+3. La causa y el arreglo
+------------------------
+En un conductímetro, una película sobre los electrodos agrega una resistencia en
+serie con la del líquido y **baja** la lectura. Una pérdida del 10 al 30 % es
+típica; la nuestra fue del 16 %.
+
+Origen de la película: **la sonda pasó la noche secándose con restos de líquido
+encima.** Al evaporarse, lo que estaba disuelto se concentra y forma una costra o
+película que el agua sola no disuelve. Es coherente con la secuencia observada:
+
+    6/10, sonda recién usada y húmeda   ->  1758 mV  (valor correcto)
+    7/10, tras la noche seca            ->  1456 mV  (-16 %)
+    7/10, tras limpiar con alcohol      ->  1733 mV  (valor correcto otra vez)
+
+Procedimiento que funcionó:
+
+    1. Sumergir SOLO la punta (los dos pines y el cuerpo blanco) en alcohol
+       isopropílico, en un pocillo aparte. El cable y el conector, fuera.
+    2. Dejar evaporar 30 segundos.
+    3. Un baño en agua desionizada y sacudida, para llevarse lo que el alcohol
+       levantó.
+    4. Sacudir las gotas y volver a medir.
+
+Por qué alcohol y no detergente: el alcohol disuelve la materia orgánica y se
+evapora sin dejar residuo. El detergente también limpia, pero deja sales y hay que
+enjuagarlo muchísimo; si queda, sube la lectura.
+
+4. Verificación después de la limpieza
+--------------------------------------
+Patrón todavía en el frasco, sin tocar nada más. 25 lecturas consecutivas, una cada
+5 segundos:
+
+    mV crudos : 1732 a 1734     (recorrido de 2 mV)
+    ppm       : 705,95 a 708,55  ->  MEDIA 707,08 ppm
+    valor del patrón               707 ppm
+    error                          +0,01 %
+    temperatura de la solución     22,75 a 22,81 °C
+    dispersión                     de 6 a 111; 19 de 25 ciclos «señal estable»
+
+Volcado crudo: `tds-verificacion-limpieza-2026-10-07.txt`.
+
+5. Consecuencias para el proyecto
+---------------------------------
+1. **La calibración del 6 de octubre queda validada.** El factor 0,9373 estaba
+   bien: lo que fallaba era la sonda sucia, no el factor.
+
+2. **El TDS no es "el canal de mayor incertidumbre": es un canal que necesita
+   limpieza periódica**, como cualquier electrodo. Eso es mantenimiento, no un
+   defecto del instrumento.
+
+3. **Regla de oro nueva:** la sonda de TDS **no se guarda seca con restos encima**.
+   Se enjuaga con agua desionizada antes de guardarla, y se limpia con alcohol
+   isopropílico cuando la lectura se aparta más de un 5 % de lo esperado.
+
+4. **Toda limpieza obliga a verificar**: la lectura puede cambiar hasta un 16 %,
+   así que después de limpiar hay que contrastar contra el patrón (o al menos
+   comprobar que el valor del tanque es coherente con lo que se dosificó).
+
+6. Nota de corrección sobre la dependencia térmica
+--------------------------------------------------
+La nota del 6 de octubre (`calibracion-del-tds-2026-10-06.txt`) declara una
+dependencia térmica del canal de ~1,4 % por grado, estimada a partir de dos
+temperaturas separadas por 1 °C en esa misma jornada.
+
+**Esa cifra queda en revisión.** La verificación del 7 de octubre dio 707,08 ppm de
+media (error +0,01 %) a 22,8 °C, o sea 0,6 °C POR DEBAJO de la temperatura de
+calibración, y con el mismo factor. Si la dependencia fuera de 1,4 % por grado, esa
+lectura habría dado unos 700 ppm, no 707.
+
+Lo más probable es que aquel apartamiento del 6 de octubre —de 707,97 a 697,75 ppm—
+no fuera térmico: **pudo ser la película empezando a formarse sobre las placas**,
+que es el mismo mecanismo que hoy quedó demostrado. La dependencia térmica real del
+canal es **menor** que la declarada y no está medida: haría falta un ensayo con la
+temperatura variando en un rango amplio y la sonda limpia.
+
+Mientras tanto, la afirmación correcta es: **la lectura se mantiene dentro del 1 %
+entre 22,8 y 23,4 °C**, y el coeficiente no está determinado.
+
+Cómo se obtuvo (repetible)
+--------------------------
+    pwsh -File _diagnostico/leer_serial.ps1 -Puerto COM6 -Segundos 150
+
+con el firmware compilado con `PUBLICAR_EN_SERVICIO 0` (lectura cada 5 segundos, sin
+publicar), para que el registro salga limpio y no se llene la cola de
+almacenamiento. Ver `docs/BITACORA_MIERCOLES_2026-10-07.md` para la cronología
+completa de la sesión.
