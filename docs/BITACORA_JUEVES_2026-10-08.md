@@ -13,8 +13,8 @@ explicar cada decisión en la defensa y para no volver a pisar los mismos errore
 
 ## 1. Resumen en cinco líneas
 
-1. Se armó el Anexo A con **31 capturas** elegidas de las 91 disponibles (falta solo la A.6).
-2. Se reconstruyeron los **tres índices** con números de página reales: **20 tablas, 47 figuras y 7 anexos**.
+1. Se armó el Anexo A con **las 32 capturas**: 31 elegidas de las 91 disponibles y la A.6, que apareció entre las tomadas a última hora (19:16 a 19:21).
+2. Se reconstruyeron los **tres índices** con números de página reales: **20 tablas, 48 figuras y 7 anexos**.
 3. Apareció un **desfase de 9 páginas** entre lo que medía el script y lo que ve el lector: el script devolvía la **página física** del archivo, no la **impresa**.
 4. La causa era que **los preliminares (portada + 8 páginas en romanos) no llevan número arábigo**, y el cuerpo arranca a contar desde 1 en la página física 10.
 5. Además se encontró que **14 instancias de Word huérfanas** (1,6 GB de RAM) hacían que la exportación del PDF tardara más de 10 minutos; liberadas, el mismo trabajo pasó a **16 segundos**.
@@ -80,10 +80,10 @@ Con eso los tres índices y el índice de contenido coinciden:
 
 | Anexo | Página impresa | Anexo | Página impresa |
 |---|---|---|---|
-| A | 40 | E | 96 |
-| B | 83 | F | 102 |
-| C | 94 | G | 103 |
-| D | 95 | | |
+| A | 40 | E | 97 |
+| B | 84 | F | 103 |
+| C | 95 | G | 104 |
+| D | 96 | | |
 
 ### 2.5 La exportación del PDF que se trababa
 
@@ -170,14 +170,39 @@ que calcula Word:
 
 | Anexo | Página | Anexo | Página |
 |---|---|---|---|
-| A | 40 | E | 96 |
-| B | 83 | F | 102 |
-| C | 94 | G | 103 |
-| D | 95 | | |
+| A | 40 | E | 97 |
+| B | 84 | F | 103 |
+| C | 95 | G | 104 |
+| D | 96 | | |
+
+(Estas son las páginas **finales**, ya con la figura A.6 insertada: al agregarla, todo lo
+que sigue al Anexo A corrió una página.)
 
 **Regla que sale de acá:** para saber en qué página está algo, **recorrer los párrafos**, no
 buscar el texto: cualquier leyenda puede estar mencionada antes en el cuerpo y la búsqueda
 devuelve la mención, no la leyenda.
+
+### 2.8 La figura A.6, la última que faltaba
+
+El texto del Anexo A la anuncia: «El panel sin novedades se muestra en la Figura A.5 y el
+panel con parámetros fuera de rango en la Figura A.6».
+
+Se revisaron las capturas guardadas a las 19:16–19:21 y **`A6.1.jpg` es la que sirve**: el
+panel de inicio con «Sistema con alertas», el Módulo 1 seleccionado y el pH en 7,4 marcado
+«Por encima del rango». Las otras dos que había con ese nombre (`A6.2` y `A6.3`) son la
+pantalla de Alertas, que ya se usan en las figuras A.16 y A.18.
+
+Se insertó con `_diagnostico/insertar_figura_a6.py`, que la coloca **después de la leyenda
+de la A.5** con el mismo formato de las demás (14 cm, centrada, leyenda en cursiva de
+10 pt). **No se usó el script general de inserción** porque ese inserta *todas* las figuras
+anunciadas en el texto y habría repetido las 31 que ya estaban.
+
+Al agregar la figura el documento pasó de 145 a **146 páginas** y todo lo que está después
+del Anexo A corrió una página: el Anexo B pasó de 83 a 84, el C de 94 a 95, y así. **Por eso
+los índices se rehicieron después de insertar la figura**, no antes.
+
+**Regla que sale de acá:** insertar primero todas las figuras y recién al final rehacer los
+índices: cualquier imagen movida corre las páginas de todo lo que sigue.
 
 ---
 
@@ -185,39 +210,43 @@ devuelve la mención, no la leyenda.
 
 | Dato | Valor |
 |---|---|
-| Páginas | 145 |
-| Palabras | 27 379 |
+| Páginas | 146 |
+| Palabras | 27 407 |
 | Cuerpo (capítulos y bibliografía) | páginas impresas 1 a 37 |
 | Anexo A | arranca en la página impresa 40 |
 | Tablas numeradas | 20 |
-| Figuras numeradas | 47 |
+| Figuras numeradas | 48 |
 | Anexos | 7 (A a G) |
-| Dibujos incrustados | 50 |
+| Dibujos incrustados | 51 |
 | Entradas de índice sueltas en el cuerpo | 0 (se quitaron 7) |
-| Figuras del Anexo A | 31 de 32 — **falta la A.6** |
+| Figuras del Anexo A | **32 de 32** |
+| Peso del `.docx` / del `.pdf` | 7,60 MB / 3,04 MB |
 
 El cuerpo queda dentro del límite de 30 a 40 páginas que pide la norma.
 
-**Lo único que falta:** la captura **A.6**, que debe mostrar el **panel de inicio con un
-módulo en estado de alertas** (el mensaje "Sistema con alertas / Algunos parámetros están
-fuera de rango" y el contador de la campana). Sirve el **Módulo 1** (Lechuga), que tiene el
-pH en 7,4, fuera de rango.
+**Ya no falta ninguna captura.** La A.6 se insertó (apartado 2.8), así que el Anexo A queda
+completo con sus 32 figuras y el texto que la anunciaba ya tiene su imagen.
+
+**Lo que queda por hacer** es subir el entregable: el `.docx` y el `.pdf`, con el nombre
+`Santos_Freddy_E4.pdf`, a la plataforma y al SharePoint, al menos un día antes de la tutoría.
 
 ---
 
 ## 4. Reglas que salieron de esta sesión
 
-1. **Antes de exportar el PDF, cerrar las instancias de Word huérfanas.** Si la exportación tarda más de lo normal, sospechar de eso primero.
-2. **Nunca borrar el PDF bueno antes de exportar:** exportar a temporal y reemplazar al final.
-3. **Los números de página del script no son los del lector:** el cuerpo se numera desde 1, pero arranca en la página física 10.
-4. **Lo que se sube a la plataforma es el `.docx` y el `.pdf`**, y el archivo se llama `Santos_Freddy_E4.pdf`.
-5. **Abrir Word siempre por PID y solo cerrar las instancias sin ventana**, para no tocar el trabajo del usuario.
+1. **Para exportar el PDF: Word cerrado, una sola instancia, desde una copia y sin rango de páginas.** Así tarda unos 15 segundos. Si la exportación se demora más de lo normal, **no esperar**: revisar instancias de Word colgadas y repetir de esta forma.
+2. **Nunca borrar el PDF bueno antes de exportar:** exportar a un temporal y reemplazar al final.
+3. **Insertar primero todas las figuras y rehacer los índices al final:** cualquier imagen que se agregue corre las páginas de todo lo que sigue.
+4. **Para saber en qué página está algo, recorrer los párrafos; no buscar el texto**, porque la leyenda puede estar mencionada antes en el cuerpo.
+5. **Los números de página del script no son los del lector:** el cuerpo se numera desde 1, pero arranca en la página física 10.
+6. **Lo que se sube a la plataforma es el `.docx` y el `.pdf`**, y el archivo se llama `Santos_Freddy_E4.pdf`.
+7. **Abrir Word siempre por PID y solo cerrar las instancias sin ventana**, para no tocar el trabajo del usuario.
 
 ---
 
 ## 5. Pendientes al cerrar
 
-- [ ] Tomar la captura **A.6** e insertarla.
+- [x] Insertar la captura **A.6** (hecho: `A6.1.jpg`, con `insertar_figura_a6.py`).
 - [ ] Subir el **E4** (`.docx` y `.pdf`) a la plataforma y al SharePoint, al menos un día antes de la tutoría.
 - [ ] Responder el **Cuestionario Q4** cuando el docente lo habilite.
 - [ ] Con la maqueta armada: **restaurar el firmware de producción** (ahora tiene la versión de prueba, que no publica a la nube) y volver a medir con las sondas ya instaladas.
