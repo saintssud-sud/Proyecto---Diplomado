@@ -5,6 +5,24 @@ que conviene hacerlo. Sale de las correcciones del E3 (`Recomendaciones_E3_T4.tx
 
 ---
 
+## 0. El E4 va con el formato de MONOGRAFÍA  ⏰ *recordar*
+
+**No** con el formato de perfil de proyecto que usaron el E1, el E2 y el E3.
+
+El E4 ya está armado sobre la estructura de monografía —portada, índice, capítulos 1 a 3,
+bibliografía y anexos— y con la tipografía de la norma (Arial 12, interlineado 1,5, márgenes
+4/3/3/3 en carta). Lo que falta es **verificarlo punto por punto contra el documento de
+lineamientos**, antes de la pasada final al documento:
+
+- [ ] Leer `Lineamientos-Tecnicos-Trabajo-Final-Diplomado-Desarrollo-Web-y-Apps-Moviles.pdf` y `Formato-Trabajo-Final-Diplomado-Distintas-Areas.pdf` (el que corresponda a Desarrollo Web y Apps Móviles).
+- [ ] Comprobar la **portada** contra el modelo de la norma (sin la línea de entregable que se quitó).
+- [ ] Comprobar los **apartados obligatorios** de la monografía y que no quede ninguno con nombre de perfil de proyecto (planteamiento, aspectos administrativos, cronograma).
+- [ ] Comprobar el **resumen / abstract**, las palabras clave y la paginación (preliminares en romanos, cuerpo desde 1).
+- [ ] Comprobar las **citas y referencias** contra la norma que pide el documento (Harvard / ISO 690).
+- [ ] Comprobar el **límite de páginas** del cuerpo (hoy 38; el tope es 40) después de los cambios de la pasada final.
+
+---
+
 ## 1. CP-22 — Usabilidad con tres personas  ⏰ *recordar*
 
 **Qué pide el docente:** el caso CP-22 (usabilidad, RNF-06) está en «Parcial» porque la sesión
