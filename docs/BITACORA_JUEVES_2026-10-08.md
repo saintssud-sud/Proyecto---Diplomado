@@ -17,7 +17,9 @@ explicar cada decisión en la defensa y para no volver a pisar los mismos errore
 2. Se reconstruyeron los **tres índices** con números de página reales: **20 tablas, 48 figuras y 7 anexos**.
 3. Apareció un **desfase de 9 páginas** entre lo que medía el script y lo que ve el lector: el script devolvía la **página física** del archivo, no la **impresa**.
 4. La causa era que **los preliminares (portada + 8 páginas en romanos) no llevan número arábigo**, y el cuerpo arranca a contar desde 1 en la página física 10.
-5. Además se encontró que **14 instancias de Word huérfanas** (1,6 GB de RAM) hacían que la exportación del PDF tardara más de 10 minutos; liberadas, el mismo trabajo pasó a **16 segundos**.
+5. El **índice de anexos tenía números falsos** (decía «Anexo A → 1») porque se buscaba el texto del título y encontraba una mención suelta; además había **7 entradas de índice metidas dentro del Capítulo 1**.
+6. La **Figura 1 (tablero Kanban) estaba congelada** al cierre de la Semana 4 y todavía mostraba la calibración del TDS en el backlog: se regeneró desde el tablero y se reemplazó.
+7. La **exportación del PDF** se trababa más de 40 minutos sin escribir nada. Quedó resuelta y documentada la forma que funciona: **una invocación propia, Word cerrado, desde una copia**: 12 segundos.
 
 ---
 
@@ -80,10 +82,10 @@ Con eso los tres índices y el índice de contenido coinciden:
 
 | Anexo | Página impresa | Anexo | Página impresa |
 |---|---|---|---|
-| A | 40 | E | 97 |
-| B | 84 | F | 103 |
-| C | 95 | G | 104 |
-| D | 96 | | |
+| A | 41 | E | 98 |
+| B | 85 | F | 104 |
+| C | 96 | G | 105 |
+| D | 97 | | |
 
 ### 2.5 La exportación del PDF que se trababa
 
@@ -124,9 +126,17 @@ funciona**, y el script ahora usa esa: dos fases con **dos instancias distintas*
 2. Cada paso deja una **traza con tiempos** en `_diagnostico/exportacion.log`.
 3. El script cierra Word y limpia las instancias colgadas **incluso si falla** (bloque `finally`), y cierra **solo las que no tienen ventana**: si el usuario tiene Word abierto, no se toca.
 
-**Regla que sale de acá:** si la exportación del PDF se demora más de lo normal, **no
-insistir ni esperar**: revisar instancias de Word colgadas y exportar desde una copia con
-instancia nueva.
+**Lo que se midió después, ya con el documento terminado.** La exportación volvió a trabarse
+dos veces más y se acotó la causa: **se traba si el mismo proceso —o su proceso padre— ya usó
+Word**. Se probó encadenando la actualización de campos y la exportación en un mismo script, y
+también llamando a la exportación como proceso hijo: las dos veces se trabó. Como invocación
+**propia**, en cambio, exportó siempre: 11, 12, 13 y 20 segundos. Por eso quedaron dos scripts
+separados: `actualizar_indices_y_pdf.ps1` (campos) y `exportar_pdf.ps1` (PDF), y **no se
+encadenan**.
+
+**Regla que sale de acá:** la exportación del PDF **siempre en su propia invocación**, con Word
+cerrado y desde una copia. Si se demora más de lo normal, **no esperar**: cortar y repetirla
+así.
 
 ### 2.6 Defecto encontrado en la aplicación
 
@@ -170,13 +180,13 @@ que calcula Word:
 
 | Anexo | Página | Anexo | Página |
 |---|---|---|---|
-| A | 40 | E | 97 |
-| B | 84 | F | 103 |
-| C | 95 | G | 104 |
-| D | 96 | | |
+| A | 41 | E | 98 |
+| B | 85 | F | 104 |
+| C | 96 | G | 105 |
+| D | 97 | | |
 
-(Estas son las páginas **finales**, ya con la figura A.6 insertada: al agregarla, todo lo
-que sigue al Anexo A corrió una página.)
+(Estas son las páginas **finales**, ya con la figura A.6 y con el tablero nuevo: cada figura
+que se agrega o crece corre las páginas de todo lo que sigue.)
 
 **Regla que sale de acá:** para saber en qué página está algo, **recorrer los párrafos**, no
 buscar el texto: cualquier leyenda puede estar mencionada antes en el cuerpo y la búsqueda
@@ -204,25 +214,52 @@ los índices se rehicieron después de insertar la figura**, no antes.
 **Regla que sale de acá:** insertar primero todas las figuras y recién al final rehacer los
 índices: cualquier imagen movida corre las páginas de todo lo que sigue.
 
+### 2.9 La Figura 1 del tablero estaba congelada
+
+**Síntoma.** El tablero de tareas que se ve en la Figura 1 del documento mostraba la tarjeta
+«Calibrar el sensor de TDS con el patrón de 707 ppm» **todavía en el backlog**, con 40 tareas
+terminadas, cuando la calibración ya estaba hecha.
+
+**Diagnóstico.** El tablero fuente —`docs/TABLERO.md`— **sí estaba al día**: la tarea T-32
+figura en «Hecho» de la Semana 5 y el backlog está vacío. Lo que había quedado viejo era **la
+figura dibujada**: el programa que la dibuja leía la línea de estado **del cierre de semana**, y
+como esa línea decía «40 terminadas · 1 en curso · 1 en el backlog», la figura se quedaba en ese
+punto. Además, el programa **se niega a dibujar** si el resumen no coincide con las tarjetas de
+las columnas: con el tablero al día y el resumen viejo, la comprobación fallaba.
+
+**Corrección.** El programa ahora lee **la última línea de estado** del tablero, sea del cierre
+de una semana o de una fecha, y limpia las marcas de negrita antes de leer los números. Se
+regeneró la figura y se reemplazó la del documento: **backlog vacío, 1 en curso, 41 terminadas**,
+con la T-32 del TDS en la Semana 5. La leyenda pasó de «al cierre de la Semana 4» a «al 6 de
+octubre de 2026».
+
+**De paso se corrigió otro defecto del programa:** informaba las rutas tomando su propia carpeta
+en vez de la raíz del proyecto, y al ejecutarlo desde `Proyecto SIGVACH/scripts/` **fallaba antes
+de dibujar nada**.
+
+**Regla que sale de acá:** el tablero versionado es la **única fuente**; la figura se regenera
+desde él y **nunca se dibuja a mano**, porque una figura escrita a mano se desincroniza sola.
+
 ---
 
 ## 3. Estado del documento al cerrar la sesión
 
 | Dato | Valor |
 |---|---|
-| Páginas | 146 |
+| Páginas | 147 |
 | Palabras | 27 407 |
-| Cuerpo (capítulos y bibliografía) | páginas impresas 1 a 37 |
-| Anexo A | arranca en la página impresa 40 |
+| Cuerpo (capítulos y bibliografía) | páginas impresas 1 a **38** |
+| Anexo A | arranca en la página impresa 41 |
 | Tablas numeradas | 20 |
 | Figuras numeradas | 48 |
 | Anexos | 7 (A a G) |
 | Dibujos incrustados | 51 |
 | Entradas de índice sueltas en el cuerpo | 0 (se quitaron 7) |
 | Figuras del Anexo A | **32 de 32** |
-| Peso del `.docx` / del `.pdf` | 7,60 MB / 3,04 MB |
+| Peso del `.docx` / del `.pdf` | 7,61 MB / 3,06 MB |
 
-El cuerpo queda dentro del límite de 30 a 40 páginas que pide la norma.
+El cuerpo termina en la página impresa **38**: sigue dentro del límite de 30 a 40 páginas que
+pide la norma, con dos páginas de margen.
 
 **Ya no falta ninguna captura.** La A.6 se insertó (apartado 2.8), así que el Anexo A queda
 completo con sus 32 figuras y el texto que la anunciaba ya tiene su imagen.
@@ -234,19 +271,22 @@ completo con sus 32 figuras y el texto que la anunciaba ya tiene su imagen.
 
 ## 4. Reglas que salieron de esta sesión
 
-1. **Para exportar el PDF: Word cerrado, una sola instancia, desde una copia y sin rango de páginas.** Así tarda unos 15 segundos. Si la exportación se demora más de lo normal, **no esperar**: revisar instancias de Word colgadas y repetir de esta forma.
-2. **Nunca borrar el PDF bueno antes de exportar:** exportar a un temporal y reemplazar al final.
-3. **Insertar primero todas las figuras y rehacer los índices al final:** cualquier imagen que se agregue corre las páginas de todo lo que sigue.
-4. **Para saber en qué página está algo, recorrer los párrafos; no buscar el texto**, porque la leyenda puede estar mencionada antes en el cuerpo.
-5. **Los números de página del script no son los del lector:** el cuerpo se numera desde 1, pero arranca en la página física 10.
-6. **Lo que se sube a la plataforma es el `.docx` y el `.pdf`**, y el archivo se llama `Santos_Freddy_E4.pdf`.
-7. **Abrir Word siempre por PID y solo cerrar las instancias sin ventana**, para no tocar el trabajo del usuario.
+1. **La exportación del PDF, siempre en su propia invocación** (`exportar_pdf.ps1`), con Word cerrado, una sola instancia, desde una copia y sin rango de páginas. Así tarda unos 15 segundos. **No encadenarla** con el script de los índices: si el mismo proceso ya usó Word, se traba. Si se demora más de lo normal, **no esperar**: cortar y repetirla.
+2. **El tablero versionado es la única fuente de la figura del tablero:** se regenera desde `docs/TABLERO.md`, nunca se dibuja a mano.
+3. **Nunca borrar el PDF bueno antes de exportar:** exportar a un temporal y reemplazar al final.
+4. **Insertar primero todas las figuras y rehacer los índices al final:** cualquier imagen que se agregue o crezca corre las páginas de todo lo que sigue.
+5. **Para saber en qué página está algo, recorrer los párrafos; no buscar el texto**, porque la leyenda puede estar mencionada antes en el cuerpo.
+6. **Los números de página del script no son los del lector:** el cuerpo se numera desde 1, pero arranca en la página física 10.
+7. **Lo que se sube a la plataforma es el `.docx` y el `.pdf`**, y el archivo se llama `Santos_Freddy_E4.pdf`.
+8. **Abrir Word siempre por PID y solo cerrar las instancias sin ventana**, para no tocar el trabajo del usuario.
 
 ---
 
 ## 5. Pendientes al cerrar
 
 - [x] Insertar la captura **A.6** (hecho: `A6.1.jpg`, con `insertar_figura_a6.py`).
+- [x] Regenerar la **Figura 1 del tablero** desde `docs/TABLERO.md` y reemplazarla en el documento.
+- [ ] Si el tablero cambia antes de la entrega: regenerar la figura (`scripts/generar_figura_tablero.py`), reemplazarla (`reemplazar_figura_tablero.py`), rehacer los índices y exportar el PDF, en ese orden.
 - [ ] Subir el **E4** (`.docx` y `.pdf`) a la plataforma y al SharePoint, al menos un día antes de la tutoría.
 - [ ] Responder el **Cuestionario Q4** cuando el docente lo habilite.
 - [ ] Con la maqueta armada: **restaurar el firmware de producción** (ahora tiene la versión de prueba, que no publica a la nube) y volver a medir con las sondas ya instaladas.

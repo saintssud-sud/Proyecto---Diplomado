@@ -140,6 +140,7 @@ class Tablero:
         self.hecho: list[tuple[str, list[dict]]] = []
         self.semana_cierre = ""
         self.fecha_cierre = ""
+        self.estado = ""
         self.resumen: tuple[int, int, int] | None = None
         self._leer()
 
@@ -168,6 +169,22 @@ class Tablero:
                 )
                 if coincidencia:
                     self.semana_cierre = "Semana " + coincidencia.group(1)
+                    self.resumen = (int(coincidencia.group(2)), int(coincidencia.group(3)),
+                                    int(coincidencia.group(4)))
+            # El estado mas reciente es el que manda: se guarda la ULTIMA linea de
+            # estado del tablero, sea del cierre de una semana o de una fecha. Si no
+            # se hiciera asi, la figura quedaba congelada en la ultima semana cerrada
+            # —mostrando en el backlog una tarea ya terminada— aunque el tablero
+            # siguiera avanzando. La linea se limpia de marcas antes de leerla porque
+            # los numeros pueden venir en negrita.
+            if texto.startswith("**Estado al "):
+                coincidencia = re.search(
+                    r"^Estado (al [^:]+):\s*(\d+) tareas terminadas\s*·\s*(\d+) en curso[^·]*·\s*"
+                    r"(\d+) en el backlog",
+                    sin_marcas(texto),
+                )
+                if coincidencia:
+                    self.estado = coincidencia.group(1).strip()
                     self.resumen = (int(coincidencia.group(2)), int(coincidencia.group(3)),
                                     int(coincidencia.group(4)))
             if texto.startswith("## 📋"):
@@ -225,7 +242,7 @@ class Tablero:
             raise SystemExit("Tablero incoherente: una tarea no puede estar en dos columnas (%s)" % detalle)
 
         if self.resumen is None:
-            raise SystemExit("No se encontro la linea de estado al cierre de la semana en el tablero.")
+            raise SystemExit("No se encontro la linea de estado del tablero (la que empieza con «**Estado al »).")
 
         contado = (self.total_hecho, len(self.en_curso), len(self.backlog))
         if contado != self.resumen:
@@ -360,8 +377,8 @@ def figura_tablero(tablero: Tablero) -> Path:
     terminadas, en_curso, backlog = tablero.resumen
     texto_centrado(
         dibujo,
-        "Estado al cierre de la %s (%s): %d tareas terminadas · %d en curso · %d en el backlog."
-        % (tablero.semana_cierre, tablero.fecha_cierre, terminadas, en_curso, backlog),
+        "Estado %s: %d tareas terminadas · %d en curso · %d en el backlog."
+        % (tablero.estado, terminadas, en_curso, backlog),
         0, alto_lienzo - 62, ANCHO, 18, GRIS,
     )
     texto_centrado(
@@ -371,7 +388,9 @@ def figura_tablero(tablero: Tablero) -> Path:
     )
 
     SALIDA.mkdir(exist_ok=True)
-    destino = SALIDA / ("13-tablero-%s.png" % tablero.semana_cierre.lower().replace(" ", "-"))
+    # El nombre sale del estado declarado, asi que cambia cuando cambia el estado.
+    nombre = re.sub(r"[^a-z0-9]+", "-", tablero.estado.lower()).strip("-")
+    destino = SALIDA / ("13-tablero-%s.png" % nombre)
     imagen.save(destino)
     return destino
 
@@ -379,15 +398,18 @@ def figura_tablero(tablero: Tablero) -> Path:
 def main() -> None:
     tablero = Tablero(TABLERO)
     tablero.comprobar()
-    print("Tablero: %s" % TABLERO.relative_to(RAIZ))
+    # Las rutas se informan respecto de la raiz del espacio y no de la carpeta del
+    # programa: el mismo programa vive en la raiz y en Proyecto SIGVACH/scripts/.
+    print("Tablero: %s" % TABLERO.relative_to(ESPACIO))
     print("  Marco        : %s" % tablero.marco)
+    print("  Estado       : %s" % tablero.estado)
     print("  Backlog      : %d" % len(tablero.backlog))
     print("  En curso     : %d" % len(tablero.en_curso))
     print("  Hecho        : %d" % tablero.total_hecho)
     for nombre, tareas in tablero.hecho:
         print("      %-28s %2d" % (nombre, len(tareas)))
     print("  Coherencia   : correcta (ninguna tarea en dos columnas)")
-    print("Figura generada: %s" % figura_tablero(tablero).relative_to(RAIZ))
+    print("Figura generada: %s" % figura_tablero(tablero).relative_to(ESPACIO))
 
 
 if __name__ == "__main__":
