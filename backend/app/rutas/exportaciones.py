@@ -12,7 +12,7 @@ from fastapi import APIRouter, Depends, Query, Response
 from ..dependencias import obtener_repositorio
 from ..repositorios.base import RepositorioDatos
 from ..seguridad import UsuarioAutenticado, requiere_consulta
-from ..servicios import evaluacion
+from ..servicios import evaluacion, lecturas
 
 enrutador = APIRouter(prefix="/exportaciones", tags=["Exportaciones"])
 
@@ -32,13 +32,19 @@ def exportar_lecturas(
     _: UsuarioAutenticado = Depends(requiere_consulta),
     repositorio: RepositorioDatos = Depends(obtener_repositorio),
 ) -> Response:
-    """Devuelve el historial consultado como archivo descargable."""
-    lecturas_consultadas = repositorio.listar_lecturas(
-        modulo_id=modulo_id,
-        variable=variable.strip().lower() if variable else None,
-        desde=desde,
-        hasta=hasta,
-        limite=limite,
+    """Devuelve el historial consultado como archivo descargable.
+
+    Las lecturas anuladas no se exportan: siguen en el historial con su motivo,
+    pero el archivo contiene las mediciones vigentes del periodo consultado.
+    """
+    lecturas_consultadas = lecturas.vigentes(
+        repositorio.listar_lecturas(
+            modulo_id=modulo_id,
+            variable=variable.strip().lower() if variable else None,
+            desde=desde,
+            hasta=hasta,
+            limite=limite,
+        )
     )
     contenido = evaluacion.generar_csv(lecturas_consultadas)
     marca = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M")

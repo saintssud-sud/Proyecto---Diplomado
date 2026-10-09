@@ -1,0 +1,52 @@
+VERIFICACIÓN EN VIVO — ANULACIÓN DE LECTURAS Y CASOS PARCIALES
+Fecha    : 2026-10-09 01:00
+Servicio : https://sigvach-api.onrender.com
+======================================================================
+
+Iniciando sesión con las dos cuentas de prueba…
+Sesiones iniciadas: operador y administrador.
+
+Módulo de prueba: Módulo 1 (modulo-1)
+
+CASO 1 — La ruta de borrado de lecturas ya no existe
+  DELETE /api/v1/lecturas/{id}  ->  HTTP 405   correcto: no hay borrado
+
+CASO 2 — El operador registra una lectura manual
+  POST /api/v1/lecturas/manual  ->  HTTP 201
+  lectura registrada: id=mMWlJjswY99hVIz3ryrK  valor=6.2 
+
+CASO 3 — Autorización: el operador no anula, el administrador sí
+  con la cuenta de operador      ->  HTTP 403   correcto
+  con motivo de 5 caracteres     ->  HTTP 422   correcto: el motivo es obligatorio
+
+CASO 4 — El administrador anula la lectura con su motivo
+  POST /api/v1/lecturas/{id}/anulacion  ->  HTTP 200
+  anulada        : True
+  motivo         : Medición repetida: el instrumento portátil estaba descalibrado.
+  anulada por    : ricOhA6gQ1gneNA6HAXvmCO6liA2
+  anulada en     : 2026-10-09T05:05:48.269526Z
+
+CASO 5 — El dato no se pierde: la lectura sigue siendo consultable
+  GET /api/v1/lecturas/{id}  ->  HTTP 200   correcto: el registro se conserva
+  estado: anulada=True
+
+CASO 6 — Anular dos veces es un conflicto, no un éxito silencioso
+  segunda anulación  ->  HTTP 409   correcto
+
+CASO 7 — La lectura anulada no se cuenta en las consultas ni en la exportación
+  GET /api/v1/lecturas?modulo_id=…  ->  HTTP 200, 59 lecturas
+  ¿aparece la anulada?  no   correcto
+  GET /api/v1/exportaciones/lecturas.csv?modulo_id=…  ->  HTTP 200, 5101 bytes
+  ¿aparece la anulada en el CSV?  sí   REVISAR
+
+CASO 8 — CP-11: los tres filtros juntos (módulo, variable y fechas)
+  GET /api/v1/lecturas?modulo_id=…&variable=ph&desde=…&hasta=…&limite=50
+     ->  HTTP 200 en 0.45 s, 15 lecturas   correcto: el índice compuesto responde
+
+CASO 9 — CP-19: exportación filtrada por módulo, variable y periodo
+     ->  HTTP 200, 17 filas (la primera es el encabezado)   correcto
+     encabezado: ﻿id,modulo_id,variable,valor,unidad,origen,timestamp
+     fila 1    : mMWlJjswY99hVIz3ryrK,modulo-1,ph,6.2,,manual,2026-10-09T05:05:46.860953+00:00
+
+======================================================================
+Fin de la verificación.
