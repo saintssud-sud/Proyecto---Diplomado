@@ -50,3 +50,15 @@ CASO 9 — CP-19: exportación filtrada por módulo, variable y periodo
 
 ======================================================================
 Fin de la verificación.
+
+======================================================================
+COMPROBACIÓN POSTERIOR (misma madrugada, tras desplegar el filtro de la exportación)
+
+En la primera corrida el CSV todavía incluía la lectura anulada, porque el filtro
+de la exportación se escribió después de ese despliegue. Con el código ya
+desplegado, la comprobación se repitió y el resultado es el esperado:
+
+  GET /api/v1/exportaciones/lecturas.csv?modulo_id=modulo-1
+     ->  HTTP 200, 5022 bytes, la lectura anulada NO aparece
+  GET /api/v1/lecturas/mMWlJjswY99hVIz3ryrK
+     ->  HTTP 200: el registro anulado se sigue consultando por su identificador
