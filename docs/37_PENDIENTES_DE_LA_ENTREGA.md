@@ -60,8 +60,15 @@ Solo hay que ejecutarlo delante del docente.
 | Capítulo 3 con una conclusión por objetivo | **Hecho**: seis objetivos, uno por párrafo. |
 | Extensión del cuerpo (límite 30–40 páginas) | **Hecho**: 38 páginas. |
 | Detalle de los casos de prueba a anexos | **Hecho**: 24 casos en la tabla G.9 del Anexo G. |
+| CP-24 (RNF-01 «No cumple») | **Hecho y medido** el 9 de octubre contra el servicio publicado: con 200 registros el p95 bajó de 1042 a **427 ms** y con 50 registros de 984 a **406 ms**; en los dos casos 20 de 20 consultas dentro del objetivo de 800 ms. Evidencia en `evidencia/rendimiento-2026-10-09-*.txt`. |
+| `DELETE /api/v1/lecturas/{id}` → anulación con motivo (A-01, RNF-08) | **Hecho**: la ruta de borrado ya no existe (405) y en su lugar está `POST /api/v1/lecturas/{id}/anulacion`, con motivo obligatorio. Verificado en vivo: el operador recibe 403, el administrador anula (200), el registro se conserva consultable y anular dos veces da 409. Evidencia en `evidencia/anulacion-2026-10-09.txt`. |
+| Cerrar CP-06, CP-11 y CP-19 (los «Parcial» baratos) | **CP-11 y CP-19 verificados en vivo** (los tres filtros juntos responden 200 en 0,45 s con el índice compuesto, y la exportación filtrada devuelve el CSV). **CP-06**: la mitad de la baja queda cerrada con la anulación; la de modificación queda por registrar. |
 | 2.7 en cinco apartados (2.7.1 a 2.7.5) | **Pendiente** (documento, una sola pasada al final). |
 | 2.3.1: nombrar el rol de solo consulta | **Pendiente** (documento, una sola pasada al final). |
-| CP-24 (RNF-01 «No cumple») | **En curso**: índice compuesto + límite, con medición antes y después. |
-| `DELETE /api/v1/lecturas/{id}` → anulación con motivo (A-01, RNF-08) | **En curso**. |
-| Cerrar CP-06, CP-11 y CP-19 (los «Parcial» baratos) | **Pendiente**. |
+| Actualizar el documento con todo lo de arriba | **Pendiente**: la tabla G.9 (CP-24, CP-11, CP-19), el conteo de pruebas de 2.8 (149 → **152** del servicio), la tabla del contrato (la anulación en lugar del borrado) y el enunciado del RNF-01 con la medición nueva. |
+
+### Índice de Firestore agregado el 9 de octubre
+
+`firestore.indexes.json` incorpora el índice compuesto de `lecturas` por
+**módulo, variable y fecha**, que es el que necesitan los tres filtros juntos de la pantalla
+de historial. Ya está desplegado en el proyecto `sigvach26-bd`.
