@@ -1,0 +1,33 @@
+VERIFICACIÓN DE LA AUTORIZACIÓN DEL SERVICIO
+Fecha    : 2026-10-09 13:23
+Servicio : https://sigvach-api.onrender.com
+========================================================================
+
+Sesiones de prueba:
+   administrador@proyecto.test      rol administrador
+   operador@proyecto.test           rol operador
+
+La ruta de administración es GET /api/v1/usuarios.
+
+1. SIN TOKEN
+   -> HTTP 401 en 36680 ms   correcto
+   respuesta: {"codigo":"no_autenticado","mensaje":"Falta el token de identidad en la cabecera Authorization.","detalle":{}}
+
+2. CON LA CUENTA DE OPERADOR
+   -> HTTP 403 en 760 ms   correcto
+   respuesta: {"codigo":"sin_permiso","mensaje":"La operación requiere el rol de administrador.","detalle":{"rol_requerido":["administrador"],"rol_actual":"operador"}}
+
+3. CON LA CUENTA DE ADMINISTRADOR
+   -> HTTP 200 en 1050 ms, 8 cuentas   correcto
+
+4. LECTURA DEL DISPOSITIVO CON CLAVE INVÁLIDA
+   -> HTTP 401 en 297 ms   correcto
+   respuesta: {"codigo":"no_autenticado","mensaje":"La clave del módulo de adquisición no es válida.","detalle":{}}
+   (no se registra nada: el rechazo ocurre antes de tocar la base)
+
+5. MONITOR DEL DESPLIEGUE
+   -> HTTP 200 en 450 ms   correcto
+   respuesta: {"estado":"ok","version_api":"v1","entorno":"produccion","base_de_datos":"conectada"}
+
+========================================================================
+RESULTADO: 5 de 5 comprobaciones con el resultado esperado.
