@@ -1,0 +1,26 @@
+VERIFICACIÓN EN VIVO — CP-06: ALTA, MODIFICACIÓN Y BAJA DE UN MÓDULO DE CULTIVO
+Fecha    : 2026-10-09 09:45
+Servicio : https://sigvach-api.onrender.com
+======================================================================
+
+Sesión iniciada con la cuenta de administración.
+
+PASO 1 — Alta del módulo
+  POST /api/v1/modulos  ->  HTTP 201
+  creado: id=FvgX2bSpfrHl1Sn3gCw3  nombre='Módulo de verificación CP-06'  ubicación='Invernadero de prueba'
+
+PASO 2 — Modificación del módulo, y se vuelve a consultar
+  PATCH /api/v1/modulos/{id}  ->  HTTP 200
+  respuesta del servicio: nombre='Módulo de verificación CP-06 (modificado)'  ubicación='Invernadero oeste'
+  GET /api/v1/modulos/{id}  ->  HTTP 200
+  lo que devuelve la consulta: nombre='Módulo de verificación CP-06 (modificado)'  ubicación='Invernadero oeste'
+  ¿la modificación persistió?  SÍ, correcto
+
+PASO 3 — Baja del módulo (no tiene lecturas, así que la baja se admite)
+  DELETE /api/v1/modulos/{id}  ->  HTTP 204
+  GET después de la baja  ->  HTTP 404   correcto: el módulo ya no está
+
+======================================================================
+RESULTADO: las tres operaciones —alta, modificación y baja— persisten en la base de
+datos y se comprueban consultando el recurso después de cada una. El módulo de prueba
+quedó eliminado: no se dejó ningún dato en el sistema.

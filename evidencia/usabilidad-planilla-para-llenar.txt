@@ -1,0 +1,85 @@
+PRUEBA DE USABILIDAD — CP-22 (RNF-06)
+Sistema : SI.G.VA.CH. — https://sigvach26-bd.web.app
+Cuenta  : operador@proyecto.test (rol de operador)
+Fecha   : ____ de octubre de 2026
+Lugar   : ______________________
+Guion   : docs/38_GUION_CP22_USABILIDAD.md
+
+Cómo se toma: se le da a la persona el enlace y las credenciales, se le leen las cinco
+tareas una por una, y se anota si las logró SIN AYUDA y cuánto tardó. No se explica cómo
+usar la aplicación: si pregunta algo, se anota la pregunta y se responde «probá vos».
+
+
+PLANILLA (una columna por persona)
+
+  Dato / Tarea                                    Persona 1    Persona 2    Persona 3
+  ----------------------------------------------  -----------  -----------  -----------
+  Nombre o iniciales                              __________   __________   __________
+  Edad aproximada                                 __________   __________   __________
+  ¿Usó antes una aplicación parecida? (sí/no)     __________   __________   __________
+
+  1. Entrar al sistema
+     ¿sin ayuda? (sí/no)                          __________   __________   __________
+     tiempo (segundos)                            __________   __________   __________
+     qué pasó (si algo pasó)                      __________   __________   __________
+
+  2. Ver las seis variables del cultivo
+     ¿sin ayuda? (sí/no)                          __________   __________   __________
+     tiempo (segundos)                            __________   __________   __________
+     qué pasó                                     __________   __________   __________
+
+  3. Consultar la evolución del pH
+     ¿sin ayuda? (sí/no)                          __________   __________   __________
+     tiempo (segundos)                            __________   __________   __________
+     qué pasó                                     __________   __________   __________
+
+  4. Registrar una medición a mano (21,5 °C)
+     ¿sin ayuda? (sí/no)                          __________   __________   __________
+     tiempo (segundos)                            __________   __________   __________
+     qué pasó                                     __________   __________   __________
+
+  5. Atender la alerta activa
+     ¿sin ayuda? (sí/no)                          __________   __________   __________
+     tiempo (segundos)                            __________   __________   __________
+     qué pasó                                     __________   __________   __________
+
+  TAREAS LOGRADAS SIN AYUDA (de 5)                __________   __________   __________
+  TIEMPO TOTAL (minutos)                          __________   __________   __________
+  ¿Pidió ayuda? ¿en qué momento?                  __________   __________   __________
+  Lo que más le costó                             __________   __________   __________
+  Comentarios textuales que hizo                  __________   __________   __________
+
+
+RESULTADO DE LA SESIÓN
+
+  Personas que completaron las cinco tareas sin ayuda: ____ de 3
+  Criterio de aprobación del caso: dos de tres personas.
+
+  CONCLUSIÓN: ____ APROBADO  ·  ____ PARCIAL (explicar por qué abajo)
+  ______________________________________________________________________________
+  ______________________________________________________________________________
+
+
+MEJORAS QUE SUGIERE LA PRUEBA (esto suma: es el valor de hacerla)
+  ______________________________________________________________________________
+  ______________________________________________________________________________
+
+
+EVIDENCIA QUE ACOMPAÑA ESTA PLANILLA  (los corchetes se marcan con una X al final;
+las capturas son OPCIONALES: lo que vale es esta planilla con las respuestas)
+  [ ] usabilidad-2026-10-09-persona-1.jpg   (captura o foto, con permiso; opcional)
+  [ ] usabilidad-2026-10-09-persona-2.jpg   (opcional)
+  [ ] usabilidad-2026-10-09-persona-3.jpg   (opcional)
+  [ ] usabilidad-2026-10-09-historial.jpg   (opcional: las mediciones que registraron)
+
+Cómo conseguir a las personas sin que sea un problema: la prueba se puede hacer A
+DISTANCIA. El mensaje listo para reenviar está en
+docs/39_MENSAJE_PARA_LA_PRUEBA_DE_USABILIDAD.md: la persona la hace cuando pueda, en
+15 minutos, y contesta por escrito.
+
+Con DOS personas alcanza: el criterio del caso es que dos de tres completen las cinco
+tareas sin ayuda. Si al final son dos, se anota «sesión con dos usuarios por
+disponibilidad» y el caso se aprueba igual.
+
+Nota: solo iniciales o nombre de pila. La norma del trabajo final prohíbe que las
+capturas y evidencias muestren datos personales reales.
