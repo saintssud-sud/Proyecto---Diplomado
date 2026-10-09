@@ -87,6 +87,46 @@ def registrar(
     return lectura
 
 
+def vigentes(lecturas: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Descarta las lecturas anuladas.
+
+    Una lectura anulada sigue en el historial —con su motivo y su autor— pero no
+    se cuenta en las consultas ni en el resumen del periodo.
+    """
+    return [lectura for lectura in lecturas if not lectura.get("anulada")]
+
+
+def anular(
+    repositorio: RepositorioDatos,
+    lectura_id: str,
+    motivo: str,
+    anulada_por: str,
+) -> dict[str, Any]:
+    """Anula una lectura con su motivo, sin borrarla.
+
+    El registro no se elimina: queda marcado como anulado, con quién lo anuló,
+    cuándo y por qué. Así la medición sigue siendo trazable (RNF-08) y el panel
+    deja de contarla. Anular dos veces es un conflicto, no un éxito silencioso.
+    """
+    lectura = obtener_o_error(repositorio, lectura_id)
+    if lectura.get("anulada"):
+        raise ErrorApi(
+            409,
+            CODIGO_CONFLICTO,
+            "La lectura ya estaba anulada.",
+        )
+
+    return repositorio.anular_lectura(
+        lectura_id,
+        {
+            "anulada": True,
+            "motivo_anulacion": motivo.strip(),
+            "anulada_por": anulada_por,
+            "anulada_en": datetime.now(timezone.utc),
+        },
+    )
+
+
 def obtener_o_error(repositorio: RepositorioDatos, lectura_id: str) -> dict[str, Any]:
     """Devuelve una lectura o lanza el error 404 correspondiente."""
     lectura = repositorio.obtener_lectura(lectura_id)

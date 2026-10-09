@@ -146,6 +146,17 @@ class LecturaManualEntrada(_LecturaBase):
     """
 
 
+class LecturaAnulacion(_BaseEntrada):
+    """Anulación de una lectura, con su motivo.
+
+    Una lectura no se borra: se anula. El registro se conserva —con quién la
+    anuló, cuándo y por qué— porque es la trazabilidad del dato medido; el motivo
+    es obligatorio y se exige de una longitud mínima para que sea informativo.
+    """
+
+    motivo: str = Field(min_length=10, max_length=300)
+
+
 class ModuloEntrada(_BaseEntrada):
     """Módulo o zona de cultivo."""
 
@@ -265,6 +276,13 @@ class LecturaSalida(_BaseSalida):
     # La observación se registra con la medición manual y forma parte de su
     # trazabilidad: se devuelve para que el cliente pueda mostrarla.
     observacion: str | None = None
+    # Anulación: la lectura no se borra nunca (RNF-08). Cuando se anula queda con
+    # su motivo, con quién la anuló y con la fecha, y deja de contarse en las
+    # consultas; el registro sigue disponible para consultarla por su identificador.
+    anulada: bool = False
+    motivo_anulacion: str | None = None
+    anulada_por: str | None = None
+    anulada_en: datetime | None = None
 
 
 class ModuloSalida(_BaseSalida):

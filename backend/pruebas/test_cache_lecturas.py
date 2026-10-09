@@ -167,14 +167,20 @@ def test_registrar_una_lectura_descarta_la_memoria():
     assert len(lecturas) == 4
 
 
-def test_eliminar_una_lectura_descarta_la_memoria():
+def test_anular_una_lectura_descarta_la_memoria():
     base, contador = _con_lecturas()
     repositorio = RepositorioConCache(contador)
     assert len(repositorio.listar_lecturas(limite=10)) == 3
 
-    assert repositorio.eliminar_lectura(base.listar_lecturas(limite=10)[0]["id"]) is True
+    identificador = base.listar_lecturas(limite=10)[0]["id"]
+    anulada = repositorio.anular_lectura(
+        identificador, {"anulada": True, "motivo_anulacion": "prueba de anulación"}
+    )
+    assert anulada is not None and anulada["anulada"] is True
 
-    assert len(repositorio.listar_lecturas(limite=10)) == 2
+    # El dato no se pierde: sigue estando, marcado como anulado.
+    assert any(lectura["id"] == identificador for lectura in repositorio.listar_lecturas(limite=10))
+    # Y la memoria se descartó: la consulta siguiente vuelve a leer la base.
     assert contador.consultas == 2
 
 

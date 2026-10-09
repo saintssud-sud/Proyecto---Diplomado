@@ -213,10 +213,11 @@ class RepositorioConCache:
         self._descartar()
         return lectura
 
-    def eliminar_lectura(self, lectura_id: str) -> bool:
-        eliminada = self._repositorio.eliminar_lectura(lectura_id)
+    def anular_lectura(self, lectura_id: str, cambios: dict[str, Any]) -> dict[str, Any] | None:
+        anulada = self._repositorio.anular_lectura(lectura_id, cambios)
+        # La memoria guarda listas de lecturas, así que una anulación la invalida.
         self._descartar()
-        return eliminada
+        return anulada
 
     def obtener_lectura(self, lectura_id: str) -> dict[str, Any] | None:
         return self._repositorio.obtener_lectura(lectura_id)

@@ -8,6 +8,7 @@ from ..dependencias import obtener_repositorio
 from ..errores import CODIGO_VALIDACION, ErrorApi
 from ..esquemas import (
     CATALOGO_VARIABLES,
+    LecturaAnulacion,
     LecturaEntrada,
     LecturaManualEntrada,
     LecturaSalida,
@@ -93,13 +94,18 @@ def consultar_lecturas(
     _: UsuarioAutenticado = Depends(requiere_consulta),
     repositorio: RepositorioDatos = Depends(obtener_repositorio),
 ) -> list[dict]:
-    """Devuelve las lecturas que satisfacen los tres filtros aplicados."""
-    return repositorio.listar_lecturas(
-        modulo_id=modulo_id,
-        variable=_variable_valida(variable),
-        desde=desde,
-        hasta=hasta,
-        limite=limite,
+    """Devuelve las lecturas que satisfacen los tres filtros aplicados.
+
+    Las lecturas anuladas no se devuelven: siguen en el historial, pero no cuentan.
+    """
+    return lecturas.vigentes(
+        repositorio.listar_lecturas(
+            modulo_id=modulo_id,
+            variable=_variable_valida(variable),
+            desde=desde,
+            hasta=hasta,
+            limite=limite,
+        )
     )
 
 
@@ -117,12 +123,14 @@ def resumir_lecturas(
     repositorio: RepositorioDatos = Depends(obtener_repositorio),
 ) -> list[dict]:
     """Resume la serie consultada; es el cálculo que sostiene el gráfico de tendencia."""
-    lecturas_consultadas = repositorio.listar_lecturas(
-        modulo_id=modulo_id,
-        variable=_variable_valida(variable),
-        desde=desde,
-        hasta=hasta,
-        limite=1000,
+    lecturas_consultadas = lecturas.vigentes(
+        repositorio.listar_lecturas(
+            modulo_id=modulo_id,
+            variable=_variable_valida(variable),
+            desde=desde,
+            hasta=hasta,
+            limite=1000,
+        )
     )
 
     por_variable: dict[str, list[dict]] = {}
@@ -158,16 +166,22 @@ def obtener_lectura(
     return lecturas.obtener_o_error(repositorio, lectura_id)
 
 
-@enrutador.delete(
-    "/{lectura_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
-    summary="Eliminar una lectura",
+@enrutador.post(
+    "/{lectura_id}/anulacion",
+    response_model=LecturaSalida,
+    summary="Anular una lectura con su motivo",
 )
-def eliminar_lectura(
+def anular_lectura(
     lectura_id: str,
-    _: UsuarioAutenticado = Depends(requiere_administracion),
+    entrada: LecturaAnulacion,
+    usuario: UsuarioAutenticado = Depends(requiere_administracion),
     repositorio: RepositorioDatos = Depends(obtener_repositorio),
-) -> None:
-    """Elimina una lectura; la operación queda reservada a la administración."""
-    lecturas.obtener_o_error(repositorio, lectura_id)
-    repositorio.eliminar_lectura(lectura_id)
+) -> dict:
+    """Anula una lectura; la operación queda reservada a la administración.
+
+    No se borra nada: la lectura queda marcada como anulada, con el motivo
+    declarado, con quién la anuló y con la fecha. Deja de contarse en las
+    consultas y en el resumen, pero sigue siendo consultable por su
+    identificador, de modo que la trazabilidad del dato medido se conserva.
+    """
+    return lecturas.anular(repositorio, lectura_id, entrada.motivo, usuario.uid)

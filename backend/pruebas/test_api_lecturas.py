@@ -217,18 +217,75 @@ def test_exportacion_csv_contiene_las_lecturas_consultadas(cliente_publico, clie
 
 
 # ---------------------------------------------------------------------------
-# Eliminación
+# Anulación (no hay borrado de lecturas: RNF-08)
 # ---------------------------------------------------------------------------
 
 
-def test_eliminar_lectura_requiere_rol_de_administracion(cliente_publico, cliente_operador, cliente_administrador, entorno):
+MOTIVO = "Medición repetida: el instrumento portátil estaba descalibrado."
+
+
+def test_anular_lectura_requiere_rol_de_administracion(cliente_publico, cliente_operador, cliente_administrador, entorno):
     creada = cliente_publico.post(
         "/api/v1/lecturas", json=_lectura(entorno, 6.0), headers=cabecera_dispositivo()
     ).json()
 
-    assert cliente_operador.delete(f"/api/v1/lecturas/{creada['id']}").status_code == 403
-    assert cliente_administrador.delete(f"/api/v1/lecturas/{creada['id']}").status_code == 204
-    assert cliente_administrador.get(f"/api/v1/lecturas/{creada['id']}").status_code == 404
+    # El operador no puede anular: la operación es de administración.
+    assert cliente_operador.post(
+        f"/api/v1/lecturas/{creada['id']}/anulacion", json={"motivo": MOTIVO}
+    ).status_code == 403
+
+    # El motivo es obligatorio y tiene que ser informativo.
+    assert cliente_administrador.post(
+        f"/api/v1/lecturas/{creada['id']}/anulacion", json={"motivo": "corto"}
+    ).status_code == 422
+    assert cliente_administrador.post(
+        f"/api/v1/lecturas/{creada['id']}/anulacion", json={}
+    ).status_code == 422
+
+
+def test_anular_una_lectura_la_marca_y_no_la_borra(cliente_publico, cliente_administrador, entorno):
+    creada = cliente_publico.post(
+        "/api/v1/lecturas", json=_lectura(entorno, 6.0), headers=cabecera_dispositivo()
+    ).json()
+
+    respuesta = cliente_administrador.post(
+        f"/api/v1/lecturas/{creada['id']}/anulacion", json={"motivo": MOTIVO}
+    )
+    assert respuesta.status_code == 200
+    cuerpo = respuesta.json()
+    assert cuerpo["anulada"] is True
+    assert cuerpo["motivo_anulacion"] == MOTIVO
+    assert cuerpo["anulada_por"]
+    assert cuerpo["anulada_en"]
+
+    # El dato no se pierde: la lectura sigue existiendo y se puede consultar.
+    consulta = cliente_administrador.get(f"/api/v1/lecturas/{creada['id']}")
+    assert consulta.status_code == 200
+    assert consulta.json()["anulada"] is True
+
+    # Pero deja de contarse en las consultas del panel.
+    listado = cliente_administrador.get("/api/v1/lecturas?limite=100").json()
+    assert all(lectura["id"] != creada["id"] for lectura in listado)
+
+
+def test_anular_dos_veces_es_un_conflicto(cliente_publico, cliente_administrador, entorno):
+    creada = cliente_publico.post(
+        "/api/v1/lecturas", json=_lectura(entorno, 6.0), headers=cabecera_dispositivo()
+    ).json()
+
+    assert cliente_administrador.post(
+        f"/api/v1/lecturas/{creada['id']}/anulacion", json={"motivo": MOTIVO}
+    ).status_code == 200
+    repetida = cliente_administrador.post(
+        f"/api/v1/lecturas/{creada['id']}/anulacion", json={"motivo": MOTIVO}
+    )
+    assert repetida.status_code == 409
+
+
+def test_no_hay_ruta_para_borrar_lecturas(cliente_administrador, entorno):
+    """El borrado físico no existe: la ruta que lo hacía ya no está en el contrato."""
+    respuesta = cliente_administrador.delete("/api/v1/lecturas/lectura-cualquiera")
+    assert respuesta.status_code == 405
 
 
 def test_no_se_puede_eliminar_un_modulo_con_lecturas(cliente_publico, cliente_administrador, entorno):

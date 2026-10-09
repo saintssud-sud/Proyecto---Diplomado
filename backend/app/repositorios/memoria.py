@@ -91,8 +91,9 @@ class RepositorioMemoria:
         resultado.sort(key=lambda item: item.get("timestamp") or _ahora(), reverse=True)
         return resultado[:limite]
 
-    def eliminar_lectura(self, lectura_id: str) -> bool:
-        return self._eliminar("lecturas", lectura_id)
+    def anular_lectura(self, lectura_id: str, cambios: dict[str, Any]) -> dict[str, Any] | None:
+        """Marca una lectura como anulada; no la borra (RNF-08)."""
+        return self._actualizar("lecturas", lectura_id, cambios)
 
     # --- Módulos de cultivo -------------------------------------------------
     def crear_modulo(self, datos: dict[str, Any]) -> dict[str, Any]:

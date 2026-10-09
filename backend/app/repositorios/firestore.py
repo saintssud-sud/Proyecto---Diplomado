@@ -118,12 +118,13 @@ class RepositorioFirestore:
         consulta = consulta.order_by("timestamp", direction="DESCENDING").limit(limite)
         return [self._documento(instantanea) for instantanea in consulta.stream()]  # type: ignore[misc]
 
-    def eliminar_lectura(self, lectura_id: str) -> bool:
+    def anular_lectura(self, lectura_id: str, cambios: dict[str, Any]) -> dict[str, Any] | None:
+        """Marca una lectura como anulada, con su motivo; no la borra (RNF-08)."""
         referencia = self._coleccion(COLECCION_LECTURAS).document(lectura_id)
         if not referencia.get().exists:
-            return False
-        referencia.delete()
-        return True
+            return None
+        referencia.update(cambios)
+        return self._documento(referencia.get())
 
     # --- Módulos de cultivo -------------------------------------------------
     def crear_modulo(self, datos: dict[str, Any]) -> dict[str, Any]:

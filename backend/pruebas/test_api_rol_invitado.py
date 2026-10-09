@@ -109,9 +109,11 @@ def test_el_invitado_no_puede_modificar_rangos(cliente_con_token, entorno):
     assert respuesta.json()["detalle"]["rol_actual"] == "invitado"
 
 
-def test_el_invitado_no_puede_eliminar_lecturas(cliente_con_token, entorno):
-    respuesta = cliente_con_token.delete(
-        "/api/v1/lecturas/lectura-inexistente", headers=cabecera("invitado")
+def test_el_invitado_no_puede_anular_lecturas(cliente_con_token, entorno):
+    respuesta = cliente_con_token.post(
+        "/api/v1/lecturas/lectura-inexistente/anulacion",
+        json={"motivo": "Motivo de prueba con la longitud suficiente."},
+        headers=cabecera("invitado"),
     )
 
     # El nivel de autorización se comprueba antes que la existencia del recurso.
