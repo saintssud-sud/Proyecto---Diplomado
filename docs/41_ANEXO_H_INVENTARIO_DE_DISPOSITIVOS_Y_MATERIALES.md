@@ -14,13 +14,11 @@ de la sección H.5 operan en capas gratuitas y por eso no tienen costo.
 
 **Cómo leer el estado de cada elemento:**
 
-| Estado | Significado |
-| --- | --- |
-| **En uso** | Está montado y funcionando en el módulo o en el sistema |
-| **Verificado** | Se usó en los ensayos o en la calibración, con evidencia fechada |
-| **Por adquirir** | Falta conseguirlo para completar la maqueta |
-| **Reserva** | Se tiene, pero no forma parte del montaje; queda como repuesto |
-| **Fuera de alcance** | Se evaluó y se decidió no usarlo, con su justificación |
+- **En uso**: está montado y funcionando en el módulo o en el sistema.
+- **Verificado**: se usó en los ensayos o en la calibración, con evidencia fechada.
+- **Por adquirir**: falta conseguirlo para completar la maqueta.
+- **Reserva**: se tiene, pero no forma parte del montaje; queda como repuesto.
+- **Fuera de alcance**: se evaluó y se decidió no usarlo, con su justificación.
 
 ---
 
@@ -40,6 +38,8 @@ de la sección H.5 operan en capas gratuitas y por eso no tienen costo.
 | Sensor de distancia ultrasónico | **HC-SR04** | 1 | Se evaluó para medir el nivel del depósito. Su salida `Echo` es de 5 V y exigiría un divisor; la variable de nivel quedó fuera del alcance | — | Fuera de alcance |  |
 | Sonda de temperatura de sustrato | Sonda **NTC** de termostato comercial (identificada el 23/09) | 1 | Mide la temperatura del suelo, que no es una de las seis variables; al ser resistiva exigiría su propia curva de calibración | — | Fuera de alcance |  |
 
+*Tabla H.1. Dispositivos del módulo de adquisición, con su conexión. Fuente: elaboración propia.*
+
 **Las seis variables del sistema quedan cubiertas** con los cinco dispositivos en uso: el
 PH-4502C aporta el pH; el TDS Meter, los sólidos disueltos y —por la relación
 `EC ≈ TDS ÷ 500`— la conductividad eléctrica; el DS18B20, la temperatura de la solución; y el
@@ -51,15 +51,20 @@ AM2302, la temperatura ambiental y la humedad relativa.
 
 | Elemento | Especificación | Fecha | Para qué se usó | Estado | Costo (Bs) |
 | --- | --- | --- | --- | --- | --- |
-| Patrón de conductividad | **Hanna HI7031**, 1413 µS/cm | 6 de octubre de 2026 | Calibrar y verificar la sonda de TDS: es el patrón que equivale a 707 ppm | Verificado |  |
+| Patrón de conductividad | **Hanna HI7031**, 1413 µS/cm | 6 de octubre de 2026 | Calibrar y verificar la sonda de TDS: es el patrón que equivale a 707 ppm | Verificado | 310,00 |
 | Solución patrón de pH 4,01 | Patrón trazable | 1 y 4 de octubre de 2026 | Primera recta de calibración del electrodo de pH | Verificado |  |
 | Solución patrón de pH 6,86 | Patrón trazable | 1 y 4 de octubre de 2026 | Segundo punto de calibración del electrodo de pH | Verificado |  |
-| Solución de conservación del electrodo | KCl 3 M (o Hanna HI70300) | Desde el 1 de octubre | Mantener húmedo el bulbo del electrodo entre mediciones; guardarlo seco lo deshidrata y descalibra | En uso |  |
+| Solución de conservación del electrodo | KCl 3 M (o Hanna HI70300) | Desde el 1 de octubre | Mantener húmedo el bulbo del electrodo entre mediciones; guardarlo seco lo deshidrata y descalibra | En uso | 270,00 |
 | Agua desionizada | — | Septiembre y octubre | Enjuagar las sondas entre patrones y antes de guardarlas | Verificado |  |
 | Alcohol isopropílico | — | 7 de octubre de 2026 | Limpiar la película que se había formado sobre las placas de la sonda de TDS, que causaba una lectura 16 % baja | Verificado |  |
 | Recipiente de fondo plano | Vaso o frasco de fondo fino, sin hueco en la base | Octubre | Medir el patrón. Un vaso de fondo grueso con hueco retenía agua y diluía la muestra en un 20 % | Verificado |  |
 | Multímetro | Digital | Septiembre y octubre | Verificar las tensiones antes de conectar, y medir el divisor del pH | En uso |  |
 | Termómetro de contraste | El propio **AM2302** | 27 de septiembre de 2026 | Contrastar el DS18B20 con el sensor de ambiente: el ensayo se registró como evidencia | Verificado |  |
+
+*Tabla H.2. Materiales de calibración y verificación, con la fecha de uso. Fuente: elaboración propia.*
+
+**Comprobante.** Los dos materiales anteriores y los gastos de despacho corresponden a la factura N° 3863 de Hanna Instruments Equipos Bolivia S.R.L., del 1 de octubre de 2026: Bs 310,00 por el patrón de conductividad, Bs 270,00 por la solución de almacenamiento y Bs 35,00 por el despacho, con un total de **Bs 615,00**. El comprobante escaneado acompaña este anexo.
+
 
 ---
 
@@ -89,6 +94,8 @@ compacto y contempla derrames, ruido y polvo de obra.
 | Cargador USB de 5 V | ≥ 2 A, con su cable | Alimentar el conjunto. Conviene usarlo en lugar de la computadora cuando las sondas están en el agua, para evitar lazos de masa | En uso |  |
 | Alargador o zapatilla | — | El consumo total del conjunto es del orden de 15 a 20 W | En uso |  |
 
+*Tabla H.3. Materiales de la maqueta hidropónica y su estado. Fuente: elaboración propia.*
+
 **Traslado a la defensa.** La maqueta viaja **sin agua**: se vacía el depósito, se desconecta
 y se arma de nuevo en el aula en unos cinco minutos. Las sondas de pH y de conductividad viajan
 **húmedas**, con su capuchón o en un frasco con solución de conservación.
@@ -110,6 +117,8 @@ y se arma de nuevo en el aula en unos cinco minutos. Las sondas de pH y de condu
 | Huincha métrica | — | Medir los tubos de la maqueta | En uso |  |
 | Bolsas u hojas de plástico | — | Cubrir la maqueta mientras duran los trabajos de albañilería: el polvo de cemento obstruye la bomba y ensucia las sondas | Por adquirir |  |
 
+*Tabla H.4. Insumos y herramientas del banco de pruebas. Fuente: elaboración propia.*
+
 ---
 
 ## H.5 Software, plataformas y servicios
@@ -129,6 +138,8 @@ en el apartado 2.9 del documento.
 | Render | Capa gratuita | Publicación del servicio de la API | En uso |  |
 | GitHub | Repositorio público | Control de versiones, integración continua y monitoreo de disponibilidad | En uso |  |
 
+*Tabla H.5. Software, plataformas y servicios empleados. Fuente: elaboración propia.*
+
 ---
 
 ## H.6 Lo que queda por adquirir, en orden de prioridad
@@ -144,6 +155,8 @@ en el apartado 2.9 del documento.
 | 7 | Lámpara LED de cultivo | Solo si el lugar no alcanza las horas de luz necesarias | Baja |  |
 | 8 | Bomba de aire con difusor | Mejora la oxigenación, a costa de ruido | Baja |  |
 
+*Tabla H.6. Elementos pendientes de adquisición, en orden de prioridad. Fuente: elaboración propia.*
+
 ---
 
 ## H.7 Estado de verificación del hardware
@@ -156,6 +169,8 @@ en el apartado 2.9 del documento.
 | Calibración del pH | 1 y 4 de octubre de 2026 | Patrones de 4,01 y 6,86 |  |
 | Calibración del TDS | 6 de octubre de 2026 | Patrón Hanna HI7031; factor de corrección 0,9373 aplicado en el firmware |  |
 | Limpieza de la sonda de TDS y verificación | 7 de octubre de 2026 | Se encontró la causa de un desvío del 16 %: una película sobre las placas. Tras limpiarla, la lectura volvió al valor del patrón |  |
+
+*Tabla H.7. Ensayos de verificación del hardware, con su fecha y resultado. Fuente: elaboración propia.*
 
 Las bitácoras de cada jornada de trabajo con el hardware están en el repositorio, con los
 archivos de evidencia correspondientes.
