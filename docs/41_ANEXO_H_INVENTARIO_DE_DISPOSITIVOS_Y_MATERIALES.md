@@ -31,9 +31,9 @@ de la sección H.5 operan en capas gratuitas y por eso no tienen costo.
 | Acondicionador de pH | **PH-4502C**, con electrodo de pH de conector **BNC** y capuchón de conservación | 1 | Mide el pH de la solución nutritiva | Salida `Po` → `SVP` (GPIO 36) con divisor ÷2 | En uso |  |
 | Sonda de sólidos disueltos | **TDS Meter V1.0**, con sonda de dos electrodos | 1 | Mide los sólidos disueltos totales en ppm; de ahí se deriva la conductividad eléctrica | Salida `AOUT` → `SVN` (GPIO 39) | En uso |  |
 | Sonda de temperatura de la solución | **DS18B20** sumergible, punta de acero inoxidable, bus OneWire, resolución 12 bits (0,0625 °C) | 1 | Mide la temperatura del agua; es también la que aporta la compensación por temperatura del TDS | Datos → `P32` (GPIO 32), con resistencia de pull-up a 3,3 V | En uso |  |
-| Sensor de ambiente | **AM2302 (DHT22)**, con cable de tres hilos; ±0,5 °C y ±2 % HR | 1 | Mide temperatura ambiental y humedad relativa: cubre dos variables | Datos → `P33` (GPIO 33) | En uso |  |
-| Resistencia de pull-up del sensor de ambiente | **10 kΩ** entre el hilo de datos y 3,3 V | 1 | Sin ella el AM2302 con cable no entrega lecturas | Sobre el hilo de datos del `P33` | En uso |  |
-| Divisor de tensión del pH | **Dos resistencias iguales** (del orden de 4,7 a 22 kΩ) | 2 | Baja la salida del PH-4502C —que puede superar los 3,3 V— a la tensión que admite el ESP32 | Entre `Po` y `SVP`, con la segunda a masa | En uso |  |
+| Sensor de ambiente | **AM2302**, con cable de tres hilos; ±0,5 °C y ±2 % HR | 1 | Mide temperatura ambiental y humedad relativa: cubre dos variables | Datos → `P33` (GPIO 33) | En uso |  |
+| Resistencia de pull-up del sensor de ambiente | **4,7 kΩ** entre el hilo de datos y 3,3 V | 1 | Sin ella el AM2302 con cable no entrega lecturas | Sobre el hilo de datos del `P33` | En uso |  |
+| Divisor de tensión del pH | **Dos resistencias iguales de 4,7 kΩ** | 2 | Baja la salida del PH-4502C —que puede superar los 3,3 V— a la tensión que admite el ESP32 | Entre `Po` y `SVP`, con la segunda a masa | En uso |  |
 | Sensor de ambiente (reserva) | **DHT11** en plaqueta de tres pines (o DHT22 en plaqueta, ver H.4) | 1 | Sensor de pruebas: se enchufa sin agregar resistencia. Menos preciso (±2 °C, ±5 % HR) y se satura por encima del 90 % de humedad | `P33`, misma conexión | Reserva |  |
 | Sensor de distancia ultrasónico | **HC-SR04** | 1 | Se evaluó para medir el nivel del depósito. Su salida `Echo` es de 5 V y exigiría un divisor; la variable de nivel quedó fuera del alcance | — | Fuera de alcance |  |
 | Sonda de temperatura de sustrato | Sonda **NTC** de termostato comercial (identificada el 23/09) | 1 | Mide la temperatura del suelo, que no es una de las seis variables; al ser resistiva exigiría su propia curva de calibración | — | Fuera de alcance |  |
@@ -76,9 +76,9 @@ compacto y contempla derrames, ruido y polvo de obra.
 
 | Elemento | Medida o especificación | Función | Estado | Costo (Bs) |
 | --- | --- | --- | --- | --- |
-| Tubos de PVC con orificios | 4 tubos de **90 cm**; el conjunto armado mide 73 a 74 cm de ancho | Canal de cultivo. Alcanza para 20 a 24 sitios | En uso *(a confirmar el diámetro exterior y el de los orificios)* |  |
+| Tubos de PVC con orificios | 4 tubos de **PVC de 2,5 cm de diámetro y 90 cm de largo**, con orificios de 2 cm y 1,8 cm; el conjunto armado mide 73 a 74 cm de ancho | Canal de cultivo. Alcanza para 20 a 24 sitios | En uso |  |
 | Colector y codos | Colector con codos para el retorno | Une los tubos y devuelve la solución al depósito | En uso |  |
-| Canastillas | 2 unidades | Sostienen las plantas en los orificios | En uso |  |
+| Canastillas | 20 unidades | Sostienen las plantas en los orificios | En uso |  |
 | Microtubo con goteros | — | Distribuye la solución en cada sitio de cultivo | En uso |  |
 | Manguera corrugada de retorno | 1 m | Devuelve la solución del canal al depósito | En uso |  |
 | Bomba sumergible | Bomba de corriente continua con su fuente y conector de barril | Recirculación de la solución. El sistema no la controla: funciona de forma continua o con temporizador | En uso |  |
@@ -109,8 +109,10 @@ y se arma de nuevo en el aula en unos cinco minutos. Las sondas de pH y de condu
 | Protoboard | — | Montar el circuito sin soldar durante las pruebas | En uso |  |
 | Cables dupont | Macho-macho y macho-hembra | Conexionado del banco de pruebas | En uso |  |
 | Cables USB de datos | — | Cargar el firmware y ver el Monitor Serie | En uso |  |
-| Resistencias de 4,7 kΩ | — | Pull-up del bus OneWire del DS18B20 | En uso |  |
-| Resistencias de 10 kΩ y 20 kΩ | — | Divisor de tensión del pH y pull-up del AM2302 | En uso |  |
+| Pasta para soldar | Pasta para soldar de 10 g | Apoyar el armado de las conexiones soldadas | Adquirido | 7,00 |
+| Cinta doble faz | Cinta doble faz de 1/2" | Fijar cables y componentes en el montaje | Adquirido | 35,00 |
+| Resistencias de 4,7 kΩ | — | Pull-up del bus OneWire del DS18B20, pull-up del AM2302 y divisor de tensión del pH | En uso |  |
+| Resistencias de 10 kΩ y 20 kΩ | — | Sin uso en el montaje actual: quedan disponibles para otras pruebas | Disponible |  |
 | Soldador y estaño | — | Soldar la resistencia de pull-up del AM2302, documentado con foto en la evidencia | Verificado |  |
 | Computadora | Con ESP-IDF v5.5.3 y Flutter instalados | Compilar el firmware y la aplicación | En uso |  |
 | Teléfono Android | — | Instalar el archivo instalable y comprobar la aplicación en el móvil | En uso |  |

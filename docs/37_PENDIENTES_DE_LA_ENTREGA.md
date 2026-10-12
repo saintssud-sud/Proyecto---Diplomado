@@ -90,3 +90,14 @@ Solo hay que ejecutarlo delante del docente.
 `firestore.indexes.json` incorpora el índice compuesto de `lecturas` por
 **módulo, variable y fecha**, que es el que necesitan los tres filtros juntos de la pantalla
 de historial. Ya está desplegado en el proyecto `sigvach26-bd`.
+
+---
+
+## Nota sobre las capturas y los datos personales
+
+Los correos que aparecen en las capturas (por ejemplo `mateosantos@yahoo.es` y
+`admin@sigvach.com`) son **cuentas ficticias de demostración**, no datos personales reales:
+la captura A.29 cumple la norma. El correo real del postulante es `saintssud@gmail.com`, el
+que figura en la portada y en la configuración del repositorio.
+
+Queda anotado para no volver a confundirlos.
